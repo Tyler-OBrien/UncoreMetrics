@@ -7,9 +7,28 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="EFCore.BulkExtensions" Version="6.5.4" />
     <PackageReference Include="MaxMind.GeoIP2" Version="5.1.0" />
-    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="6.0.5" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.7" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="6.0.1" />
     <PackageReference Include="Okolni.Source.Query" Version="1.2.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\UncoreMetrics.Data\UncoreMetrics.Data.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Databases\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Databases\GeoLite2-ASN.mmdb">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Databases\GeoLite2-City.mmdb">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

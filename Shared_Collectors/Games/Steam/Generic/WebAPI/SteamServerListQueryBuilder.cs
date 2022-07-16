@@ -39,6 +39,12 @@ public class SteamServerListQueryBuilder
         _stringBuilder = new StringBuilder();
     }
 
+
+    public static SteamServerListQueryBuilder New()
+    {
+        return new SteamServerListQueryBuilder();
+    }
+
     public override string ToString()
     {
         return _stringBuilder.ToString();

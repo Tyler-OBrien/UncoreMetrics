@@ -1,28 +1,60 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Net;
 using Okolni.Source.Query.Responses;
+using Shared_Collectors.Models.Tools.Maxmind;
+using UncoreMetrics.Data;
 
-namespace Shared_Collectors.Models.Games.Steam.SteamAPI
+namespace Shared_Collectors.Models.Games.Steam.SteamAPI;
+
+public class FullServerInfo
 {
-    public class FullServerInfo
+    public FullServerInfo(IPAddress address, int port, SteamListServer? server, InfoResponse? serverInfo,
+        PlayerResponse? serverPlayers, RuleResponse? serverRules, IPInformation ipInformation)
     {
-        public FullServerInfo(SteamListServer? server, InfoResponse? serverInfo, PlayerResponse? serverPlayers, RuleResponse? serverRules)
+        Address = address;
+        Port = port;
+        this.server = server;
+        this.serverInfo = serverInfo;
+        this.serverPlayers = serverPlayers;
+        this.serverRules = serverRules;
+        IpInformation = ipInformation;
+    }
+
+    public SteamListServer server { get; set; }
+    public InfoResponse serverInfo { get; set; }
+
+    public PlayerResponse? serverPlayers { get; set; }
+
+
+    public RuleResponse? serverRules { get; set; }
+
+    public IPInformation IpInformation { get; set; }
+
+    public IPAddress Address { get; set; }
+
+    public int Port { get; set; }
+
+    public GenericServer ToGenericServer()
+    {
+        return new GenericServer
         {
-            this.server = server;
-            this.serverInfo = serverInfo;
-            this.serverPlayers = serverPlayers;
-            this.serverRules = serverRules;
-        }
-        public SteamListServer? server { get; set; }
-        public InfoResponse? serverInfo { get; set; }
-
-        public PlayerResponse? serverPlayers { get; set; }
-
-
-        public RuleResponse? serverRules { get; set; }
-
+            Address = Address,
+            IpAddressBytes = Address.GetAddressBytes(),
+            QueryPort = Port,
+            AppID = server.AppID,
+            Game = server.Gamedir,
+            ASN = IpInformation?.AutonomousSystemNumber,
+            Continent = IpInformation?.Continent,
+            Country = IpInformation?.Country,
+            Timezone = IpInformation?.TimeZone,
+            ISP = IpInformation?.AutonomousSystemOrganization,
+            Latitude = IpInformation?.Latitude,
+            Longitude = IpInformation?.Longitude,
+            IsOnline = true,
+            LastCheckOnline = true,
+            LastCheck = DateTime.UtcNow,
+            MaxPlayers = serverInfo.MaxPlayers,
+            Port = serverInfo.Port ?? Port,
+            Players = serverInfo.Players
+        };
     }
 }

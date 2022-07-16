@@ -14,7 +14,10 @@ public class ServerListResponse
 
 public class SteamListServer
 {
-    /// <value>Game Server Address, including port. Example: 100.64.192.29:27320. The port here is the query port, not the game port.</value>
+    /// <value>
+    ///     Game Server Address, including port. Example: 100.64.192.29:27320. The port here is the query port, not the game
+    ///     port.
+    /// </value>
     [JsonPropertyName("addr")]
     public string Address { get; set; }
 

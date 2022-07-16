@@ -1,10 +1,6 @@
-using System.Collections.Concurrent;
-using System.Diagnostics;
-using Okolni.Source.Query;
-using Okolni.Source.Query.Responses;
+using Microsoft.EntityFrameworkCore;
 using Shared_Collectors.Games.Steam.Generic;
-using Shared_Collectors.Games.Steam.Generic.ServerQuery;
-using Shared_Collectors.Models.Games.Steam.SteamAPI;
+using UncoreMetrics.Data;
 
 namespace V_Rising_Collector;
 
@@ -13,12 +9,12 @@ public class Worker : BackgroundService
     private const string VRisingAppId = "1604030";
     private readonly ILogger<Worker> _logger;
 
-    private readonly SteamAPI _steamApi;
+    private readonly IServiceScopeFactory _scopeFactory;
 
-    public Worker(ILogger<Worker> logger)
+    public Worker(ILogger<Worker> logger, IServiceScopeFactory steamStats)
     {
         _logger = logger;
-        _steamApi = new SteamAPI("DA96ED9F43054048C6A8EADB879C1289");
+        _scopeFactory = steamStats;
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -33,10 +29,8 @@ public class Worker : BackgroundService
     }
 
 
-
     private async Task RunActions()
     {
-
         /*
             var runWith10 = await GetAllServers(10);
             Console.WriteLine($"10 Concurrency, {runWith10.Item1} Players, {runWith10.Item2}% Success");
@@ -66,8 +60,19 @@ public class Worker : BackgroundService
         Console.ReadKey(true);
         */
 
-        var servers = _steamApi.GetAndSubmit(VRisingAppId);
 
+        using var scope = _scopeFactory.CreateScope();
+
+        var steamStats = scope.ServiceProvider.GetService<IGenericSteamStats>();
+
+        var databaseContext = scope.ServiceProvider.GetService<GenericServersContext>();
+
+        var item = await databaseContext.Servers.Where(x => x.IsOnline).FirstOrDefaultAsync();
+        
+
+
+        if (steamStats == null) throw new InvalidOperationException("Cannot resolve IGenericSteamStats Service");
+
+        var servers = await steamStats.HandleGeneric(VRisingAppId);
     }
-
 }

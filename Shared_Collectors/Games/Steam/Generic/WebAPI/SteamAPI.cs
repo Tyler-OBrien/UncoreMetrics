@@ -1,16 +1,21 @@
-﻿namespace Shared_Collectors.Games.Steam.Generic;
+﻿using Microsoft.Extensions.Options;
+using Shared_Collectors.Games.Steam.Generic.WebAPI;
+using Shared_Collectors.Models;
 
-public partial class SteamAPI
+namespace Shared_Collectors.Games.Steam.Generic;
+
+public partial class SteamAPI : ISteamAPI
 {
+    private readonly BaseConfiguration _baseConfiguration;
     private readonly HttpClient _httpClient;
-    private readonly string _STEAM_API_KEY;
+    private readonly string? _STEAM_API_KEY;
 
 
-    public SteamAPI(string steamApiKey)
+    public SteamAPI(IOptions<BaseConfiguration> baseConfigurationOptions)
     {
         _httpClient = new HttpClient();
-
+        _baseConfiguration = baseConfigurationOptions.Value;
         _httpClient.BaseAddress = new Uri("https://api.steampowered.com/");
-        _STEAM_API_KEY = steamApiKey;
+        _STEAM_API_KEY = _baseConfiguration.SteamAPIKey;
     }
 }

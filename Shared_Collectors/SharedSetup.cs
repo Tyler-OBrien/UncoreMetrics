@@ -1,25 +1,27 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
-using Shared_Collectors.Databases.DataAccess;
+using Microsoft.Extensions.Hosting;
+using Shared_Collectors.Games.Steam.Generic;
+using Shared_Collectors.Games.Steam.Generic.WebAPI;
 using Shared_Collectors.Models;
 using Shared_Collectors.Tools.Maxmind;
+using UncoreMetrics.Data;
 
-namespace Shared_Collectors
+namespace Shared_Collectors;
+
+public static class SharedSetup
 {
-    public static class SharedSetup
+    public static void ConfigureSharedServices(this IServiceCollection services, HostBuilderContext hostContext)
     {
-        public static void ConfigureSharedServices(this IServiceCollection services, BaseConfiguration configuration)
-        {
-            services.AddDbContext<GenericServersContext>(options =>
-                options.UseNpgsql(configuration.PostgresConnectionString));
-            services.AddSingleton<IGeoIPService, MaxMindService>();
-        }
+        IConfiguration configuration = hostContext.Configuration.GetSection("Base");
+        var baseConfiguration = configuration.Get<BaseConfiguration>();
+        services.Configure<BaseConfiguration>(configuration);
+        services.AddSingleton<ISteamAPI, SteamAPI>();
+        services.AddDbContext<GenericServersContext>(options =>
+            options.UseNpgsql(baseConfiguration.PostgresConnectionString));
+
+        services.AddSingleton<IGeoIPService, MaxMindService>();
+        services.AddScoped<IGenericSteamStats, GenericSteamStats>();
     }
 }
