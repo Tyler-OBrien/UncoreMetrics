@@ -49,8 +49,10 @@ namespace UncoreMetrics.Data.Migrations
                     b.Property<string>("Country")
                         .HasColumnType("text");
 
+                    b.Property<int>("FailedChecks")
+                        .HasColumnType("integer");
+
                     b.Property<DateTime>("FoundAt")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Game")
@@ -66,9 +68,6 @@ namespace UncoreMetrics.Data.Migrations
                     b.Property<DateTime>("LastCheck")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<bool>("LastCheckOnline")
-                        .HasColumnType("boolean");
-
                     b.Property<double?>("Latitude")
                         .HasColumnType("double precision");
 
@@ -82,6 +81,9 @@ namespace UncoreMetrics.Data.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<DateTime>("NextCheck")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<int>("Players")
                         .HasColumnType("integer");
 
@@ -90,10 +92,13 @@ namespace UncoreMetrics.Data.Migrations
 
                     b.Property<NpgsqlTsVector>("SearchVector")
                         .IsRequired()
-                        .ValueGeneratedOnAddOrUpdate()
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("tsvector")
                         .HasAnnotation("Npgsql:TsVectorConfig", "english")
                         .HasAnnotation("Npgsql:TsVectorProperties", new[] { "Name" });
+
+                    b.Property<bool>("ServerDead")
+                        .HasColumnType("boolean");
 
                     b.Property<Guid>("ServerID")
                         .ValueGeneratedOnAdd()
@@ -110,9 +115,13 @@ namespace UncoreMetrics.Data.Migrations
 
                     b.HasIndex("IsOnline");
 
+                    b.HasIndex("NextCheck");
+
                     b.HasIndex("SearchVector");
 
                     NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("SearchVector"), "GIN");
+
+                    b.HasIndex("ServerDead");
 
                     b.ToTable("Servers", (string)null);
                 });

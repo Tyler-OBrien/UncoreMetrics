@@ -5,10 +5,10 @@ using UncoreMetrics.Data;
 
 namespace Shared_Collectors.Models.Games.Steam.SteamAPI;
 
-public class FullServerInfo
+public class DiscoveredServerInfo
 {
-    public FullServerInfo(IPAddress address, int port, SteamListServer? server, InfoResponse? serverInfo,
-        PlayerResponse? serverPlayers, RuleResponse? serverRules, IPInformation ipInformation)
+    public DiscoveredServerInfo(IPAddress address, int port, SteamListServer server, InfoResponse serverInfo,
+        PlayerResponse serverPlayers, RuleResponse? serverRules, IPInformation ipInformation)
     {
         Address = address;
         Port = port;
@@ -19,10 +19,12 @@ public class FullServerInfo
         IpInformation = ipInformation;
     }
 
+
+
     public SteamListServer server { get; set; }
     public InfoResponse serverInfo { get; set; }
 
-    public PlayerResponse? serverPlayers { get; set; }
+    public PlayerResponse serverPlayers { get; set; }
 
 
     public RuleResponse? serverRules { get; set; }
@@ -33,7 +35,7 @@ public class FullServerInfo
 
     public int Port { get; set; }
 
-    public GenericServer ToGenericServer()
+    public GenericServer ToGenericServer(int nextCheckSeconds)
     {
         return new GenericServer
         {
@@ -50,11 +52,16 @@ public class FullServerInfo
             Latitude = IpInformation?.Latitude,
             Longitude = IpInformation?.Longitude,
             IsOnline = true,
-            LastCheckOnline = true,
+            ServerDead = false,
             LastCheck = DateTime.UtcNow,
             MaxPlayers = serverInfo.MaxPlayers,
             Port = serverInfo.Port ?? Port,
-            Players = serverInfo.Players
+            Players = serverPlayers?.Players?.Count ?? serverInfo.Players,
+            FoundAt = DateTime.UtcNow,
+            Name = server.Name,
+            ServerID = Guid.NewGuid(),
+            NextCheck = DateTime.UtcNow.AddSeconds(30),
+            FailedChecks = 0
         };
     }
 }

@@ -7,6 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Games\Steam\GenericSteamStats.Discovery.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="EFCore.BulkExtensions" Version="6.5.4" />
     <PackageReference Include="MaxMind.GeoIP2" Version="5.1.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.7" />
@@ -20,6 +24,10 @@
 
   <ItemGroup>
     <Folder Include="Databases\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="Games\Steam\Generic\GenericSteamStats.Discovery.cs" />
   </ItemGroup>
 
   <ItemGroup>

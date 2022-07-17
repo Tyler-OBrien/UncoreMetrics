@@ -13,7 +13,8 @@ public class GenericServer
 
     [Required] public string Name { get; set; }
 
-    [Required] public NpgsqlTsVector SearchVector { get; set; }
+    [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
+    public NpgsqlTsVector SearchVector { get; set; }
 
 
     [Required] public string Game { get; set; }
@@ -53,11 +54,15 @@ public class GenericServer
 
     [Required] public bool IsOnline { get; set; }
 
-    [Required] public bool LastCheckOnline { get; set; }
+    [Required] public bool ServerDead { get; set; }
+
 
     [Required] public DateTime LastCheck { get; set; }
 
+    [Required] public DateTime NextCheck { get; set; }
+
+    [Required] public int FailedChecks { get; set; }
+
     [Required]
-    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public DateTime FoundAt { get; set; }
 }

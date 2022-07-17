@@ -36,8 +36,10 @@ namespace UncoreMetrics.Data.Migrations
                     Continent = table.Column<string>(type: "text", nullable: true),
                     Timezone = table.Column<string>(type: "text", nullable: true),
                     IsOnline = table.Column<bool>(type: "boolean", nullable: false),
-                    LastCheckOnline = table.Column<bool>(type: "boolean", nullable: false),
+                    ServerDead = table.Column<bool>(type: "boolean", nullable: false),
                     LastCheck = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    NextCheck = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    FailedChecks = table.Column<int>(type: "integer", nullable: false),
                     FoundAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
@@ -61,10 +63,20 @@ namespace UncoreMetrics.Data.Migrations
                 column: "IsOnline");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Servers_NextCheck",
+                table: "Servers",
+                column: "NextCheck");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Servers_SearchVector",
                 table: "Servers",
                 column: "SearchVector")
                 .Annotation("Npgsql:IndexMethod", "GIN");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Servers_ServerDead",
+                table: "Servers",
+                column: "ServerDead");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)

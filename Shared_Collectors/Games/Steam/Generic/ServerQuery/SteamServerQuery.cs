@@ -31,10 +31,12 @@ public static class SteamServerQuery
             conn.Host = Host;
 
             conn.Port = Port;
+            conn.ReceiveTimeout = 500;
+            conn.SendTimeout = 500;
 
-            await conn.ConnectAsync(5000);
+            conn.Setup();
 
-            var info = await conn.GetInfoAsync(0); // Get the Server info
+            var info = await conn.GetInfoAsync(5); // Get the Server info
 
             return info;
         }
@@ -59,12 +61,12 @@ public static class SteamServerQuery
 
 
             conn.Host = Host;
-
             conn.Port = Port;
+            conn.ReceiveTimeout = 500;
+            conn.SendTimeout = 500;
+            conn.Setup();
 
-            await conn.ConnectAsync(5000);
-
-            var players = await conn.GetPlayersAsync(0); // Get the Server info
+            var players = await conn.GetPlayersAsync(5); // Get the Server info
 
             return players;
         }
@@ -91,10 +93,12 @@ public static class SteamServerQuery
             conn.Host = Host;
 
             conn.Port = Port;
+            conn.ReceiveTimeout = 500;
+            conn.SendTimeout = 500;
 
-            await conn.ConnectAsync(5000);
+            conn.Setup();
 
-            var rules = await conn.GetRulesAsync(0); // Get the Server info
+            var rules = await conn.GetRulesAsync(5); // Get the Server info
 
             return rules;
         }
