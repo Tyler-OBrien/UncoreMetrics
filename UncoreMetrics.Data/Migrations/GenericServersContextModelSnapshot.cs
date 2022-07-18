@@ -74,8 +74,8 @@ namespace UncoreMetrics.Data.Migrations
                     b.Property<double?>("Longitude")
                         .HasColumnType("double precision");
 
-                    b.Property<int>("MaxPlayers")
-                        .HasColumnType("integer");
+                    b.Property<long>("MaxPlayers")
+                        .HasColumnType("bigint");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -84,8 +84,8 @@ namespace UncoreMetrics.Data.Migrations
                     b.Property<DateTime>("NextCheck")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<int>("Players")
-                        .HasColumnType("integer");
+                    b.Property<long>("Players")
+                        .HasColumnType("bigint");
 
                     b.Property<int>("QueryPort")
                         .HasColumnType("integer");

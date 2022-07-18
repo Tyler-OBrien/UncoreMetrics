@@ -34,9 +34,9 @@ public class GenericServer
 
     [Required] public int QueryPort { get; set; }
 
-    [Required] public int Players { get; set; }
+    [Required] public uint Players { get; set; }
 
-    [Required] public int MaxPlayers { get; set; }
+    [Required] public uint MaxPlayers { get; set; }
 
     public long? ASN { get; set; }
 

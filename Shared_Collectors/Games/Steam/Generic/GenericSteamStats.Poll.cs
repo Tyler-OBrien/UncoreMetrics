@@ -44,7 +44,7 @@ namespace Shared_Collectors.Games.Steam.Generic
             var bulkConfig = new BulkConfig()
             {
                 PropertiesToExclude = new List<string>() { "SearchVector" },
-                PropertiesToExcludeOnUpdate = new List<string>() { "FoundAt", "ServerID" }
+                PropertiesToExcludeOnUpdate = new List<string>() { "FoundAt", "ServerID", "SearchVector" }
             };
 
 
@@ -93,12 +93,11 @@ namespace Shared_Collectors.Games.Steam.Generic
                     try
                     {
                         await concurrencySemaphore.WaitAsync();
-                        var Port = server.Port;
+                        var Port = server.QueryPort;
                         var HostStr = server.Address.ToString();
                         var infoTask = SteamServerQuery.GetServerInfo(HostStr, Port);
                         var rulesTask = SteamServerQuery.GetRules(HostStr, Port);
                         var playersTask = SteamServerQuery.GetPlayers(HostStr, Port);
-                        var GetIPInformation = await _geoIpService.GetIpInformation(HostStr);
                         await Task.WhenAll(infoTask, rulesTask, playersTask);
                         var (info, rules, players) = (infoTask.Result, rulesTask.Result, playersTask.Result);
                         if (info != null && rules != null && players != null)
@@ -144,6 +143,8 @@ namespace Shared_Collectors.Games.Steam.Generic
             while (await Task.WhenAny(waitAll, Task.Delay(1000)) != waitAll)
             {
                 Console.Write("Status Update: ");
+                ThreadPool.GetAvailableThreads(out int maxWorkerThreads, out int maxCompletionPortThreads);
+                Console.WriteLine($"Threads: {ThreadPool.ThreadCount} Threads, maxWorker: {maxWorkerThreads}, maxCompletion: {maxCompletionPortThreads} ");
                 if (tasks.Count != 0)
                     Console.Write(
                         $"Finished {totalCompleted}/{tasks.Count} ({(int)Math.Round(totalCompleted / (double)tasks.Count * 100)}%)");

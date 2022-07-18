@@ -46,7 +46,7 @@ namespace Shared_Collectors.Games.Steam.Generic
             var bulkConfig = new BulkConfig()
             {
                 PropertiesToExclude = new List<string>() { "SearchVector" },
-                PropertiesToExcludeOnUpdate = new List<string>() { "FoundAt", "ServerID" }
+                PropertiesToExcludeOnUpdate = new List<string>() { "FoundAt", "ServerID", "SearchVector" }
             };
 
 
@@ -72,29 +72,75 @@ namespace Shared_Collectors.Games.Steam.Generic
         {
             var serverInfos = new ConcurrentBag<DiscoveredServerInfo>();
             var stopwatch = Stopwatch.StartNew();
+
+
+
+
             // Might want to make this configurable eventually..
             var maxConcurrency = 2046;
             // Windows performs much worse with that many sockets..
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
-                maxConcurrency = 512;
+                maxConcurrency = 100;
             }
 
 
             var concurrencySemaphore = new SemaphoreSlim(maxConcurrency);
 
+
+
+
+
             var tasks = new ConcurrentBag<Task>();
             var successfullyCompleted = 0;
             var failed = 0;
             var totalCompleted = 0;
+
+            await QueueTasks(tasks, servers, serverInfos, concurrencySemaphore, successfullyCompleted, failed,
+                totalCompleted);
+
+            
+            var waitAll = Task.WhenAll(tasks.ToArray());
+            while (await Task.WhenAny(waitAll, Task.Delay(1000)) != waitAll)
+            {
+                Console.Write("Status Update: ");
+                ThreadPool.GetAvailableThreads(out int maxWorkerThreads, out int maxCompletionPortThreads);
+                Console.WriteLine($"Threads: {ThreadPool.ThreadCount} Threads, maxWorker: {maxWorkerThreads}, maxCompletion: {maxCompletionPortThreads} ");
+                if (tasks.Count != 0)
+                    Console.Write(
+                        $"Finished {totalCompleted}/{tasks.Count} ({(int)Math.Round(totalCompleted / (double)tasks.Count * 100)}%)");
+
+                Console.Write($" Failed: {failed}, Successful {successfullyCompleted}");
+                if (failed != 0)
+                    Console.WriteLine($" ({(int)Math.Round(successfullyCompleted / (double)totalCompleted * 100)}%)");
+                else
+                    Console.WriteLine(" (100%)");
+            }
+
+            concurrencySemaphore.Dispose();
+
+
+            stopwatch.Stop();
+            Console.WriteLine($"Took {stopwatch.ElapsedMilliseconds}ms to get {servers.Count} server infos from list");
+            Console.WriteLine("-----------------------------------------");
+            Console.WriteLine(
+                $"We were able to connect to {serverInfos.Count} out of {servers.Count} {(int)Math.Round(serverInfos.Count / (double)servers.Count * 100)}%");
+            Console.WriteLine(
+                $"Total Players: {serverInfos.Sum(info => info.serverInfo?.Players)}, Total Servers: {serverInfos.Count}");
+            return serverInfos.ToList();
+        }
+
+        public async Task QueueTasks(ConcurrentBag<Task> tasks, List<SteamListServer> servers, ConcurrentBag<DiscoveredServerInfo> serverInfos, SemaphoreSlim concurrencySemaphore, int successfullyCompleted, int failed, int totalCompleted)
+        {
             Console.WriteLine("Queueing Tasks");
+
             foreach (var server in servers)
             {
+                await concurrencySemaphore.WaitAsync();
                 var newTask = Task.Run(async () =>
                 {
                     try
                     {
-                        await concurrencySemaphore.WaitAsync();
                         var (Host, Port) = SteamServerQuery.ParseIPAndPort(server.Address);
                         var HostStr = Host.ToString();
                         var infoTask = SteamServerQuery.GetServerInfo(HostStr, Port);
@@ -134,37 +180,9 @@ namespace Shared_Collectors.Games.Steam.Generic
                 });
 
                 tasks.Add(newTask);
+                Console.WriteLine($"Finished queueing all {tasks.Count} tasks to get server info..");
+
             }
-
-            Console.WriteLine($"Finished queueing all {tasks.Count} tasks to get server info..");
-
-
-            var waitAll = Task.WhenAll(tasks.ToArray());
-            while (await Task.WhenAny(waitAll, Task.Delay(1000)) != waitAll)
-            {
-                Console.Write("Status Update: ");
-                if (tasks.Count != 0)
-                    Console.Write(
-                        $"Finished {totalCompleted}/{tasks.Count} ({(int)Math.Round(totalCompleted / (double)tasks.Count * 100)}%)");
-
-                Console.Write($" Failed: {failed}, Successful {successfullyCompleted}");
-                if (failed != 0)
-                    Console.WriteLine($" ({(int)Math.Round(successfullyCompleted / (double)totalCompleted * 100)}%)");
-                else
-                    Console.WriteLine(" (100%)");
-            }
-
-            concurrencySemaphore.Dispose();
-
-
-            stopwatch.Stop();
-            Console.WriteLine($"Took {stopwatch.ElapsedMilliseconds}ms to get {servers.Count} server infos from list");
-            Console.WriteLine("-----------------------------------------");
-            Console.WriteLine(
-                $"We were able to connect to {serverInfos.Count} out of {servers.Count} {(int)Math.Round(serverInfos.Count / (double)servers.Count * 100)}%");
-            Console.WriteLine(
-                $"Total Players: {serverInfos.Sum(info => info.serverInfo?.Players)}, Total Servers: {serverInfos.Count}");
-            return serverInfos.ToList();
         }
     }
 }

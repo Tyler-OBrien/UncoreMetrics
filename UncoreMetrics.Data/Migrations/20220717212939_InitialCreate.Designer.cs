@@ -14,7 +14,7 @@ using UncoreMetrics.Data;
 namespace UncoreMetrics.Data.Migrations
 {
     [DbContext(typeof(GenericServersContext))]
-    [Migration("20220717014705_InitialCreate")]
+    [Migration("20220717212939_InitialCreate")]
     partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -76,8 +76,8 @@ namespace UncoreMetrics.Data.Migrations
                     b.Property<double?>("Longitude")
                         .HasColumnType("double precision");
 
-                    b.Property<int>("MaxPlayers")
-                        .HasColumnType("integer");
+                    b.Property<long>("MaxPlayers")
+                        .HasColumnType("bigint");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -86,8 +86,8 @@ namespace UncoreMetrics.Data.Migrations
                     b.Property<DateTime>("NextCheck")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<int>("Players")
-                        .HasColumnType("integer");
+                    b.Property<long>("Players")
+                        .HasColumnType("bigint");
 
                     b.Property<int>("QueryPort")
                         .HasColumnType("integer");

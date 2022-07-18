@@ -56,7 +56,7 @@ public class DiscoveredServerInfo
             LastCheck = DateTime.UtcNow,
             MaxPlayers = serverInfo.MaxPlayers,
             Port = serverInfo.Port ?? Port,
-            Players = serverPlayers?.Players?.Count ?? serverInfo.Players,
+            Players =  (uint)serverPlayers.Players.Count,
             FoundAt = DateTime.UtcNow,
             Name = server.Name,
             ServerID = Guid.NewGuid(),

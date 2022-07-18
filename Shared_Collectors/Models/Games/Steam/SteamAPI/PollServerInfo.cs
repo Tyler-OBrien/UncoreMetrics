@@ -60,7 +60,7 @@ namespace Shared_Collectors.Models.Games.Steam.SteamAPI
             {
                 server.NextCheck = DateTime.UtcNow.AddSeconds(nextCheckSeconds);
                 server.FailedChecks = 0;
-                server.Players = serverPlayers?.Players.Count ?? serverInfo.Players;
+                server.Players = serverPlayers != null ? (uint)serverPlayers.Players.Count : serverInfo.Players;
                 server.MaxPlayers = serverInfo.MaxPlayers;
                 server.AppID = serverInfo.HasGameID ? (long)serverInfo.GameID : server.AppID;
                 server.IsOnline = true;

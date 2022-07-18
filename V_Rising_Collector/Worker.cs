@@ -53,7 +53,7 @@ public class Worker : BackgroundService
             Console.WriteLine("----------------------");
             Console.WriteLine("Starting Discovery...");
             Console.WriteLine("----------------------");
-            _nextDiscoveryTime = _nextDiscoveryTime.AddSeconds(SECONDS_BETWEEN_DISCOVERY);
+            _nextDiscoveryTime = DateTime.UtcNow.AddSeconds(SECONDS_BETWEEN_DISCOVERY);
             var servers = await steamStats.GenericServerDiscovery(VRisingAppId);
             Console.WriteLine("----------------------");
             Console.WriteLine($"Discovery Complete... Found {servers.Count} Servers.");
