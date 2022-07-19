@@ -21,7 +21,40 @@ public static class SteamServerQuery
         return new ValueTuple<IPAddress, int>(ipAddress, port);
     }
 
-    public static async Task<InfoResponse?> GetServerInfo(string Host, int Port)
+
+    public static InfoResponse? GetServerInfo(string Host, int Port)
+    {
+        try
+        {
+            using var conn = new QueryConnection();
+
+
+            conn.Host = Host;
+
+            conn.Port = Port;
+            conn.ReceiveTimeout = 500;
+            conn.SendTimeout = 500;
+
+            conn.Setup();
+
+            var info = conn.GetInfo(5); // Get the Server info
+
+            return info;
+        }
+        catch (TimeoutException)
+        {
+            return null;
+        }
+
+        catch (SourceQueryException)
+        {
+            return null;
+        }
+
+        return null;
+    }
+
+    public static async Task<InfoResponse?> GetServerInfoAsync(string Host, int Port)
     {
         try
         {
@@ -53,7 +86,38 @@ public static class SteamServerQuery
         return null;
     }
 
-    public static async Task<PlayerResponse?> GetPlayers(string Host, int Port)
+
+    public static PlayerResponse? GetPlayers(string Host, int Port)
+    {
+        try
+        {
+            using var conn = new QueryConnection();
+
+
+            conn.Host = Host;
+            conn.Port = Port;
+            conn.ReceiveTimeout = 500;
+            conn.SendTimeout = 500;
+            conn.Setup();
+
+            var players =  conn.GetPlayers(5); // Get the Server info
+
+            return players;
+        }
+        catch (TimeoutException)
+        {
+            return null;
+        }
+
+        catch (SourceQueryException)
+        {
+            return null;
+        }
+
+        return null;
+    }
+
+    public static async Task<PlayerResponse?> GetPlayersAsync(string Host, int Port)
     {
         try
         {
@@ -83,7 +147,40 @@ public static class SteamServerQuery
         return null;
     }
 
-    public static async Task<RuleResponse?> GetRules(string Host, int Port)
+
+    public static RuleResponse? GetRules(string Host, int Port)
+    {
+        try
+        {
+            using var conn = new QueryConnection();
+
+
+            conn.Host = Host;
+
+            conn.Port = Port;
+            conn.ReceiveTimeout = 500;
+            conn.SendTimeout = 500;
+
+            conn.Setup();
+
+            var rules = conn.GetRules(5); // Get the Server info
+
+            return rules;
+        }
+        catch (TimeoutException)
+        {
+            return null;
+        }
+
+        catch (SourceQueryException)
+        {
+            return null;
+        }
+
+        return null;
+    }
+
+    public static async Task<RuleResponse?> GetRulesAsync(string Host, int Port)
     {
         try
         {

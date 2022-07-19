@@ -23,7 +23,7 @@ namespace UncoreMetrics.Data.Migrations
                         .Annotation("Npgsql:TsVectorConfig", "english")
                         .Annotation("Npgsql:TsVectorProperties", new[] { "Name" }),
                     Game = table.Column<string>(type: "text", nullable: false),
-                    AppID = table.Column<long>(type: "bigint", nullable: false),
+                    AppID = table.Column<decimal>(type: "numeric(20,0)", nullable: false),
                     Address = table.Column<IPAddress>(type: "inet", nullable: false),
                     QueryPort = table.Column<int>(type: "integer", nullable: false),
                     Players = table.Column<long>(type: "bigint", nullable: false),

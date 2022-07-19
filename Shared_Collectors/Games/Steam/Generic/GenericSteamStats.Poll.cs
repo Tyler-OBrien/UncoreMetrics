@@ -7,14 +7,58 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using EFCore.BulkExtensions;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Shared_Collectors.Games.Steam.Generic.ServerQuery;
 using Shared_Collectors.Games.Steam.Generic.WebAPI;
+using Shared_Collectors.Helpers;
 using Shared_Collectors.Models.Games.Steam.SteamAPI;
+using Shared_Collectors.Tools.Maxmind;
 using UncoreMetrics.Data;
 
 namespace Shared_Collectors.Games.Steam.Generic
 {
+
+    public class PollSolver : IGenericAsyncSolver<GenericServer, PollServerInfo>
+    {
+
+        public async Task<PollServerInfo?> Solve(GenericServer server)
+        {
+            try
+            {
+                var Port = server.QueryPort;
+                var HostStr = server.Address.ToString();
+                var info = await SteamServerQuery.GetServerInfoAsync(HostStr, Port);
+                var rules = await SteamServerQuery.GetRulesAsync(HostStr, Port);
+                var players = await SteamServerQuery.GetPlayersAsync(HostStr, Port);
+
+                if (info != null && rules != null && players != null)
+                {
+                    return (new PollServerInfo(server, info, players, rules));
+
+                }
+                else
+                {
+#if DEBUG
+                    Console.WriteLine($"Failed to get {server.Address} - {server.Name} - {server.LastCheck}");
+#endif
+                    return null;
+                }
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Unexpected error" + ex.ToString());
+#if DEBUG
+                Console.WriteLine($"Failed to get {server.Address} - {server.Name} - {server.LastCheck}");
+#endif
+                return null;
+            }
+
+            return null;
+        }
+    }
+
     public partial class GenericSteamStats : IGenericSteamStats
     {
         /// <summary>
@@ -23,7 +67,7 @@ namespace Shared_Collectors.Games.Steam.Generic
         /// </summary>
         /// <param name="appID"></param>
         /// <returns>Returns a list of full server info to be actioned on with stats for that specific server type</returns>
-        public async Task<List<PollServerInfo>> GenericServerPoll(long appID)
+        public async Task<List<PollServerInfo>> GenericServerPoll(ulong appID)
         {
             if (_steamApi == null) throw new NullReferenceException("Steam API cannot be null to use HandleGeneric");
 
@@ -44,119 +88,47 @@ namespace Shared_Collectors.Games.Steam.Generic
             var bulkConfig = new BulkConfig()
             {
                 PropertiesToExclude = new List<string>() { "SearchVector" },
-                PropertiesToExcludeOnUpdate = new List<string>() { "FoundAt", "ServerID", "SearchVector" }
+                PropertiesToExcludeOnUpdate = new List<string>() { "FoundAt", "ServerID", "SearchVector" },
+                UseTempDB = false,
             };
 
 
 
             var genericServers = fullServers.Select(fullserver => fullserver.UpdateGenericServer(_configuration.SecondsBetweenChecks, _configuration.SecondsBetweenFailedChecks, _configuration.DaysUntilServerMarkedDead)).ToList();
-            await _genericServersContext.BulkUpdateAsync(genericServers, bulkConfig, obj =>
+            await _genericServersContext.BulkInsertOrUpdateAsync(genericServers, bulkConfig, obj =>
             {
 #if DEBUG
                 Console.WriteLine($"BulkInsertOrUpdateAsync Progress {obj}%...");
 #endif
             }, null, CancellationToken.None);
-            await _genericServersContext.BulkSaveChangesAsync(bulkConfig, obj =>
-            {
-#if DEBUG
-                Console.WriteLine($"BulkSaveChangesAsync Progress {obj}%...");
-#endif
-            });
         }
 
 
 
         private async Task<List<PollServerInfo>> GetAllServersPoll(List<GenericServer> servers)
         {
-            var serverInfos = new ConcurrentBag<PollServerInfo>();
             var stopwatch = Stopwatch.StartNew();
             // Might want to make this configurable eventually..
-            var maxConcurrency = 2046;
-            // Windows performs much worse with that many sockets..
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            var maxConcurrency = 100;
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
             {
-                maxConcurrency = 512;
+                // Linux doesn't seem to need one thread per connection..
+                maxConcurrency = 1024;
             }
 
 
-            var concurrencySemaphore = new SemaphoreSlim(maxConcurrency);
+            var newSolver = new PollSolver();
 
-            var tasks = new ConcurrentBag<Task>();
-            var successfullyCompleted = 0;
-            var failed = 0;
-            var totalCompleted = 0;
-            Console.WriteLine("Queueing Tasks");
-            foreach (var server in servers)
+            var queue = new AsyncResolveQueue<GenericServer, PollServerInfo>(servers, maxConcurrency, newSolver);
+
+
+            while (!queue.Done)
             {
-                var newTask = Task.Run(async () =>
-                {
-                    try
-                    {
-                        await concurrencySemaphore.WaitAsync();
-                        var Port = server.QueryPort;
-                        var HostStr = server.Address.ToString();
-                        var infoTask = SteamServerQuery.GetServerInfo(HostStr, Port);
-                        var rulesTask = SteamServerQuery.GetRules(HostStr, Port);
-                        var playersTask = SteamServerQuery.GetPlayers(HostStr, Port);
-                        await Task.WhenAll(infoTask, rulesTask, playersTask);
-                        var (info, rules, players) = (infoTask.Result, rulesTask.Result, playersTask.Result);
-                        if (info != null && rules != null && players != null)
-                        {
-                            Interlocked.Increment(ref successfullyCompleted);
-                        }
-                        else
-                        {
-#if DEBUG
-                            Console.WriteLine($"Failed to get {server.Address} - {server.Name} - {server.LastCheck}");
-#endif
-                            Interlocked.Increment(ref failed);
-                        }
-                        serverInfos.Add(new PollServerInfo(server, info, players, rules));
-
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine("Unexpected error" + ex.ToString());
-#if DEBUG
-                        Console.WriteLine($"Failed to get {server.Address} - {server.Name} - {server.LastCheck}");
-#endif
-                        Interlocked.Increment(ref failed);
-                        serverInfos.Add(new PollServerInfo(server, null, null, null));
-                    }
-                    finally
-                    {
-
-                        Interlocked.Increment(ref totalCompleted);
-
-                        concurrencySemaphore.Release();
-                    }
-
-                });
-
-                tasks.Add(newTask);
+                LogStatus(servers.Count, queue.Completed, queue.Failed, queue.Successful, maxConcurrency, queue.Running);
+                await Task.Delay(1000);
             }
-
-            Console.WriteLine($"Finished queueing all {tasks.Count} tasks to get server info..");
-
-
-            var waitAll = Task.WhenAll(tasks.ToArray());
-            while (await Task.WhenAny(waitAll, Task.Delay(1000)) != waitAll)
-            {
-                Console.Write("Status Update: ");
-                ThreadPool.GetAvailableThreads(out int maxWorkerThreads, out int maxCompletionPortThreads);
-                Console.WriteLine($"Threads: {ThreadPool.ThreadCount} Threads, maxWorker: {maxWorkerThreads}, maxCompletion: {maxCompletionPortThreads} ");
-                if (tasks.Count != 0)
-                    Console.Write(
-                        $"Finished {totalCompleted}/{tasks.Count} ({(int)Math.Round(totalCompleted / (double)tasks.Count * 100)}%)");
-
-                Console.Write($" Failed: {failed}, Successful {successfullyCompleted}");
-                if (failed != 0)
-                    Console.WriteLine($" ({(int)Math.Round(successfullyCompleted / (double)totalCompleted * 100)}%)");
-                else
-                    Console.WriteLine(" (100%)");
-            }
-
-            concurrencySemaphore.Dispose();
+            queue.Dispose();
+            var serverInfos = queue.Outgoing;
 
 
             stopwatch.Stop();

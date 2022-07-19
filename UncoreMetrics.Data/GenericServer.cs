@@ -19,7 +19,7 @@ public class GenericServer
 
     [Required] public string Game { get; set; }
 
-    [Required] public long AppID { get; set; }
+    [Required] public ulong AppID { get; set; }
 
 
     [Required]

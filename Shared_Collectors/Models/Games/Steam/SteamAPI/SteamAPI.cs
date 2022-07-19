@@ -38,7 +38,7 @@ public class SteamListServer
     /// <value>Application ID of the server. Example: Valve CS:GO EU West Server (srcds119-fra2.271.306)</value>
 
     [JsonPropertyName("appid")]
-    public long AppID { get; set; }
+    public ulong AppID { get; set; }
 
     /// <value>Game Directory / Game Name of the server. Example: csgo</value>
 

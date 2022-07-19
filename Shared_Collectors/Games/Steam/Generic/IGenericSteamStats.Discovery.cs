@@ -15,6 +15,6 @@ namespace Shared_Collectors.Games.Steam.Generic
         /// </summary>
         /// <param name="appID"></param>
         /// <returns>Returns a list of full server info to be actioned on with stats for that specific server type</returns>
-        public Task<List<DiscoveredServerInfo>> GenericServerDiscovery(long appID);
+        public Task<List<DiscoveredServerInfo>> GenericServerDiscovery(ulong appID);
     }
 }

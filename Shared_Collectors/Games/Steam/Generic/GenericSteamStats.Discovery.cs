@@ -9,10 +9,56 @@ using System.Threading.Tasks;
 using EFCore.BulkExtensions;
 using Shared_Collectors.Games.Steam.Generic.ServerQuery;
 using Shared_Collectors.Games.Steam.Generic.WebAPI;
+using Shared_Collectors.Helpers;
 using Shared_Collectors.Models.Games.Steam.SteamAPI;
+using Shared_Collectors.Tools.Maxmind;
 
 namespace Shared_Collectors.Games.Steam.Generic
 {
+    public class DiscoverySolver : IGenericAsyncSolver<SteamListServer, DiscoveredServerInfo>
+    {
+        private readonly IGeoIPService _geoIpService;
+
+        public DiscoverySolver(IGeoIPService geoIpService)
+        {
+            _geoIpService = geoIpService;
+        }
+
+        public async Task<DiscoveredServerInfo?> Solve(SteamListServer server)
+        {
+            try
+            {
+                var (Host, Port) = SteamServerQuery.ParseIPAndPort(server.Address);
+                var HostStr = Host.ToString();
+                var info = await SteamServerQuery.GetServerInfoAsync(HostStr, Port);
+                var rules  = await SteamServerQuery.GetRulesAsync(HostStr, Port);
+                var players = await SteamServerQuery.GetPlayersAsync(HostStr, Port);
+                var geoIpInformation = await _geoIpService.GetIpInformation(HostStr);
+                if (info != null && rules != null && players != null)
+                {
+                    return new DiscoveredServerInfo(Host, Port, server, info, players, rules, geoIpInformation);
+                }
+                else
+                {
+#if DEBUG
+                    Console.WriteLine($"Failed to get {server.Address} - {server.Name} - {server.SteamID}");
+#endif
+                    return null;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Unexpected error" + ex.ToString());
+#if DEBUG
+                Console.WriteLine($"Failed to get {server.Address} - {server.Name} - {server.SteamID}");
+#endif
+                return null;
+            }
+
+            return null;
+        }
+    }
+
     public partial class GenericSteamStats : IGenericSteamStats
     {
         /// <summary>
@@ -21,7 +67,7 @@ namespace Shared_Collectors.Games.Steam.Generic
         /// </summary>
         /// <param name="appID"></param>
         /// <returns>Returns a list of full server info to be actioned on with stats for that specific server type</returns>
-        public async Task<List<DiscoveredServerInfo>> GenericServerDiscovery(long appID)
+        public async Task<List<DiscoveredServerInfo>> GenericServerDiscovery(ulong appID)
         {
             if (_steamApi == null) throw new NullReferenceException("Steam API cannot be null to use HandleGeneric");
 
@@ -58,66 +104,42 @@ namespace Shared_Collectors.Games.Steam.Generic
                 Console.WriteLine($"BulkInsertOrUpdateAsync Progress {obj}%...");
 #endif
             }, null, CancellationToken.None);
-            await _genericServersContext.BulkSaveChangesAsync(bulkConfig, obj =>
-            {
-#if DEBUG
-                Console.WriteLine($"BulkSaveChangesAsync Progress {obj}%...");
-#endif
-            });
         }
 
 
 
         private async Task<List<DiscoveredServerInfo>> GetAllServersDiscovery(List<SteamListServer> servers)
         {
-            var serverInfos = new ConcurrentBag<DiscoveredServerInfo>();
             var stopwatch = Stopwatch.StartNew();
 
 
 
 
             // Might want to make this configurable eventually..
-            var maxConcurrency = 2046;
-            // Windows performs much worse with that many sockets..
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            var maxConcurrency = 100;
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
             {
-                maxConcurrency = 100;
+                // Linux doesn't seem to need one thread per connection..
+                maxConcurrency = 1024;
             }
 
 
-            var concurrencySemaphore = new SemaphoreSlim(maxConcurrency);
 
 
+            Console.WriteLine("Queueing Tasks");
 
+            var newSolver = new DiscoverySolver(_geoIpService);
 
+            var queue = new AsyncResolveQueue<SteamListServer, DiscoveredServerInfo>(servers, maxConcurrency, newSolver);
 
-            var tasks = new ConcurrentBag<Task>();
-            var successfullyCompleted = 0;
-            var failed = 0;
-            var totalCompleted = 0;
-
-            await QueueTasks(tasks, servers, serverInfos, concurrencySemaphore, successfullyCompleted, failed,
-                totalCompleted);
-
-            
-            var waitAll = Task.WhenAll(tasks.ToArray());
-            while (await Task.WhenAny(waitAll, Task.Delay(1000)) != waitAll)
+            while (!queue.Done)
             {
-                Console.Write("Status Update: ");
-                ThreadPool.GetAvailableThreads(out int maxWorkerThreads, out int maxCompletionPortThreads);
-                Console.WriteLine($"Threads: {ThreadPool.ThreadCount} Threads, maxWorker: {maxWorkerThreads}, maxCompletion: {maxCompletionPortThreads} ");
-                if (tasks.Count != 0)
-                    Console.Write(
-                        $"Finished {totalCompleted}/{tasks.Count} ({(int)Math.Round(totalCompleted / (double)tasks.Count * 100)}%)");
-
-                Console.Write($" Failed: {failed}, Successful {successfullyCompleted}");
-                if (failed != 0)
-                    Console.WriteLine($" ({(int)Math.Round(successfullyCompleted / (double)totalCompleted * 100)}%)");
-                else
-                    Console.WriteLine(" (100%)");
+                LogStatus(servers.Count, queue.Completed, queue.Failed, queue.Successful, maxConcurrency,
+                    queue.Running);
+                await Task.Delay(1000);
             }
-
-            concurrencySemaphore.Dispose();
+            queue.Dispose();
+            var serverInfos = queue.Outgoing.ToList();
 
 
             stopwatch.Stop();
@@ -127,62 +149,31 @@ namespace Shared_Collectors.Games.Steam.Generic
                 $"We were able to connect to {serverInfos.Count} out of {servers.Count} {(int)Math.Round(serverInfos.Count / (double)servers.Count * 100)}%");
             Console.WriteLine(
                 $"Total Players: {serverInfos.Sum(info => info.serverInfo?.Players)}, Total Servers: {serverInfos.Count}");
-            return serverInfos.ToList();
+            return serverInfos;
         }
 
-        public async Task QueueTasks(ConcurrentBag<Task> tasks, List<SteamListServer> servers, ConcurrentBag<DiscoveredServerInfo> serverInfos, SemaphoreSlim concurrencySemaphore, int successfullyCompleted, int failed, int totalCompleted)
+        private void LogStatus(int tasksCount, int totalCompleted, int failed, int successfullyCompleted, int concurrencyLimit, int totalQueued = 0)
         {
-            Console.WriteLine("Queueing Tasks");
-
-            foreach (var server in servers)
+            Console.Write("Status Update: ");
+            ThreadPool.GetAvailableThreads(out int maxWorkerThreads, out int maxCompletionPortThreads);
+            Console.WriteLine($"Threads: {ThreadPool.ThreadCount} Threads, maxWorker: {maxWorkerThreads}, maxCompletion: {maxCompletionPortThreads} ");
+            if (tasksCount != 0)
             {
-                await concurrencySemaphore.WaitAsync();
-                var newTask = Task.Run(async () =>
+                Console.Write(
+                    $"Finished {totalCompleted}/{tasksCount} ({(int)Math.Round(totalCompleted / (double)tasksCount * 100)}%)");
+                if (totalQueued != 0)
                 {
-                    try
-                    {
-                        var (Host, Port) = SteamServerQuery.ParseIPAndPort(server.Address);
-                        var HostStr = Host.ToString();
-                        var infoTask = SteamServerQuery.GetServerInfo(HostStr, Port);
-                        var rulesTask = SteamServerQuery.GetRules(HostStr, Port);
-                        var playersTask = SteamServerQuery.GetPlayers(HostStr, Port);
-                        var GetIPInformation = await _geoIpService.GetIpInformation(HostStr);
-                        await Task.WhenAll(infoTask, rulesTask, playersTask);
-                        var (info, rules, players) = (infoTask.Result, rulesTask.Result, playersTask.Result);
-                        if (info != null && rules != null && players != null)
-                        {
-                            serverInfos.Add(new DiscoveredServerInfo(Host, Port, server, info, players, rules, GetIPInformation));
-                            Interlocked.Increment(ref successfullyCompleted);
-                        }
-                        else
-                        {
-#if DEBUG
-                            Console.WriteLine($"Failed to get {server.Address} - {server.Name} - {server.SteamID}");
-#endif
-                            Interlocked.Increment(ref failed);
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine("Unexpected error" + ex.ToString());
-#if DEBUG
-                        Console.WriteLine($"Failed to get {server.Address} - {server.Name} - {server.SteamID}");
-#endif
-                        Interlocked.Increment(ref failed);
-                    }
-                    finally
-                    {
-                        Interlocked.Increment(ref totalCompleted);
-
-                        concurrencySemaphore.Release();
-                    }
-
-                });
-
-                tasks.Add(newTask);
-                Console.WriteLine($"Finished queueing all {tasks.Count} tasks to get server info..");
+                    Console.Write($" Queued: {totalQueued}/{concurrencyLimit} ({(int)Math.Round((totalQueued) / (double)(concurrencyLimit) * 100)}%) ");
+                }
 
             }
+
+            Console.Write($" Failed: {failed}, Successful {successfullyCompleted}");
+            if (failed != 0)
+                Console.WriteLine($" ({(int)Math.Round(successfullyCompleted / (double)totalCompleted * 100)}%)");
+            else
+                Console.WriteLine(" (100%)");
         }
+
     }
 }

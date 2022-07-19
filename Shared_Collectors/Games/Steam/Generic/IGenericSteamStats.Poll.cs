@@ -9,7 +9,7 @@ namespace Shared_Collectors.Games.Steam.Generic
 {
     public partial interface IGenericSteamStats
     {
-        public Task<List<PollServerInfo>> GenericServerPoll(long appID);
+        public Task<List<PollServerInfo>> GenericServerPoll(ulong appID);
 
     }
 }

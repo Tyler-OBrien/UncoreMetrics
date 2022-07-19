@@ -40,8 +40,8 @@ namespace UncoreMetrics.Data.Migrations
                         .IsRequired()
                         .HasColumnType("inet");
 
-                    b.Property<long>("AppID")
-                        .HasColumnType("bigint");
+                    b.Property<decimal>("AppID")
+                        .HasColumnType("numeric(20,0)");
 
                     b.Property<string>("Continent")
                         .HasColumnType("text");

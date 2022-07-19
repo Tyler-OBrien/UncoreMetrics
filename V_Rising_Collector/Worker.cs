@@ -6,7 +6,7 @@ namespace V_Rising_Collector;
 
 public class Worker : BackgroundService
 {
-    private const long VRisingAppId = 1604030;
+    private const ulong VRisingAppId = 1604030;
     private readonly ILogger<Worker> _logger;
 
     private readonly IServiceScopeFactory _scopeFactory;
@@ -43,6 +43,7 @@ public class Worker : BackgroundService
         using var scope = _scopeFactory.CreateScope();
 
         var steamStats = scope.ServiceProvider.GetService<IGenericSteamStats>();
+
 
 
         if (steamStats == null) throw new InvalidOperationException("Cannot resolve IGenericSteamStats Service");

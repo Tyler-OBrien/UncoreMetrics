@@ -14,7 +14,7 @@ using UncoreMetrics.Data;
 namespace UncoreMetrics.Data.Migrations
 {
     [DbContext(typeof(GenericServersContext))]
-    [Migration("20220717212939_InitialCreate")]
+    [Migration("20220719012958_InitialCreate")]
     partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -42,8 +42,8 @@ namespace UncoreMetrics.Data.Migrations
                         .IsRequired()
                         .HasColumnType("inet");
 
-                    b.Property<long>("AppID")
-                        .HasColumnType("bigint");
+                    b.Property<decimal>("AppID")
+                        .HasColumnType("numeric(20,0)");
 
                     b.Property<string>("Continent")
                         .HasColumnType("text");

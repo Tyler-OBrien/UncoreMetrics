@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+using NpgsqlTypes;
 using Okolni.Source.Query.Responses;
 using Shared_Collectors.Models.Tools.Maxmind;
 using UncoreMetrics.Data;
@@ -35,6 +36,7 @@ namespace Shared_Collectors.Models.Games.Steam.SteamAPI
 
         public GenericServer UpdateGenericServer(int nextCheckSeconds, List<int> nextCheckFailed, int daysUntilServerMarkedAsDead)
         {
+            server.ASN = 69;
             if (serverInfo == null)
             {
                 server.FailedChecks += 1;
@@ -62,9 +64,10 @@ namespace Shared_Collectors.Models.Games.Steam.SteamAPI
                 server.FailedChecks = 0;
                 server.Players = serverPlayers != null ? (uint)serverPlayers.Players.Count : serverInfo.Players;
                 server.MaxPlayers = serverInfo.MaxPlayers;
-                server.AppID = serverInfo.HasGameID ? (long)serverInfo.GameID : server.AppID;
+                server.AppID = serverInfo.GameID ?? server.AppID;
                 server.IsOnline = true;
                 server.Game = serverInfo.Game;
+                server.Name = serverInfo.Name;
             }
 
             return server;

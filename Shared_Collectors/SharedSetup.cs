@@ -24,4 +24,6 @@ public static class SharedSetup
         services.AddSingleton<IGeoIPService, MaxMindService>();
         services.AddScoped<IGenericSteamStats, GenericSteamStats>();
     }
+
+
 }
