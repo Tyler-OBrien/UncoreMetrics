@@ -61,7 +61,8 @@ namespace Shared_Collectors.Helpers
             Interlocked.Add(ref _incomingItems, items.Count());
             for (int i = 0; i < workerCount; i++)
             {
-                Consume(_tokenSource.Token);
+                Consume(_tokenSource.Token).ContinueWith(t => Console.WriteLine(t.Exception),
+                    TaskContinuationOptions.OnlyOnFaulted).ContinueWith(t => Console.WriteLine($"Worker exited safely {t.Status}"), TaskContinuationOptions.OnlyOnRanToCompletion); ;
             }
         }
 

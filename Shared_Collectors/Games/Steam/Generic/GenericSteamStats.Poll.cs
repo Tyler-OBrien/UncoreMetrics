@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using EFCore.BulkExtensions;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using Okolni.Source.Query.Source;
 using Shared_Collectors.Games.Steam.Generic.ServerQuery;
 using Shared_Collectors.Games.Steam.Generic.WebAPI;
 using Shared_Collectors.Helpers;
@@ -19,11 +20,12 @@ using UncoreMetrics.Data;
 namespace Shared_Collectors.Games.Steam.Generic
 {
 
-    public class PollSolver : IGenericAsyncSolver<GenericServer, PollServerInfo>
+    public class PollSolver : IGenericAsyncSolver<QueryPoolItem<GenericServer>, PollServerInfo>
     {
 
-        public async Task<PollServerInfo?> Solve(GenericServer server)
+        public async Task<PollServerInfo?> Solve(QueryPoolItem<GenericServer> item)
         {
+            var server = item.Item;
             try
             {
                 var Port = server.QueryPort;
@@ -109,7 +111,7 @@ namespace Shared_Collectors.Games.Steam.Generic
         {
             var stopwatch = Stopwatch.StartNew();
             // Might want to make this configurable eventually..
-            var maxConcurrency = 100;
+            var maxConcurrency = 1024;
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
             {
                 // Linux doesn't seem to need one thread per connection..
@@ -118,8 +120,9 @@ namespace Shared_Collectors.Games.Steam.Generic
 
 
             var newSolver = new PollSolver();
+            var pool = new QueryConnectionPool();
 
-            var queue = new AsyncResolveQueue<GenericServer, PollServerInfo>(servers, maxConcurrency, newSolver);
+            var queue = new AsyncResolveQueue<QueryPoolItem<GenericServer>, PollServerInfo>(servers.Select(server => new QueryPoolItem<GenericServer>(pool, server)), maxConcurrency, newSolver);
 
 
             while (!queue.Done)
@@ -129,6 +132,7 @@ namespace Shared_Collectors.Games.Steam.Generic
             }
             queue.Dispose();
             var serverInfos = queue.Outgoing;
+            pool.Dispose();
 
 
             stopwatch.Stop();

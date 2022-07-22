@@ -7,6 +7,8 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using EFCore.BulkExtensions;
+using Microsoft.Extensions.Hosting;
+using Okolni.Source.Query.Source;
 using Shared_Collectors.Games.Steam.Generic.ServerQuery;
 using Shared_Collectors.Games.Steam.Generic.WebAPI;
 using Shared_Collectors.Helpers;
@@ -15,7 +17,7 @@ using Shared_Collectors.Tools.Maxmind;
 
 namespace Shared_Collectors.Games.Steam.Generic
 {
-    public class DiscoverySolver : IGenericAsyncSolver<SteamListServer, DiscoveredServerInfo>
+    public class DiscoverySolver : IGenericAsyncSolver<QueryPoolItem<SteamListServer>, DiscoveredServerInfo>
     {
         private readonly IGeoIPService _geoIpService;
 
@@ -24,8 +26,9 @@ namespace Shared_Collectors.Games.Steam.Generic
             _geoIpService = geoIpService;
         }
 
-        public async Task<DiscoveredServerInfo?> Solve(SteamListServer server)
+        public async Task<DiscoveredServerInfo?> Solve(QueryPoolItem<SteamListServer> poolItem)
         {
+            var server = poolItem.Item;
             try
             {
                 var (Host, Port) = SteamServerQuery.ParseIPAndPort(server.Address);
@@ -116,7 +119,7 @@ namespace Shared_Collectors.Games.Steam.Generic
 
 
             // Might want to make this configurable eventually..
-            var maxConcurrency = 100;
+            var maxConcurrency = 1024;
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
             {
                 // Linux doesn't seem to need one thread per connection..
@@ -129,8 +132,10 @@ namespace Shared_Collectors.Games.Steam.Generic
             Console.WriteLine("Queueing Tasks");
 
             var newSolver = new DiscoverySolver(_geoIpService);
+            var pool = new QueryConnectionPool();
 
-            var queue = new AsyncResolveQueue<SteamListServer, DiscoveredServerInfo>(servers, maxConcurrency, newSolver);
+
+            var queue = new AsyncResolveQueue<QueryPoolItem<SteamListServer>, DiscoveredServerInfo>(servers.Select(server => new QueryPoolItem<SteamListServer>(pool, server)), maxConcurrency, newSolver);
 
             while (!queue.Done)
             {
@@ -140,7 +145,7 @@ namespace Shared_Collectors.Games.Steam.Generic
             }
             queue.Dispose();
             var serverInfos = queue.Outgoing.ToList();
-
+            pool.Dispose();
 
             stopwatch.Stop();
             Console.WriteLine($"Took {stopwatch.ElapsedMilliseconds}ms to get {servers.Count} server infos from list");
