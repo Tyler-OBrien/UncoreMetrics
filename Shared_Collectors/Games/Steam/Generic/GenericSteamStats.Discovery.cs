@@ -119,7 +119,7 @@ namespace Shared_Collectors.Games.Steam.Generic
 
 
             // Might want to make this configurable eventually..
-            var maxConcurrency = 1024;
+            var maxConcurrency = 512;
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
             {
                 // Linux doesn't seem to need one thread per connection..
