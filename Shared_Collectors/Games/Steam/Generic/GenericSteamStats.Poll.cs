@@ -121,6 +121,8 @@ namespace Shared_Collectors.Games.Steam.Generic
 
             var newSolver = new PollSolver();
             var pool = new QueryConnectionPool();
+            pool.ReceiveTimeout = 750;
+            pool.SendTimeout = 750;
             pool.Message += msg =>
             {
                 Console.WriteLine("Pool Message" + msg);
@@ -133,13 +135,20 @@ namespace Shared_Collectors.Games.Steam.Generic
             pool.Setup();
             var queue = new AsyncResolveQueue<QueryPoolItem<GenericServer>, PollServerInfo>(servers.Select(server => new QueryPoolItem<GenericServer>(pool, server)), maxConcurrency, newSolver);
 
-            // Wait a max of 300 seconds...
+            // Wait a max of 60 seconds...
             int delayCount = 0;
-            while (!queue.Done && delayCount < 300)
+            while (!queue.Done && delayCount <= 500)
             {
-                LogStatus(servers.Count, queue.Completed, queue.Failed, queue.Successful, maxConcurrency, queue.Running);
+
+  
+
+                LogStatus(pool, servers.Count, queue.Completed, queue.Failed, queue.Successful, maxConcurrency, queue.Running);
                 await Task.Delay(1000);
                 delayCount++;
+            }
+            if (delayCount >= 60)
+            {
+                Console.WriteLine($"[Warning] Operation timed out, reached {delayCount} Seconds, so we terminated. ");
             }
             queue.Dispose();
             var serverInfos = queue.Outgoing;

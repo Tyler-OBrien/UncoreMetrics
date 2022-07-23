@@ -135,6 +135,8 @@ namespace Shared_Collectors.Games.Steam.Generic
 
             var newSolver = new DiscoverySolver(_geoIpService);
             var pool = new QueryConnectionPool();
+            pool.ReceiveTimeout = 750;
+            pool.SendTimeout = 750;
             pool.Message += msg =>
             {
                 Console.WriteLine("Pool Message" + msg);
@@ -148,14 +150,23 @@ namespace Shared_Collectors.Games.Steam.Generic
 
             var queue = new AsyncResolveQueue<QueryPoolItem<SteamListServer>, DiscoveredServerInfo>(servers.Select(server => new QueryPoolItem<SteamListServer>(pool, server)), maxConcurrency, newSolver);
 
-            // Wait a max of 300 seconds...
+            // Wait a max of 60 seconds...
             int delayCount = 0;
-            while (!queue.Done && delayCount < 300)
+            while (!queue.Done && delayCount <= 60)
             {
-                LogStatus(servers.Count, queue.Completed, queue.Failed, queue.Successful, maxConcurrency,
+
+
+
+
+                LogStatus(pool, servers.Count, queue.Completed, queue.Failed, queue.Successful, maxConcurrency,
                     queue.Running);
                 await Task.Delay(1000);
                 delayCount++;
+            }
+
+            if (delayCount >= 60)
+            {
+                Console.WriteLine($"[Warning] Operation timed out, reached {delayCount} Seconds, so we terminated. ");
             }
             queue.Dispose();
             var serverInfos = queue.Outgoing.ToList();
@@ -171,11 +182,12 @@ namespace Shared_Collectors.Games.Steam.Generic
             return serverInfos;
         }
 
-        private void LogStatus(int tasksCount, int totalCompleted, int failed, int successfullyCompleted, int concurrencyLimit, int totalQueued = 0)
+        private void LogStatus(QueryConnectionPool pool, int tasksCount, int totalCompleted, int failed, int successfullyCompleted, int concurrencyLimit, int totalQueued = 0)
         {
             Console.Write("Status Update: ");
-            ThreadPool.GetAvailableThreads(out int maxWorkerThreads, out int maxCompletionPortThreads);
-            Console.WriteLine($"Threads: {ThreadPool.ThreadCount} Threads, maxWorker: {maxWorkerThreads}, maxCompletion: {maxCompletionPortThreads} ");
+            ThreadPool.GetAvailableThreads(out int workerThreads, out int completionPortThreads);
+            Console.WriteLine($"Threads: {ThreadPool.ThreadCount} Threads, Available Workers: {workerThreads}, Available Completion: {completionPortThreads}");
+            Console.WriteLine($"Connection Pool Running Queries: {pool.Running}, Pool Waiting Queries: {pool.WaitingForResponse}");
             if (tasksCount != 0)
             {
                 Console.Write(
