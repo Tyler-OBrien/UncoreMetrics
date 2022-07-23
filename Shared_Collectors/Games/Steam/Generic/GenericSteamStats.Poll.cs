@@ -133,9 +133,9 @@ namespace Shared_Collectors.Games.Steam.Generic
             pool.Setup();
             var queue = new AsyncResolveQueue<QueryPoolItem<GenericServer>, PollServerInfo>(servers.Select(server => new QueryPoolItem<GenericServer>(pool, server)), maxConcurrency, newSolver);
 
-            // Wait a max of 60 seconds...
+            // Wait a max of 300 seconds...
             int delayCount = 0;
-            while (!queue.Done && delayCount < 60)
+            while (!queue.Done && delayCount < 300)
             {
                 LogStatus(servers.Count, queue.Completed, queue.Failed, queue.Successful, maxConcurrency, queue.Running);
                 await Task.Delay(1000);

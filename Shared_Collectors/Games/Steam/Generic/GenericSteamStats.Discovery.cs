@@ -148,9 +148,9 @@ namespace Shared_Collectors.Games.Steam.Generic
 
             var queue = new AsyncResolveQueue<QueryPoolItem<SteamListServer>, DiscoveredServerInfo>(servers.Select(server => new QueryPoolItem<SteamListServer>(pool, server)), maxConcurrency, newSolver);
 
-            // Wait a max of 60 seconds...
+            // Wait a max of 300 seconds...
             int delayCount = 0;
-            while (!queue.Done && delayCount < 60)
+            while (!queue.Done && delayCount < 300)
             {
                 LogStatus(servers.Count, queue.Completed, queue.Failed, queue.Successful, maxConcurrency,
                     queue.Running);
