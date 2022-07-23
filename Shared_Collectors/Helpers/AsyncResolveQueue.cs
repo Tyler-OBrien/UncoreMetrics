@@ -143,6 +143,16 @@ namespace Shared_Collectors.Helpers
             _tokenSource.Dispose();
         }
 
+        public TIn? Peek()
+        {
+            if (this._incoming.TryPeek(out var result))
+            {
+                return result;
+            }
+
+            return default(TIn);
+        }
+
   
     }
 }
