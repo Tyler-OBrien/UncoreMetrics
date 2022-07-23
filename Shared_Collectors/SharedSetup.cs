@@ -23,7 +23,14 @@ public static class SharedSetup
 
         services.AddSingleton<IGeoIPService, MaxMindService>();
         services.AddScoped<IGenericSteamStats, GenericSteamStats>();
+
+
+        TaskScheduler.UnobservedTaskException += TaskSchedulerOnUnobservedTaskException; 
     }
 
-
+    private static void TaskSchedulerOnUnobservedTaskException(object? sender, UnobservedTaskExceptionEventArgs e)
+    {
+        Console.WriteLine($"[ERROR] Unobserved Error: {e} - {e.Exception}");
+        throw e.Exception;
+    }
 }
