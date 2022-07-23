@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Net;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
@@ -29,14 +30,15 @@ namespace Shared_Collectors.Games.Steam.Generic
         public async Task<DiscoveredServerInfo?> Solve(QueryPoolItem<SteamListServer> poolItem)
         {
             var server = poolItem.Item;
+            var pool = poolItem.QueryConnectionPool;
             try
             {
                 var (Host, Port) = SteamServerQuery.ParseIPAndPort(server.Address);
-                var HostStr = Host.ToString();
-                var info = await SteamServerQuery.GetServerInfoAsync(HostStr, Port);
-                var rules  = await SteamServerQuery.GetRulesAsync(HostStr, Port);
-                var players = await SteamServerQuery.GetPlayersAsync(HostStr, Port);
-                var geoIpInformation = await _geoIpService.GetIpInformation(HostStr);
+                var endPoint = new IPEndPoint(Host, Port);
+                var info = await pool.GetServerInfoSafeAsync(endPoint);
+                var rules  = await pool.GetRulesSafeAsync(endPoint);
+                var players = await pool.GetPlayersSafeAsync(endPoint);
+                var geoIpInformation = await _geoIpService.GetIpInformation(Host.ToString());
                 if (info != null && rules != null && players != null)
                 {
                     return new DiscoveredServerInfo(Host, Port, server, info, players, rules, geoIpInformation);
@@ -133,7 +135,16 @@ namespace Shared_Collectors.Games.Steam.Generic
 
             var newSolver = new DiscoverySolver(_geoIpService);
             var pool = new QueryConnectionPool();
-
+            pool.Message += msg =>
+            {
+                Console.WriteLine("Pool Message" + msg);
+            };
+            pool.Error += exception =>
+            {
+                Console.WriteLine("Exception from pool: " +  exception);
+                throw exception;
+            };
+            pool.Setup();
 
             var queue = new AsyncResolveQueue<QueryPoolItem<SteamListServer>, DiscoveredServerInfo>(servers.Select(server => new QueryPoolItem<SteamListServer>(pool, server)), maxConcurrency, newSolver);
 

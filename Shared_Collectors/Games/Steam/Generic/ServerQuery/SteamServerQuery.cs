@@ -1,7 +1,9 @@
 ﻿using System.Net;
+using Microsoft.Extensions.Hosting;
 using Okolni.Source.Common;
 using Okolni.Source.Query;
 using Okolni.Source.Query.Responses;
+using Okolni.Source.Query.Source;
 
 namespace Shared_Collectors.Games.Steam.Generic.ServerQuery;
 
@@ -22,54 +24,14 @@ public static class SteamServerQuery
     }
 
 
-    public static InfoResponse? GetServerInfo(string Host, int Port)
+
+
+    public static async Task<InfoResponse?> GetServerInfoSafeAsync(this IQueryConnectionPool pool, IPEndPoint endPoint)
     {
         try
         {
-            using var conn = new QueryConnection();
 
-
-            conn.Host = Host;
-
-            conn.Port = Port;
-            conn.ReceiveTimeout = 500;
-            conn.SendTimeout = 500;
-
-            conn.Setup();
-
-            var info = conn.GetInfo(5); // Get the Server info
-
-            return info;
-        }
-        catch (TimeoutException)
-        {
-            return null;
-        }
-
-        catch (SourceQueryException)
-        {
-            return null;
-        }
-
-        return null;
-    }
-
-    public static async Task<InfoResponse?> GetServerInfoAsync(string Host, int Port)
-    {
-        try
-        {
-            using var conn = new QueryConnection();
-
-
-            conn.Host = Host;
-
-            conn.Port = Port;
-            conn.ReceiveTimeout = 500;
-            conn.SendTimeout = 500;
-
-            conn.Setup();
-
-            var info = await conn.GetInfoAsync(5); // Get the Server info
+            var info = await pool.GetInfoAsync(endPoint, 5); // Get the Server info
 
             return info;
         }
@@ -87,50 +49,13 @@ public static class SteamServerQuery
     }
 
 
-    public static PlayerResponse? GetPlayers(string Host, int Port)
+
+    public static async Task<PlayerResponse?> GetPlayersSafeAsync(this IQueryConnectionPool pool, IPEndPoint endPoint)
     {
         try
         {
-            using var conn = new QueryConnection();
 
-
-            conn.Host = Host;
-            conn.Port = Port;
-            conn.ReceiveTimeout = 500;
-            conn.SendTimeout = 500;
-            conn.Setup();
-
-            var players =  conn.GetPlayers(5); // Get the Server info
-
-            return players;
-        }
-        catch (TimeoutException)
-        {
-            return null;
-        }
-
-        catch (SourceQueryException)
-        {
-            return null;
-        }
-
-        return null;
-    }
-
-    public static async Task<PlayerResponse?> GetPlayersAsync(string Host, int Port)
-    {
-        try
-        {
-            using var conn = new QueryConnection();
-
-
-            conn.Host = Host;
-            conn.Port = Port;
-            conn.ReceiveTimeout = 500;
-            conn.SendTimeout = 500;
-            conn.Setup();
-
-            var players = await conn.GetPlayersAsync(5); // Get the Server info
+            var players = await pool.GetPlayersAsync(endPoint, 5); // Get the Server info
 
             return players;
         }
@@ -148,54 +73,14 @@ public static class SteamServerQuery
     }
 
 
-    public static RuleResponse? GetRules(string Host, int Port)
+
+
+    public static async Task<RuleResponse?> GetRulesSafeAsync(this IQueryConnectionPool pool, IPEndPoint endPoint)
     {
         try
         {
-            using var conn = new QueryConnection();
 
-
-            conn.Host = Host;
-
-            conn.Port = Port;
-            conn.ReceiveTimeout = 500;
-            conn.SendTimeout = 500;
-
-            conn.Setup();
-
-            var rules = conn.GetRules(5); // Get the Server info
-
-            return rules;
-        }
-        catch (TimeoutException)
-        {
-            return null;
-        }
-
-        catch (SourceQueryException)
-        {
-            return null;
-        }
-
-        return null;
-    }
-
-    public static async Task<RuleResponse?> GetRulesAsync(string Host, int Port)
-    {
-        try
-        {
-            using var conn = new QueryConnection();
-
-
-            conn.Host = Host;
-
-            conn.Port = Port;
-            conn.ReceiveTimeout = 500;
-            conn.SendTimeout = 500;
-
-            conn.Setup();
-
-            var rules = await conn.GetRulesAsync(5); // Get the Server info
+            var rules = await pool.GetRulesAsync(endPoint, 5); // Get the Server info
 
             return rules;
         }

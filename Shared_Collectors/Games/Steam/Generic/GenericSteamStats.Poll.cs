@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Net;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
@@ -26,13 +27,13 @@ namespace Shared_Collectors.Games.Steam.Generic
         public async Task<PollServerInfo?> Solve(QueryPoolItem<GenericServer> item)
         {
             var server = item.Item;
+            var pool = item.QueryConnectionPool;
             try
             {
-                var Port = server.QueryPort;
-                var HostStr = server.Address.ToString();
-                var info = await SteamServerQuery.GetServerInfoAsync(HostStr, Port);
-                var rules = await SteamServerQuery.GetRulesAsync(HostStr, Port);
-                var players = await SteamServerQuery.GetPlayersAsync(HostStr, Port);
+                var endPoint = new IPEndPoint(server.Address, server.QueryPort);
+                var info = await pool.GetServerInfoSafeAsync(endPoint);
+                var rules = await pool.GetRulesSafeAsync(endPoint);
+                var players = await pool.GetPlayersSafeAsync(endPoint);
 
                 if (info != null && rules != null && players != null)
                 {
@@ -118,10 +119,18 @@ namespace Shared_Collectors.Games.Steam.Generic
                 maxConcurrency = 1024;
             }
 
-
             var newSolver = new PollSolver();
             var pool = new QueryConnectionPool();
-
+            pool.Message += msg =>
+            {
+                Console.WriteLine("Pool Message" + msg);
+            };
+            pool.Error += exception =>
+            {
+                Console.WriteLine("Exception from pool: " + exception);
+                throw exception;
+            }; 
+            pool.Setup();
             var queue = new AsyncResolveQueue<QueryPoolItem<GenericServer>, PollServerInfo>(servers.Select(server => new QueryPoolItem<GenericServer>(pool, server)), maxConcurrency, newSolver);
 
 

@@ -11,6 +11,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="Databases\GeoLite2-ASN.mmdb" />
+    <None Remove="Databases\GeoLite2-City.mmdb" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="EFCore.BulkExtensions" Version="6.5.4" />
     <PackageReference Include="MaxMind.GeoIP2" Version="5.1.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.7" />
@@ -23,20 +28,16 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Databases\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <None Include="Games\Steam\Generic\GenericSteamStats.Discovery.cs" />
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="Databases\GeoLite2-ASN.mmdb">
+    <Resource Include="Databases\GeoLite2-ASN.mmdb">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Databases\GeoLite2-City.mmdb">
+    </Resource>
+    <Resource Include="Databases\GeoLite2-City.mmdb">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
+    </Resource>
   </ItemGroup>
 
 </Project>
