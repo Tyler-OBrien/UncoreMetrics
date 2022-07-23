@@ -60,7 +60,7 @@ public class DiscoveredServerInfo
             FoundAt = DateTime.UtcNow,
             Name = server.Name,
             ServerID = Guid.NewGuid(),
-            NextCheck = DateTime.UtcNow.AddSeconds(30),
+            NextCheck = DateTime.UtcNow.AddSeconds(Random.Shared.Next(30, 90)),
             FailedChecks = 0
         };
     }
