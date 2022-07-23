@@ -30,7 +30,7 @@ public static class SharedSetup
 
     private static void TaskSchedulerOnUnobservedTaskException(object? sender, UnobservedTaskExceptionEventArgs e)
     {
-        Console.WriteLine($"[ERROR] Unobserved Error: {e} - {e.Exception}");
+        Console.WriteLine($"[ERROR] Unobserved Error: {e} - {e.Exception} - {sender}");
         throw e.Exception;
     }
 }
