@@ -5,17 +5,17 @@ VisualStudioVersion = 17.2.32519.379
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Collector_Services", "Collector_Services", "{6BA5B9D6-F869-4231-8207-6F990CDDE85C}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "V_Rising_Collector", "Collector_Services\V_Rising_Collector\V_Rising_Collector.csproj", "{5AA56B10-7441-4B91-AFF1-9CFB4437A0EE}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shared_Collectors", "Collector_Services\Shared_Collectors\Shared_Collectors.csproj", "{48C8DBC8-A102-4D0E-AE80-7AAE5B3660D9}"
+EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Integration_Services", "Integration_Services", "{FDE0F169-7104-49A4-8BB3-3A81DAA71846}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Web_Services", "Web_Services", "{FEE2070E-977D-4884-8FC6-B2B8870CB4D8}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "V_Rising_Collector", "V_Rising_Collector\V_Rising_Collector.csproj", "{5AA56B10-7441-4B91-AFF1-9CFB4437A0EE}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shared_Collectors", "Shared_Collectors\Shared_Collectors.csproj", "{48C8DBC8-A102-4D0E-AE80-7AAE5B3660D9}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Data_Services", "Data_Services", "{59D666AC-21AC-4E6A-ABDC-0217EA5AB0F2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UncoreMetrics.Data", "UncoreMetrics.Data\UncoreMetrics.Data.csproj", "{6F98F9BC-DA17-4F10-AFC2-92263ECB53AC}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UncoreMetrics.Data", "Data_Services\UncoreMetrics.Data\UncoreMetrics.Data.csproj", "{6F98F9BC-DA17-4F10-AFC2-92263ECB53AC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
