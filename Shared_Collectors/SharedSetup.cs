@@ -25,7 +25,7 @@ public static class SharedSetup
         services.AddScoped<IGenericSteamStats, GenericSteamStats>();
 
 
-        TaskScheduler.UnobservedTaskException += TaskSchedulerOnUnobservedTaskException; 
+        TaskScheduler.UnobservedTaskException += TaskSchedulerOnUnobservedTaskException;
     }
 
     private static void TaskSchedulerOnUnobservedTaskException(object? sender, UnobservedTaskExceptionEventArgs e)

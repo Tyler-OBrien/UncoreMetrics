@@ -1,132 +1,84 @@
-﻿using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Concurrent;
 
-namespace Shared_Collectors.Helpers
+namespace Shared_Collectors.Helpers;
+
+public class ResolveQueue<TIn, TOut> : IDisposable
 {
-    public class ResolveQueue<TIn, TOut> : IDisposable
+    private readonly IGenericSolver<TIn, TOut> _solvingMethod;
+    private int _completed;
+    private int _failed;
+    private readonly BlockingCollection<TIn> _incoming = new();
+    private int _incomingItems;
+    private int _running;
+    private int _successful;
+
+
+    public ResolveQueue(IEnumerable<TIn> items, int workerCount, IGenericSolver<TIn, TOut> solver)
     {
-        BlockingCollection<TIn> _incoming = new BlockingCollection<TIn>();
+        _solvingMethod = solver;
 
-        public ConcurrentBag<TOut> Outgoing { get; private set; } = new ConcurrentBag<TOut>();
-
-        private readonly IGenericSolver<TIn, TOut> _solvingMethod;
-        private int _failed;
-        private int _successful;
-        private int _completed;
-        private int _incomingItems;
-        private int _running;
-
-        public int Failed
-        {
-            get => _failed;
-        }
-
-        public int Successful
-        {
-            get => _successful;
-        }
-
-        public int Completed
-        {
-            get => _completed;
-        }
-
-        public int IncomingItems
-        {
-            get => _incomingItems;
-        }
-
-        public int Running
-        {
-            get => _running;
-        }
+        _incoming = new BlockingCollection<TIn>(new ConcurrentQueue<TIn>(items));
+        Interlocked.Add(ref _incomingItems, items.Count());
+        for (var i = 0; i < workerCount; i++) Task.Factory.StartNew(Consume);
+    }
 
 
-        public ResolveQueue(IEnumerable<TIn> items, int workerCount, IGenericSolver<TIn, TOut> solver)
-        {
+    public ResolveQueue(int workerCount, IGenericSolver<TIn, TOut> solver)
+    {
+        for (var i = 0; i < workerCount; i++) Task.Factory.StartNew(Consume);
 
-            _solvingMethod = solver;
+        _solvingMethod = solver;
+    }
 
-            _incoming = new BlockingCollection<TIn>(new ConcurrentQueue<TIn>(items));
-            Interlocked.Add(ref _incomingItems, items.Count());
-            for (int i = 0; i < workerCount; i++)
+    public ConcurrentBag<TOut> Outgoing { get; } = new();
+
+    public int Failed => _failed;
+
+    public int Successful => _successful;
+
+    public int Completed => _completed;
+
+    public int IncomingItems => _incomingItems;
+
+    public int Running => _running;
+
+    public int QueueCount => _incoming.Count;
+
+    public bool Done => _incomingItems == _completed;
+
+    public void Dispose()
+    {
+        _incoming.CompleteAdding();
+    }
+
+    public void Add(TIn incoming)
+    {
+        _incoming.Add(incoming);
+        Interlocked.Increment(ref _incomingItems);
+    }
+
+
+    private void Consume()
+    {
+        foreach (var item in _incoming.GetConsumingEnumerable())
+            try
             {
-                Task.Factory.StartNew(Consume);
-            }
-        }
-
-
-        public ResolveQueue(int workerCount, IGenericSolver<TIn, TOut> solver)
-        {
-            for (int i = 0; i < workerCount; i++)
-            {
-                Task.Factory.StartNew(Consume);
-            }
-
-            _solvingMethod = solver;
-        }
-
-        public void Add(TIn incoming)
-        {
-            _incoming.Add(incoming);
-            Interlocked.Increment(ref _incomingItems);
-        }
-
-
-
-        private void Consume()
-        {
-            foreach (var item in _incoming.GetConsumingEnumerable())
-            {
-                try
+                Interlocked.Increment(ref _running);
+                var outItem = _solvingMethod.Solve(item);
+                if (outItem == null)
                 {
-                    Interlocked.Increment(ref _running);
-                    var outItem = _solvingMethod.Solve(item);
-                    if (outItem == null)
-                    {
-                        Interlocked.Increment(ref _failed);
-                    }
-                    else
-                    {
-                        Interlocked.Increment(ref _successful);
-                        Outgoing.Add(outItem);
-                    }
+                    Interlocked.Increment(ref _failed);
                 }
-                finally
+                else
                 {
-                    Interlocked.Increment(ref _completed);
-                    Interlocked.Decrement(ref _running);
-
+                    Interlocked.Increment(ref _successful);
+                    Outgoing.Add(outItem);
                 }
-
             }
-        }
-
-        public int QueueCount
-        {
-            get
+            finally
             {
-                return _incoming.Count;
+                Interlocked.Increment(ref _completed);
+                Interlocked.Decrement(ref _running);
             }
-        }
-
-        public bool Done
-        {
-            get
-            {
-                return _incomingItems == _completed;
-            }
-        }
-
-        public void Dispose()
-        {
-            _incoming.CompleteAdding();
-        }
-
-
     }
 }

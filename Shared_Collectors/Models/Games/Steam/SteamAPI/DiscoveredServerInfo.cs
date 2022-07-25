@@ -13,27 +13,27 @@ public class DiscoveredServerInfo<T> : IGenericServerInfo<T> where T : GenericSe
         Address = address;
         Port = port;
         this.server = server;
-        this.ServerInfo = serverInfo;
-        this.ServerPlayers = serverPlayers;
-        this.ServerRules = serverRules;
+        ServerInfo = serverInfo;
+        ServerPlayers = serverPlayers;
+        ServerRules = serverRules;
         IpInformation = ipInformation;
     }
 
-    public T CustomServerInfo { get; set; }
-
     public SteamListServer server { get; set; }
-    public InfoResponse ServerInfo { get; set; }
-
-    public PlayerResponse ServerPlayers { get; set; }
-
-
-    public RuleResponse? ServerRules { get; set; }
 
     public IPInformation IpInformation { get; set; }
 
     public IPAddress Address { get; set; }
 
     public int Port { get; set; }
+
+    public T CustomServerInfo { get; set; }
+    public InfoResponse ServerInfo { get; set; }
+
+    public PlayerResponse ServerPlayers { get; set; }
+
+
+    public RuleResponse? ServerRules { get; set; }
 
     internal T CreateCustomServerInfo(int nextCheckSeconds)
     {

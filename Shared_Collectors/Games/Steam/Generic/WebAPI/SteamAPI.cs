@@ -1,8 +1,7 @@
 ﻿using Microsoft.Extensions.Options;
-using Shared_Collectors.Games.Steam.Generic.WebAPI;
 using Shared_Collectors.Models;
 
-namespace Shared_Collectors.Games.Steam.Generic;
+namespace Shared_Collectors.Games.Steam.Generic.WebAPI;
 
 public partial class SteamAPI : ISteamAPI
 {

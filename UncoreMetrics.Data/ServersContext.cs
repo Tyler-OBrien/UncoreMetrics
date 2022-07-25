@@ -6,7 +6,6 @@ namespace UncoreMetrics.Data;
 
 public class ServersContext : DbContext
 {
-
     public ServersContext(DbContextOptions<ServersContext> contextOptions)
         : base(contextOptions)
     {
@@ -28,7 +27,6 @@ public class ServersContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-
         modelBuilder.Entity<GenericServer>().ToTable("Servers");
         modelBuilder.Entity<GenericServer>().HasIndex(server => server.AppID);
         modelBuilder.Entity<GenericServer>().HasIndex(server => server.Continent);
@@ -47,8 +45,6 @@ public class ServersContext : DbContext
         modelBuilder.Entity<GenericServer>().HasKey(server => server.ServerID);
         modelBuilder.Entity<GenericServer>().Property(p => p.SearchVector).ValueGeneratedOnAdd()
             .Metadata.SetBeforeSaveBehavior(PropertySaveBehavior.Ignore);
-
-
 
 
         modelBuilder.Entity<VRisingServer>().ToTable("V_Rising_Servers");

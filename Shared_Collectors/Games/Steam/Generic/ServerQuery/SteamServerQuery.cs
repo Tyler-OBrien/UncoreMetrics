@@ -1,7 +1,5 @@
 ﻿using System.Net;
-using Microsoft.Extensions.Hosting;
 using Okolni.Source.Common;
-using Okolni.Source.Query;
 using Okolni.Source.Query.Responses;
 using Okolni.Source.Query.Source;
 
@@ -24,13 +22,10 @@ public static class SteamServerQuery
     }
 
 
-
-
     public static async Task<InfoResponse?> GetServerInfoSafeAsync(this IQueryConnectionPool pool, IPEndPoint endPoint)
     {
         try
         {
-
             var info = await pool.GetInfoAsync(endPoint, 5); // Get the Server info
 
             return info;
@@ -49,12 +44,10 @@ public static class SteamServerQuery
     }
 
 
-
     public static async Task<PlayerResponse?> GetPlayersSafeAsync(this IQueryConnectionPool pool, IPEndPoint endPoint)
     {
         try
         {
-
             var players = await pool.GetPlayersAsync(endPoint, 5); // Get the Server info
 
             return players;
@@ -73,13 +66,10 @@ public static class SteamServerQuery
     }
 
 
-
-
     public static async Task<RuleResponse?> GetRulesSafeAsync(this IQueryConnectionPool pool, IPEndPoint endPoint)
     {
         try
         {
-
             var rules = await pool.GetRulesAsync(endPoint, 5); // Get the Server info
 
             return rules;

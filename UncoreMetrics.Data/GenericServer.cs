@@ -7,41 +7,6 @@ namespace UncoreMetrics.Data;
 
 public class GenericServer
 {
-
-
-    public GenericServer()
-    { }
-
-    public void Copy(GenericServer toCopy)
-    {
-        this.ServerID = toCopy.ServerID;
-        this.Name = toCopy.Name;
-        this.SearchVector = toCopy.SearchVector;
-        this.Game = toCopy.Game;
-        this.AppID = toCopy.AppID;
-        this.IpAddressBytes = toCopy.IpAddressBytes;
-        this.Address = toCopy.Address;
-        this.Port = toCopy.Port;
-        this.QueryPort = toCopy.QueryPort;
-        this.Players = toCopy.Players;
-        this.MaxPlayers = toCopy.MaxPlayers;
-        this.ASN = toCopy.ASN;
-        this.ISP = toCopy.ISP;
-        this.Latitude = toCopy.Latitude;
-        this.Longitude = toCopy.Longitude;
-        this.Country = toCopy.Country;
-        this.Continent = toCopy.Continent;
-        this.Timezone = toCopy.Timezone;
-        this.IsOnline = toCopy.IsOnline;
-        this.ServerDead = toCopy.ServerDead;
-        this.LastCheck = toCopy.LastCheck;
-        this.NextCheck = toCopy.NextCheck;
-        this.FailedChecks = toCopy.FailedChecks;
-        this.FoundAt = toCopy.FoundAt;
-    }
-
-
-
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     [Required]
     public Guid ServerID { get; set; }
@@ -98,6 +63,33 @@ public class GenericServer
 
     [Required] public int FailedChecks { get; set; }
 
-    [Required]
-    public DateTime FoundAt { get; set; }
+    [Required] public DateTime FoundAt { get; set; }
+
+    public void Copy(GenericServer toCopy)
+    {
+        ServerID = toCopy.ServerID;
+        Name = toCopy.Name;
+        SearchVector = toCopy.SearchVector;
+        Game = toCopy.Game;
+        AppID = toCopy.AppID;
+        IpAddressBytes = toCopy.IpAddressBytes;
+        Address = toCopy.Address;
+        Port = toCopy.Port;
+        QueryPort = toCopy.QueryPort;
+        Players = toCopy.Players;
+        MaxPlayers = toCopy.MaxPlayers;
+        ASN = toCopy.ASN;
+        ISP = toCopy.ISP;
+        Latitude = toCopy.Latitude;
+        Longitude = toCopy.Longitude;
+        Country = toCopy.Country;
+        Continent = toCopy.Continent;
+        Timezone = toCopy.Timezone;
+        IsOnline = toCopy.IsOnline;
+        ServerDead = toCopy.ServerDead;
+        LastCheck = toCopy.LastCheck;
+        NextCheck = toCopy.NextCheck;
+        FailedChecks = toCopy.FailedChecks;
+        FoundAt = toCopy.FoundAt;
+    }
 }

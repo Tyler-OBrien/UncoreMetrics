@@ -1,43 +1,35 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿namespace UncoreMetrics.Data.GameData.VRising;
 
-namespace UncoreMetrics.Data.GameData.VRising
+public enum CastleHeartDamageMode
 {
-    public enum CastleHeartDamageMode
+    None,
+    CanBeDestroyedOnlyWhenDecaying,
+    CanBeDestroyedByPlayers,
+    CanBeSeizedOrDestroyedByPlayers,
+    Unknown
+}
+
+public class VRisingServer : GenericServer
+{
+    public VRisingServer()
     {
-        None,
-        CanBeDestroyedOnlyWhenDecaying,
-        CanBeDestroyedByPlayers,
-        CanBeSeizedOrDestroyedByPlayers,
-        Unknown
     }
-    public class VRisingServer : GenericServer
+
+    public VRisingServer(CastleHeartDamageMode? heartDamage, bool? bloodBoundEquipment, int? daysRunning,
+        string? description)
     {
-        public VRisingServer()
-        {
-
-        }
-        public VRisingServer(CastleHeartDamageMode? heartDamage, bool? bloodBoundEquipment, int? daysRunning, string? description)
-        {
-            HeartDamage = heartDamage;
-            BloodBoundEquipment = bloodBoundEquipment;
-            DaysRunning = daysRunning;
-            Description = description;
-        }
-     
-
-
-
-        public CastleHeartDamageMode? HeartDamage { get; set; }
-
-        public bool? BloodBoundEquipment { get; set; }
-
-        public int? DaysRunning { get; set; }
-
-        public string? Description { get; set; }
+        HeartDamage = heartDamage;
+        BloodBoundEquipment = bloodBoundEquipment;
+        DaysRunning = daysRunning;
+        Description = description;
     }
+
+
+    public CastleHeartDamageMode? HeartDamage { get; set; }
+
+    public bool? BloodBoundEquipment { get; set; }
+
+    public int? DaysRunning { get; set; }
+
+    public string? Description { get; set; }
 }

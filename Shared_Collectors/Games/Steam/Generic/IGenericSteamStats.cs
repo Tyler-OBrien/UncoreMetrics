@@ -1,5 +1,4 @@
-﻿using Shared_Collectors.Models.Games.Steam.SteamAPI;
-using UncoreMetrics.Data;
+﻿using UncoreMetrics.Data;
 
 namespace Shared_Collectors.Games.Steam.Generic;
 
