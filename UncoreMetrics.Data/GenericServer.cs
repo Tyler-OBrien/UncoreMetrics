@@ -7,6 +7,41 @@ namespace UncoreMetrics.Data;
 
 public class GenericServer
 {
+
+
+    public GenericServer()
+    { }
+
+    public void Copy(GenericServer toCopy)
+    {
+        this.ServerID = toCopy.ServerID;
+        this.Name = toCopy.Name;
+        this.SearchVector = toCopy.SearchVector;
+        this.Game = toCopy.Game;
+        this.AppID = toCopy.AppID;
+        this.IpAddressBytes = toCopy.IpAddressBytes;
+        this.Address = toCopy.Address;
+        this.Port = toCopy.Port;
+        this.QueryPort = toCopy.QueryPort;
+        this.Players = toCopy.Players;
+        this.MaxPlayers = toCopy.MaxPlayers;
+        this.ASN = toCopy.ASN;
+        this.ISP = toCopy.ISP;
+        this.Latitude = toCopy.Latitude;
+        this.Longitude = toCopy.Longitude;
+        this.Country = toCopy.Country;
+        this.Continent = toCopy.Continent;
+        this.Timezone = toCopy.Timezone;
+        this.IsOnline = toCopy.IsOnline;
+        this.ServerDead = toCopy.ServerDead;
+        this.LastCheck = toCopy.LastCheck;
+        this.NextCheck = toCopy.NextCheck;
+        this.FailedChecks = toCopy.FailedChecks;
+        this.FoundAt = toCopy.FoundAt;
+    }
+
+
+
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     [Required]
     public Guid ServerID { get; set; }

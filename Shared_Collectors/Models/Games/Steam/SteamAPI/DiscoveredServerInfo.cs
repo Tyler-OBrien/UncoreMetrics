@@ -5,7 +5,7 @@ using UncoreMetrics.Data;
 
 namespace Shared_Collectors.Models.Games.Steam.SteamAPI;
 
-public class DiscoveredServerInfo
+public class DiscoveredServerInfo<T> : IGenericServerInfo<T> where T : GenericServer, new()
 {
     public DiscoveredServerInfo(IPAddress address, int port, SteamListServer server, InfoResponse serverInfo,
         PlayerResponse serverPlayers, RuleResponse? serverRules, IPInformation ipInformation)
@@ -13,21 +13,21 @@ public class DiscoveredServerInfo
         Address = address;
         Port = port;
         this.server = server;
-        this.serverInfo = serverInfo;
-        this.serverPlayers = serverPlayers;
-        this.serverRules = serverRules;
+        this.ServerInfo = serverInfo;
+        this.ServerPlayers = serverPlayers;
+        this.ServerRules = serverRules;
         IpInformation = ipInformation;
     }
 
-
+    public T CustomServerInfo { get; set; }
 
     public SteamListServer server { get; set; }
-    public InfoResponse serverInfo { get; set; }
+    public InfoResponse ServerInfo { get; set; }
 
-    public PlayerResponse serverPlayers { get; set; }
+    public PlayerResponse ServerPlayers { get; set; }
 
 
-    public RuleResponse? serverRules { get; set; }
+    public RuleResponse? ServerRules { get; set; }
 
     public IPInformation IpInformation { get; set; }
 
@@ -35,33 +35,34 @@ public class DiscoveredServerInfo
 
     public int Port { get; set; }
 
-    public GenericServer ToGenericServer(int nextCheckSeconds)
+    internal T CreateCustomServerInfo(int nextCheckSeconds)
     {
-        return new GenericServer
-        {
-            Address = Address,
-            IpAddressBytes = Address.GetAddressBytes(),
-            QueryPort = Port,
-            AppID = server.AppID,
-            Game = server.Gamedir,
-            ASN = IpInformation?.AutonomousSystemNumber,
-            Continent = IpInformation?.Continent,
-            Country = IpInformation?.Country,
-            Timezone = IpInformation?.TimeZone,
-            ISP = IpInformation?.AutonomousSystemOrganization,
-            Latitude = IpInformation?.Latitude,
-            Longitude = IpInformation?.Longitude,
-            IsOnline = true,
-            ServerDead = false,
-            LastCheck = DateTime.UtcNow,
-            MaxPlayers = serverInfo.MaxPlayers,
-            Port = serverInfo.Port ?? Port,
-            Players =  (uint)serverPlayers.Players.Count,
-            FoundAt = DateTime.UtcNow,
-            Name = server.Name,
-            ServerID = Guid.NewGuid(),
-            NextCheck = DateTime.UtcNow.AddSeconds(Random.Shared.Next(30, 90)),
-            FailedChecks = 0
-        };
+        if (CustomServerInfo == null) CustomServerInfo = new T();
+
+
+        CustomServerInfo.Address = Address;
+        CustomServerInfo.IpAddressBytes = Address.GetAddressBytes();
+        CustomServerInfo.QueryPort = Port;
+        CustomServerInfo.AppID = server.AppID;
+        CustomServerInfo.Game = server.Gamedir;
+        CustomServerInfo.ASN = IpInformation?.AutonomousSystemNumber;
+        CustomServerInfo.Continent = IpInformation?.Continent;
+        CustomServerInfo.Country = IpInformation?.Country;
+        CustomServerInfo.Timezone = IpInformation?.TimeZone;
+        CustomServerInfo.ISP = IpInformation?.AutonomousSystemOrganization;
+        CustomServerInfo.Latitude = IpInformation?.Latitude;
+        CustomServerInfo.Longitude = IpInformation?.Longitude;
+        CustomServerInfo.IsOnline = true;
+        CustomServerInfo.ServerDead = false;
+        CustomServerInfo.LastCheck = DateTime.UtcNow;
+        CustomServerInfo.MaxPlayers = ServerInfo.MaxPlayers;
+        CustomServerInfo.Port = ServerInfo.Port ?? Port;
+        CustomServerInfo.Players = (uint)ServerPlayers.Players.Count;
+        CustomServerInfo.FoundAt = DateTime.UtcNow;
+        CustomServerInfo.Name = server.Name;
+        CustomServerInfo.ServerID = Guid.NewGuid();
+        CustomServerInfo.NextCheck = DateTime.UtcNow.AddSeconds(Random.Shared.Next(30, 90));
+        CustomServerInfo.FailedChecks = 0;
+        return CustomServerInfo;
     }
 }

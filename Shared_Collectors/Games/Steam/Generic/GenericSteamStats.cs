@@ -15,13 +15,13 @@ namespace Shared_Collectors.Games.Steam.Generic;
 
 public partial class GenericSteamStats : IGenericSteamStats
 {
-    private readonly GenericServersContext _genericServersContext;
+    private readonly ServersContext _genericServersContext;
     private readonly IGeoIPService _geoIpService;
     private readonly ISteamAPI _steamApi;
     private readonly BaseConfiguration _configuration;
 
 
-    public GenericSteamStats(ISteamAPI steamAPI, IGeoIPService geoIPService, IOptions<BaseConfiguration> baseConfiguration, GenericServersContext serversContext)
+    public GenericSteamStats(ISteamAPI steamAPI, IGeoIPService geoIPService, IOptions<BaseConfiguration> baseConfiguration, ServersContext serversContext)
     {
         _steamApi = steamAPI;
         _geoIpService = geoIPService;
@@ -31,6 +31,25 @@ public partial class GenericSteamStats : IGenericSteamStats
     }
 
 
+    public async Task BulkInsertOrUpdate<T>(List<T> servers) where T : GenericServer, new()
+    {
+        await InsertGenericServer(servers.ToList<GenericServer>());
+        await _genericServersContext.BulkInsertOrUpdateAsync(servers);
+
+    }
+
+    private async Task InsertGenericServer(List<GenericServer> servers)
+    {
+        var bulkConfig = new BulkConfig()
+        {
+            PropertiesToExclude = new List<string>() { "SearchVector" },
+            PropertiesToExcludeOnUpdate = new List<string>() { "FoundAt", "ServerID", "SearchVector" },
+            UseTempDB = false,
+        };
+
+
+        await _genericServersContext.BulkInsertOrUpdateAsync(servers, bulkConfig);
+    }
 
 
 

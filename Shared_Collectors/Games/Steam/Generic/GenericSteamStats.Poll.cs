@@ -21,10 +21,10 @@ using UncoreMetrics.Data;
 namespace Shared_Collectors.Games.Steam.Generic
 {
 
-    public class PollSolver : IGenericAsyncSolver<QueryPoolItem<GenericServer>, PollServerInfo>
+    public class PollSolver<T> : IGenericAsyncSolver<QueryPoolItem<GenericServer>, PollServerInfo<T>> where T : GenericServer, new()
     {
 
-        public async Task<PollServerInfo?> Solve(QueryPoolItem<GenericServer> item)
+        public async Task<PollServerInfo<T>?> Solve(QueryPoolItem<GenericServer> item)
         {
             var server = item.Item;
             var pool = item.QueryConnectionPool;
@@ -37,7 +37,7 @@ namespace Shared_Collectors.Games.Steam.Generic
 
                 if (info != null && rules != null && players != null)
                 {
-                    return (new PollServerInfo(server, info, players, rules));
+                    return (new PollServerInfo<T>(server, info, players, rules));
 
                 }
                 else
@@ -70,45 +70,29 @@ namespace Shared_Collectors.Games.Steam.Generic
         /// </summary>
         /// <param name="appID"></param>
         /// <returns>Returns a list of full server info to be actioned on with stats for that specific server type</returns>
-        public async Task<List<PollServerInfo>> GenericServerPoll(ulong appID)
+        public async Task<List<PollServerInfo<T>>> GenericServerPoll<T>(ulong appID) where T : GenericServer, new()
         {
             if (_steamApi == null) throw new NullReferenceException("Steam API cannot be null to use HandleGeneric");
 
             var servers = await _genericServersContext.Servers.Where(server => server.NextCheck < DateTime.UtcNow && server.AppID == appID).ToListAsync();
 
             
-            var polledServers = await GetAllServersPoll(servers);
+            var polledServers = await GetAllServersPoll<T>(servers);
 
-            // Some submission step....
-            await Submit(polledServers);
+
+            foreach (var server in polledServers)
+            {
+                server.CreateCustomServerInfo(_configuration.SecondsBetweenChecks, _configuration.SecondsBetweenFailedChecks, _configuration.DaysUntilServerMarkedDead);
+            }
+
 
             return polledServers;
         }
 
 
-        private async Task Submit(List<PollServerInfo> fullServers)
-        {
-            var bulkConfig = new BulkConfig()
-            {
-                PropertiesToExclude = new List<string>() { "SearchVector" },
-                PropertiesToExcludeOnUpdate = new List<string>() { "FoundAt", "ServerID", "SearchVector" },
-                UseTempDB = false,
-            };
 
 
-
-            var genericServers = fullServers.Select(fullserver => fullserver.UpdateGenericServer(_configuration.SecondsBetweenChecks, _configuration.SecondsBetweenFailedChecks, _configuration.DaysUntilServerMarkedDead)).ToList();
-            await _genericServersContext.BulkInsertOrUpdateAsync(genericServers, bulkConfig, obj =>
-            {
-#if DEBUG
-                Console.WriteLine($"BulkInsertOrUpdateAsync Progress {obj}%...");
-#endif
-            }, null, CancellationToken.None);
-        }
-
-
-
-        private async Task<List<PollServerInfo>> GetAllServersPoll(List<GenericServer> servers)
+        private async Task<List<PollServerInfo<T>>> GetAllServersPoll<T>(List<GenericServer> servers) where T : GenericServer, new()
         {
             var stopwatch = Stopwatch.StartNew();
             // Might want to make this configurable eventually..
@@ -119,7 +103,7 @@ namespace Shared_Collectors.Games.Steam.Generic
                 maxConcurrency = 1024;
             }
 
-            var newSolver = new PollSolver();
+            var newSolver = new PollSolver<T>();
             var pool = new QueryConnectionPool();
             pool.ReceiveTimeout = 750;
             pool.SendTimeout = 750;
@@ -133,7 +117,7 @@ namespace Shared_Collectors.Games.Steam.Generic
                 throw exception;
             }; 
             pool.Setup();
-            var queue = new AsyncResolveQueue<QueryPoolItem<GenericServer>, PollServerInfo>(servers.Select(server => new QueryPoolItem<GenericServer>(pool, server)), maxConcurrency, newSolver);
+            var queue = new AsyncResolveQueue<QueryPoolItem<GenericServer>, PollServerInfo<T>>(servers.Select(server => new QueryPoolItem<GenericServer>(pool, server)), maxConcurrency, newSolver);
 
             // Wait a max of 60 seconds...
             int delayCount = 0;
@@ -161,7 +145,7 @@ namespace Shared_Collectors.Games.Steam.Generic
             Console.WriteLine(
                 $"We were able to connect to {serverInfos.Count} out of {servers.Count} {(int)Math.Round(serverInfos.Count / (double)servers.Count * 100)}%");
             Console.WriteLine(
-                $"Total Players: {serverInfos.Sum(info => info.serverInfo?.Players)}, Total Servers: {serverInfos.Count}");
+                $"Total Players: {serverInfos.Sum(info => info.ServerInfo?.Players)}, Total Servers: {serverInfos.Count}");
             return serverInfos.ToList();
         }
     }

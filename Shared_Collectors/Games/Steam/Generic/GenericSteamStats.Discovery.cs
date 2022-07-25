@@ -15,10 +15,12 @@ using Shared_Collectors.Games.Steam.Generic.WebAPI;
 using Shared_Collectors.Helpers;
 using Shared_Collectors.Models.Games.Steam.SteamAPI;
 using Shared_Collectors.Tools.Maxmind;
+using UncoreMetrics.Data;
 
 namespace Shared_Collectors.Games.Steam.Generic
 {
-    public class DiscoverySolver : IGenericAsyncSolver<QueryPoolItem<SteamListServer>, DiscoveredServerInfo>
+
+    public class DiscoverySolver<T> : IGenericAsyncSolver<QueryPoolItem<SteamListServer>, DiscoveredServerInfo<T>> where T : GenericServer, new()
     {
         private readonly IGeoIPService _geoIpService;
 
@@ -27,7 +29,7 @@ namespace Shared_Collectors.Games.Steam.Generic
             _geoIpService = geoIpService;
         }
 
-        public async Task<DiscoveredServerInfo?> Solve(QueryPoolItem<SteamListServer> poolItem)
+        public async Task<DiscoveredServerInfo<T>?> Solve(QueryPoolItem<SteamListServer> poolItem)
         {
             var server = poolItem.Item;
             var pool = poolItem.QueryConnectionPool;
@@ -41,7 +43,7 @@ namespace Shared_Collectors.Games.Steam.Generic
                 var geoIpInformation = await _geoIpService.GetIpInformation(Host.ToString());
                 if (info != null && rules != null && players != null)
                 {
-                    return new DiscoveredServerInfo(Host, Port, server, info, players, rules, geoIpInformation);
+                    return new DiscoveredServerInfo<T>(Host, Port, server, info, players, rules, geoIpInformation);
                 }
                 else
                 {
@@ -72,7 +74,7 @@ namespace Shared_Collectors.Games.Steam.Generic
         /// </summary>
         /// <param name="appID"></param>
         /// <returns>Returns a list of full server info to be actioned on with stats for that specific server type</returns>
-        public async Task<List<DiscoveredServerInfo>> GenericServerDiscovery(ulong appID)
+        public async Task<List<DiscoveredServerInfo<T>>> GenericServerDiscovery<T>(ulong appID) where T : GenericServer, new()
         {
             if (_steamApi == null) throw new NullReferenceException("Steam API cannot be null to use HandleGeneric");
 
@@ -83,37 +85,23 @@ namespace Shared_Collectors.Games.Steam.Generic
                 await _steamApi.GetServerList(SteamServerListQueryBuilder.New().AppID(appID.ToString()).Dedicated().NotEmpty(),
                     int.MaxValue);
 
-            var servers = await GetAllServersDiscovery(serverList);
+            var servers = await GetAllServersDiscovery<T>(serverList);
 
-            // Some submission step....
-            await Submit(servers);
+
+            foreach (var server in servers)
+            {
+                server.CreateCustomServerInfo(_configuration.SecondsBetweenChecks);
+            }
+
 
             return servers;
         }
 
 
-        private async Task Submit(List<DiscoveredServerInfo> fullServers)
-        {
-            var bulkConfig = new BulkConfig()
-            {
-                PropertiesToExclude = new List<string>() { "SearchVector" },
-                PropertiesToExcludeOnUpdate = new List<string>() { "FoundAt", "ServerID", "SearchVector" }
-            };
 
 
 
-            var genericServers = fullServers.Select(fullserver => fullserver.ToGenericServer(_configuration.SecondsBetweenChecks)).ToList();
-            await _genericServersContext.BulkInsertOrUpdateAsync(genericServers, bulkConfig, obj =>
-            {
-#if DEBUG
-                Console.WriteLine($"BulkInsertOrUpdateAsync Progress {obj}%...");
-#endif
-            }, null, CancellationToken.None);
-        }
-
-
-
-        private async Task<List<DiscoveredServerInfo>> GetAllServersDiscovery(List<SteamListServer> servers)
+        private async Task<List<DiscoveredServerInfo<T>>> GetAllServersDiscovery<T>(List<SteamListServer> servers) where T : GenericServer, new()
         {
             var stopwatch = Stopwatch.StartNew();
 
@@ -133,7 +121,7 @@ namespace Shared_Collectors.Games.Steam.Generic
 
             Console.WriteLine("Queueing Tasks");
 
-            var newSolver = new DiscoverySolver(_geoIpService);
+            var newSolver = new DiscoverySolver<T>(_geoIpService);
             var pool = new QueryConnectionPool();
             pool.ReceiveTimeout = 750;
             pool.SendTimeout = 750;
@@ -148,7 +136,7 @@ namespace Shared_Collectors.Games.Steam.Generic
             };
             pool.Setup();
 
-            var queue = new AsyncResolveQueue<QueryPoolItem<SteamListServer>, DiscoveredServerInfo>(servers.Select(server => new QueryPoolItem<SteamListServer>(pool, server)), maxConcurrency, newSolver);
+            var queue = new AsyncResolveQueue<QueryPoolItem<SteamListServer>, DiscoveredServerInfo<T>>(servers.Select(server => new QueryPoolItem<SteamListServer>(pool, server)), maxConcurrency, newSolver);
 
             // Wait a max of 60 seconds...
             int delayCount = 0;
@@ -178,7 +166,7 @@ namespace Shared_Collectors.Games.Steam.Generic
             Console.WriteLine(
                 $"We were able to connect to {serverInfos.Count} out of {servers.Count} {(int)Math.Round(serverInfos.Count / (double)servers.Count * 100)}%");
             Console.WriteLine(
-                $"Total Players: {serverInfos.Sum(info => info.serverInfo?.Players)}, Total Servers: {serverInfos.Count}");
+                $"Total Players: {serverInfos.Sum(info => info.ServerInfo?.Players)}, Total Servers: {serverInfos.Count}");
             return serverInfos;
         }
 

@@ -18,7 +18,7 @@ public static class SharedSetup
         var baseConfiguration = configuration.Get<BaseConfiguration>();
         services.Configure<BaseConfiguration>(configuration);
         services.AddSingleton<ISteamAPI, SteamAPI>();
-        services.AddDbContext<GenericServersContext>(options =>
+        services.AddDbContext<ServersContext>(options =>
             options.UseNpgsql(baseConfiguration.PostgresConnectionString));
 
         services.AddSingleton<IGeoIPService, MaxMindService>();
