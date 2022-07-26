@@ -1,10 +1,9 @@
-using System.Text;
-using Shared_Collectors.Games.Steam.Generic;
-using Shared_Collectors.Helpers;
-using Shared_Collectors.Models.Games.Steam.SteamAPI;
+using Microsoft.Extensions.Options;
+using Steam_Collector.Models;
+using Steam_Collector.SteamServers;
 using UncoreMetrics.Data.GameData.VRising;
 
-namespace V_Rising_Collector;
+namespace Steam_Collector;
 
 public class Worker : BackgroundService
 {
@@ -15,13 +14,19 @@ public class Worker : BackgroundService
 
     private readonly IServiceScopeFactory _scopeFactory;
 
+    private readonly BaseConfiguration _configuration;
+
     private DateTime _nextDiscoveryTime = DateTime.UnixEpoch;
 
+    private IGameResolver _gameResolver;
 
-    public Worker(ILogger<Worker> logger, IServiceScopeFactory steamStats)
+
+    public Worker(ILogger<Worker> logger, IServiceScopeFactory steamStats, IOptions<BaseConfiguration> baseConfiguration)
     {
         _logger = logger;
         _scopeFactory = steamStats;
+        _configuration = baseConfiguration.Value;
+        _gameResolver = GameCollectorResolver.GetResolver(_configuration.GameType);
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -42,7 +47,7 @@ public class Worker : BackgroundService
     {
         using var scope = _scopeFactory.CreateScope();
 
-        var steamStats = scope.ServiceProvider.GetService<IGenericSteamStats>();
+        var steamStats = scope.ServiceProvider.GetService<ISteamServers>();
 
 
         if (_nextDiscoveryTime < DateTime.UtcNow)
@@ -51,7 +56,7 @@ public class Worker : BackgroundService
             Console.WriteLine("Starting Discovery...");
             Console.WriteLine("----------------------");
             _nextDiscoveryTime = DateTime.UtcNow.AddSeconds(SECONDS_BETWEEN_DISCOVERY);
-            var servers = await steamStats.GenericServerDiscovery<VRisingServer>(VRisingAppId);
+            var servers = await steamStats.GenericServerDiscovery<>(VRisingAppId);
             servers.ForEach(ResolveCustomServerInfo);
             await steamStats.BulkInsertOrUpdate(servers.Select(server => server.CustomServerInfo).ToList());
             Console.WriteLine("----------------------");
@@ -72,29 +77,5 @@ public class Worker : BackgroundService
         }
     }
 
-    // We might be able to implement this by just using attributes in the future
-    private void ResolveCustomServerInfo(IGenericServerInfo<VRisingServer> server)
-    {
-        try
-        {
-            if (server.ServerRules != null)
-            {
 
-                if (server.ServerRules.TryGetBoolean("blood-bound-enabled", out var bloodBound))
-                    server.CustomServerInfo.BloodBoundEquipment = bloodBound;
-                if (server.ServerRules.TryGetEnum("castle-heart-damage-mode", out CastleHeartDamageMode castleHeartDamageMode))
-                    server.CustomServerInfo.HeartDamage = castleHeartDamageMode;
-                if (server.ServerRules.TryGetInt("days-runningv2", out var daysRunning))
-                    server.CustomServerInfo.DaysRunning = daysRunning;
-                if (server.ServerRules.TryGetRunningString("desc{0}", out var description))
-                    server.CustomServerInfo.Description = description;
-
-    
-            }
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine("Unexpected issue resolving custom server rules for VRising" + ex);
-        }
-    }
 }

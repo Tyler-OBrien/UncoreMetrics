@@ -22,7 +22,7 @@ public static class SharedSetup
             options.UseNpgsql(baseConfiguration.PostgresConnectionString));
 
         services.AddSingleton<IGeoIPService, MaxMindService>();
-        services.AddScoped<IGenericSteamStats, GenericSteamStats>();
+        services.AddScoped<ISteamServers, SteamServers>();
 
 
         TaskScheduler.UnobservedTaskException += TaskSchedulerOnUnobservedTaskException;
