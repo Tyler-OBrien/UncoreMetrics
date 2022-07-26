@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
+using UncoreMetrics.Data.GameData.ARK;
 using UncoreMetrics.Data.GameData.VRising;
 
 namespace UncoreMetrics.Data;
@@ -16,10 +17,14 @@ public class ServersContext : DbContext
     {
     }
 
-    public DbSet<GenericServer> Servers { get; set; }
+    public DbSet<Server> Servers { get; set; }
 
 
     public DbSet<VRisingServer> VRisingServers { get; set; }
+
+
+
+    public DbSet<ArkServer> ArkServer { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
@@ -27,13 +32,13 @@ public class ServersContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<GenericServer>().ToTable("Servers");
-        modelBuilder.Entity<GenericServer>().HasIndex(server => server.AppID);
-        modelBuilder.Entity<GenericServer>().HasIndex(server => server.Continent);
-        modelBuilder.Entity<GenericServer>().HasIndex(server => server.NextCheck);
-        modelBuilder.Entity<GenericServer>().HasIndex(server => server.ServerDead);
-        modelBuilder.Entity<GenericServer>().HasIndex(server => server.IsOnline);
-        modelBuilder.Entity<GenericServer>()
+        modelBuilder.Entity<Server>().ToTable("Servers");
+        modelBuilder.Entity<Server>().HasIndex(server => server.AppID);
+        modelBuilder.Entity<Server>().HasIndex(server => server.Continent);
+        modelBuilder.Entity<Server>().HasIndex(server => server.NextCheck);
+        modelBuilder.Entity<Server>().HasIndex(server => server.ServerDead);
+        modelBuilder.Entity<Server>().HasIndex(server => server.IsOnline);
+        modelBuilder.Entity<Server>()
             .HasGeneratedTsVectorColumn(
                 p => p.SearchVector,
                 "english", // Text search config
@@ -41,14 +46,19 @@ public class ServersContext : DbContext
             .HasIndex(p => p.SearchVector)
             .HasMethod("GIN"); // Index method on the search vector (GIN or GIST)
 
-        modelBuilder.Entity<GenericServer>().HasKey(server => new { server.IpAddressBytes, server.Port });
-        modelBuilder.Entity<GenericServer>().HasKey(server => server.ServerID);
-        modelBuilder.Entity<GenericServer>().Property(p => p.SearchVector).ValueGeneratedOnAdd()
+        modelBuilder.Entity<Server>().HasKey(server => new { server.IpAddressBytes, server.Port });
+        modelBuilder.Entity<Server>().HasKey(server => server.ServerID);
+        modelBuilder.Entity<Server>().Property(p => p.SearchVector).ValueGeneratedOnAdd()
             .Metadata.SetBeforeSaveBehavior(PropertySaveBehavior.Ignore);
 
 
         modelBuilder.Entity<VRisingServer>().ToTable("V_Rising_Servers");
         modelBuilder.Entity<VRisingServer>().HasIndex(server => server.HeartDamage);
         modelBuilder.Entity<VRisingServer>().HasIndex(server => server.BloodBoundEquipment);
+
+        modelBuilder.Entity<ArkServer>().ToTable("Ark_Servers");
+        modelBuilder.Entity<ArkServer>().HasIndex(server => server.Battleye);
+        modelBuilder.Entity<ArkServer>().HasIndex(server => server.PVE);
+        modelBuilder.Entity<ArkServer>().HasIndex(server => server.PasswordRequired);
     }
 }

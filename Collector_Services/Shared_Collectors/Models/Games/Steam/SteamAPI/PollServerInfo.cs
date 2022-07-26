@@ -3,9 +3,9 @@ using UncoreMetrics.Data;
 
 namespace Shared_Collectors.Models.Games.Steam.SteamAPI;
 
-public class PollServerInfo<T> : IGenericServerInfo<T> where T : GenericServer, new()
+public class PollServerInfo<T> : IGenericServerInfo<T> where T : Server, new()
 {
-    public PollServerInfo(GenericServer server, InfoResponse? serverInfo,
+    public PollServerInfo(Server server, InfoResponse? serverInfo,
         PlayerResponse? serverPlayers, RuleResponse? serverRules)
     {
         this.server = server;
@@ -15,7 +15,7 @@ public class PollServerInfo<T> : IGenericServerInfo<T> where T : GenericServer, 
     }
 
 
-    public GenericServer server { get; set; }
+    public Server server { get; set; }
 
     public T CustomServerInfo { get; set; }
 

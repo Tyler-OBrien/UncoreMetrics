@@ -3,7 +3,7 @@ using UncoreMetrics.Data;
 
 namespace Shared_Collectors.Models.Games.Steam.SteamAPI;
 
-public interface IGenericServerInfo<T> where T : GenericServer, new()
+public interface IGenericServerInfo<T> where T : Server, new()
 {
     public T CustomServerInfo { get; set; }
 

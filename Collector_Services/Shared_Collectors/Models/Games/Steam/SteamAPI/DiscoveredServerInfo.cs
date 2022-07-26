@@ -5,7 +5,7 @@ using UncoreMetrics.Data;
 
 namespace Shared_Collectors.Models.Games.Steam.SteamAPI;
 
-public class DiscoveredServerInfo<T> : IGenericServerInfo<T> where T : GenericServer, new()
+public class DiscoveredServerInfo<T> : IGenericServerInfo<T> where T : Server, new()
 {
     public DiscoveredServerInfo(IPAddress address, int port, SteamListServer server, InfoResponse serverInfo,
         PlayerResponse serverPlayers, RuleResponse? serverRules, IPInformation ipInformation)

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Net;
 using Microsoft.EntityFrameworkCore.Migrations;
 using NpgsqlTypes;
@@ -48,6 +49,35 @@ namespace UncoreMetrics.Data.Migrations.ServerContext
                 });
 
             migrationBuilder.CreateTable(
+                name: "Ark_Servers",
+                columns: table => new
+                {
+                    ServerID = table.Column<Guid>(type: "uuid", nullable: false),
+                    Modded = table.Column<bool>(type: "boolean", nullable: true),
+                    DownloadCharacters = table.Column<bool>(type: "boolean", nullable: true),
+                    DownloadItems = table.Column<bool>(type: "boolean", nullable: true),
+                    Mods = table.Column<List<string>>(type: "text[]", nullable: true),
+                    DaysRunning = table.Column<int>(type: "integer", nullable: true),
+                    SessionFlags = table.Column<int>(type: "integer", nullable: true),
+                    ClusterID = table.Column<string>(type: "text", nullable: true),
+                    CustomServerName = table.Column<string>(type: "text", nullable: true),
+                    PasswordRequired = table.Column<bool>(type: "boolean", nullable: true),
+                    Battleye = table.Column<bool>(type: "boolean", nullable: true),
+                    OfficialServer = table.Column<bool>(type: "boolean", nullable: true),
+                    PVE = table.Column<bool>(type: "boolean", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Ark_Servers", x => x.ServerID);
+                    table.ForeignKey(
+                        name: "FK_Ark_Servers_Servers_ServerID",
+                        column: x => x.ServerID,
+                        principalTable: "Servers",
+                        principalColumn: "ServerID",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "V_Rising_Servers",
                 columns: table => new
                 {
@@ -67,6 +97,21 @@ namespace UncoreMetrics.Data.Migrations.ServerContext
                         principalColumn: "ServerID",
                         onDelete: ReferentialAction.Cascade);
                 });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Ark_Servers_Battleye",
+                table: "Ark_Servers",
+                column: "Battleye");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Ark_Servers_PasswordRequired",
+                table: "Ark_Servers",
+                column: "PasswordRequired");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Ark_Servers_PVE",
+                table: "Ark_Servers",
+                column: "PVE");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Servers_AppID",
@@ -112,6 +157,9 @@ namespace UncoreMetrics.Data.Migrations.ServerContext
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropTable(
+                name: "Ark_Servers");
+
             migrationBuilder.DropTable(
                 name: "V_Rising_Servers");
 

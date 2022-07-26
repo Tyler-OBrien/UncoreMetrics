@@ -1,5 +1,6 @@
 using System.Text;
 using Shared_Collectors.Games.Steam.Generic;
+using Shared_Collectors.Helpers;
 using Shared_Collectors.Models.Games.Steam.SteamAPI;
 using UncoreMetrics.Data.GameData.VRising;
 
@@ -78,31 +79,17 @@ public class Worker : BackgroundService
         {
             if (server.ServerRules != null)
             {
-                if (server.ServerRules.Rules.TryGetValue("blood-bound-enabled", out var bloodBoundValue) &&
-                    bool.TryParse(bloodBoundValue, out var bloodBound))
+
+                if (server.ServerRules.TryGetBoolean("blood-bound-enabled", out var bloodBound))
                     server.CustomServerInfo.BloodBoundEquipment = bloodBound;
-                if (server.ServerRules.Rules.TryGetValue("castle-heart-damage-mode",
-                        out var castleHeartDamageModeValue) &&
-                    Enum.TryParse(castleHeartDamageModeValue, true, out CastleHeartDamageMode castleHeartDamageMode))
+                if (server.ServerRules.TryGetEnum("castle-heart-damage-mode", out CastleHeartDamageMode castleHeartDamageMode))
                     server.CustomServerInfo.HeartDamage = castleHeartDamageMode;
-                if (server.ServerRules.Rules.TryGetValue("days-runningv2", out var daysRunningValue) &&
-                    int.TryParse(daysRunningValue, out var daysRunning))
+                if (server.ServerRules.TryGetInt("days-runningv2", out var daysRunning))
                     server.CustomServerInfo.DaysRunning = daysRunning;
+                if (server.ServerRules.TryGetRunningString("desc{0}", out var description))
+                    server.CustomServerInfo.Description = description;
 
-                var descriptionStringBuilder = new StringBuilder();
-                var descCount = 0;
-                while (true)
-                {
-                    if (server.ServerRules.Rules.TryGetValue($"desc{descCount}", out var description))
-                        descriptionStringBuilder.Append(description);
-                    else
-                        // Break when no more descriptions are found....
-                        break;
-                    descCount++;
-                }
-
-                if (descriptionStringBuilder.Length > 0)
-                    server.CustomServerInfo.Description = descriptionStringBuilder.ToString();
+    
             }
         }
         catch (Exception ex)

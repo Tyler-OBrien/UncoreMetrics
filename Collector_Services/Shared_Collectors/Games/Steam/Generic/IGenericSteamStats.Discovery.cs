@@ -11,5 +11,5 @@ public partial interface IGenericSteamStats
     /// </summary>
     /// <param name="appID"></param>
     /// <returns>Returns a list of full server info to be actioned on with stats for that specific server type</returns>
-    public Task<List<DiscoveredServerInfo<T>>> GenericServerDiscovery<T>(ulong appID) where T : GenericServer, new();
+    public Task<List<DiscoveredServerInfo<T>>> GenericServerDiscovery<T>(ulong appID) where T : Server, new();
 }

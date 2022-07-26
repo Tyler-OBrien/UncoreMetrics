@@ -5,5 +5,5 @@ namespace Shared_Collectors.Games.Steam.Generic;
 
 public partial interface IGenericSteamStats
 {
-    public Task<List<PollServerInfo<T>>> GenericServerPoll<T>(ulong appID) where T : GenericServer, new();
+    public Task<List<PollServerInfo<T>>> GenericServerPoll<T>(ulong appID) where T : Server, new();
 }

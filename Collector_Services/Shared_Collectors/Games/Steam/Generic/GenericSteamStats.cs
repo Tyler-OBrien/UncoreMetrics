@@ -25,13 +25,13 @@ public partial class GenericSteamStats : IGenericSteamStats
     }
 
 
-    public async Task BulkInsertOrUpdate<T>(List<T> servers) where T : GenericServer, new()
+    public async Task BulkInsertOrUpdate<T>(List<T> servers) where T : Server, new()
     {
-        await InsertGenericServer(servers.ToList<GenericServer>());
+        await InsertGenericServer(servers.ToList<Server>());
         await _genericServersContext.BulkInsertOrUpdateAsync(servers);
     }
 
-    private async Task InsertGenericServer(List<GenericServer> servers)
+    private async Task InsertGenericServer(List<Server> servers)
     {
         var bulkConfig = new BulkConfig
         {

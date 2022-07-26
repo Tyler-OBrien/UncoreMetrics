@@ -9,7 +9,7 @@ public enum CastleHeartDamageMode
     Unknown
 }
 
-public class VRisingServer : GenericServer
+public class VRisingServer : Server
 {
     public VRisingServer()
     {

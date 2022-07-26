@@ -12,7 +12,7 @@ using UncoreMetrics.Data;
 namespace Shared_Collectors.Games.Steam.Generic;
 
 public class DiscoverySolver<T> : IGenericAsyncSolver<QueryPoolItem<SteamListServer>, DiscoveredServerInfo<T>>
-    where T : GenericServer, new()
+    where T : Server, new()
 {
     private readonly IGeoIPService _geoIpService;
 
@@ -62,7 +62,7 @@ public partial class GenericSteamStats : IGenericSteamStats
     /// <param name="appID"></param>
     /// <returns>Returns a list of full server info to be actioned on with stats for that specific server type</returns>
     public async Task<List<DiscoveredServerInfo<T>>> GenericServerDiscovery<T>(ulong appID)
-        where T : GenericServer, new()
+        where T : Server, new()
     {
         if (_steamApi == null) throw new NullReferenceException("Steam API cannot be null to use HandleGeneric");
 
@@ -85,7 +85,7 @@ public partial class GenericSteamStats : IGenericSteamStats
 
 
     private async Task<List<DiscoveredServerInfo<T>>> GetAllServersDiscovery<T>(List<SteamListServer> servers)
-        where T : GenericServer, new()
+        where T : Server, new()
     {
         var stopwatch = Stopwatch.StartNew();
 
@@ -103,7 +103,7 @@ public partial class GenericSteamStats : IGenericSteamStats
         var pool = new QueryConnectionPool();
         pool.ReceiveTimeout = 750;
         pool.SendTimeout = 750;
-        pool.Message += msg => { Console.WriteLine("Pool Message" + msg); };
+        pool.Message += msg => { Console.WriteLine("Pool Message: " + msg); };
         pool.Error += exception =>
         {
             Console.WriteLine("Exception from pool: " + exception);

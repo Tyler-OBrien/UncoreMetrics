@@ -10,10 +10,10 @@ using UncoreMetrics.Data;
 
 namespace Shared_Collectors.Games.Steam.Generic;
 
-public class PollSolver<T> : IGenericAsyncSolver<QueryPoolItem<GenericServer>, PollServerInfo<T>>
-    where T : GenericServer, new()
+public class PollSolver<T> : IGenericAsyncSolver<QueryPoolItem<Server>, PollServerInfo<T>>
+    where T : Server, new()
 {
-    public async Task<PollServerInfo<T>?> Solve(QueryPoolItem<GenericServer> item)
+    public async Task<PollServerInfo<T>?> Solve(QueryPoolItem<Server> item)
     {
         var server = item.Item;
         var pool = item.QueryConnectionPool;
@@ -54,7 +54,7 @@ public partial class GenericSteamStats : IGenericSteamStats
     /// </summary>
     /// <param name="appID"></param>
     /// <returns>Returns a list of full server info to be actioned on with stats for that specific server type</returns>
-    public async Task<List<PollServerInfo<T>>> GenericServerPoll<T>(ulong appID) where T : GenericServer, new()
+    public async Task<List<PollServerInfo<T>>> GenericServerPoll<T>(ulong appID) where T : Server, new()
     {
         if (_steamApi == null) throw new NullReferenceException("Steam API cannot be null to use HandleGeneric");
 
@@ -74,8 +74,8 @@ public partial class GenericSteamStats : IGenericSteamStats
     }
 
 
-    private async Task<List<PollServerInfo<T>>> GetAllServersPoll<T>(List<GenericServer> servers)
-        where T : GenericServer, new()
+    private async Task<List<PollServerInfo<T>>> GetAllServersPoll<T>(List<Server> servers)
+        where T : Server, new()
     {
         var stopwatch = Stopwatch.StartNew();
         // Might want to make this configurable eventually..
@@ -88,15 +88,15 @@ public partial class GenericSteamStats : IGenericSteamStats
         var pool = new QueryConnectionPool();
         pool.ReceiveTimeout = 750;
         pool.SendTimeout = 750;
-        pool.Message += msg => { Console.WriteLine("Pool Message" + msg); };
+        pool.Message += msg => { Console.WriteLine("Pool Message: " + msg); };
         pool.Error += exception =>
         {
             Console.WriteLine("Exception from pool: " + exception);
             throw exception;
         };
         pool.Setup();
-        var queue = new AsyncResolveQueue<QueryPoolItem<GenericServer>, PollServerInfo<T>>(
-            servers.Select(server => new QueryPoolItem<GenericServer>(pool, server)), maxConcurrency, newSolver);
+        var queue = new AsyncResolveQueue<QueryPoolItem<Server>, PollServerInfo<T>>(
+            servers.Select(server => new QueryPoolItem<Server>(pool, server)), maxConcurrency, newSolver);
 
         // Wait a max of 60 seconds...
         var delayCount = 0;

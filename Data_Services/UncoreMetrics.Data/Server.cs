@@ -5,7 +5,7 @@ using NpgsqlTypes;
 
 namespace UncoreMetrics.Data;
 
-public class GenericServer
+public class Server
 {
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     [Required]
@@ -65,7 +65,7 @@ public class GenericServer
 
     [Required] public DateTime FoundAt { get; set; }
 
-    public void Copy(GenericServer toCopy)
+    public void Copy(Server toCopy)
     {
         ServerID = toCopy.ServerID;
         Name = toCopy.Name;
