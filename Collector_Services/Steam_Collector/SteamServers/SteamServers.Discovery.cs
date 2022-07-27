@@ -3,6 +3,7 @@ using System.Net;
 using System.Runtime.InteropServices;
 using Okolni.Source.Query.Source;
 using Steam_Collector.Helpers;
+using Steam_Collector.Helpers.IPAddressExtensions;
 using Steam_Collector.Helpers.Maxmind;
 using Steam_Collector.Models.Games.Steam.SteamAPI;
 using Steam_Collector.SteamServers.ServerQuery;
@@ -72,6 +73,18 @@ public partial class SteamServers : ISteamServers
             await _steamApi.GetServerList(
                 SteamServerListQueryBuilder.New().AppID(appID.ToString()).Dedicated().NotEmpty(),
                 int.MaxValue);
+        var serverListCount = serverList.Count;
+        foreach (var server in serverList.ToList())
+        {
+            var (Host, Port) = SteamServerQuery.ParseIPAndPort(server.Address);
+            if (Host.IsPrivate())
+            {
+                serverList.Remove(server);
+            }
+        }
+#if DEBUG
+        Console.WriteLine($"Removed {serverListCount - serverList.Count} Servers containing Private IP Addresses (Valve Servers use Relays and don't expose, among others) ");
+#endif
 
         var servers = await GetAllServersDiscovery(serverList);
 

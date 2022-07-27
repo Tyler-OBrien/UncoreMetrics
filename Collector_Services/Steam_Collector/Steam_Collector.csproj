@@ -4,7 +4,7 @@
     <TargetFramework>net6.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <UserSecretsId>dotnet-V_Rising_Collector-456F2E8C-01DB-4894-B828-287001A37A8C</UserSecretsId>
+    <UserSecretsId>dotnet-Steam_Collector-456F2E8C-01DB-4894-B828-287001A37A8C</UserSecretsId>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
   </PropertyGroup>
 

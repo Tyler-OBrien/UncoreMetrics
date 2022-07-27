@@ -185,4 +185,9 @@ public static class A2SRulesHelper
 
         return items;
     }
+    public static bool DoesPropertyExist(this RuleResponse ruleResponse, string name)
+    {
+        if (string.IsNullOrWhiteSpace(name)) return false;
+        return ruleResponse.Rules.ContainsKey(name);
+    }
 }

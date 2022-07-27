@@ -5,16 +5,16 @@ WORKDIR /app
 
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 WORKDIR /src
-COPY ["V_Rising_Collector/V_Rising_Collector.csproj", "V_Rising_Collector/"]
-RUN dotnet restore "V_Rising_Collector/V_Rising_Collector.csproj"
+COPY ["Steam_Collector/Steam_Collector.csproj", "Steam_Collector/"]
+RUN dotnet restore "Steam_Collector/Steam_Collector.csproj"
 COPY . .
-WORKDIR "/src/V_Rising_Collector"
-RUN dotnet build "V_Rising_Collector.csproj" -c Release -o /app/build
+WORKDIR "/src/Steam_Collector"
+RUN dotnet build "Steam_Collector.csproj" -c Release -o /app/build
 
 FROM build AS publish
-RUN dotnet publish "V_Rising_Collector.csproj" -c Release -o /app/publish
+RUN dotnet publish "Steam_Collector.csproj" -c Release -o /app/publish
 
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "V_Rising_Collector.dll"]
+ENTRYPOINT ["dotnet", "Steam_Collector.dll"]
