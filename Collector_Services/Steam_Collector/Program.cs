@@ -22,7 +22,7 @@ public class Program
                 var resolver = new GameResolvers();
                 var gameType = baseConfiguration.GameType;
                 var env = Environment.GetEnvironmentVariable("UNCORE_COLLECTOR_GAMETYPE");
-                if (String.IsNullOrWhiteSpace(env) == false)
+                if (string.IsNullOrWhiteSpace(env) == false)
                     gameType = env;
 
                 if (resolver.DoesGameResolverExist(gameType) == false)
