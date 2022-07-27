@@ -12,7 +12,7 @@ namespace Steam_Collector.SteamServers;
 
 public class PollSolver : IGenericAsyncSolver<QueryPoolItem<Server>, PollServerInfo>
 {
-    public async Task<PollServerInfo?> Solve(QueryPoolItem<Server> item)
+    public async Task<(PollServerInfo? item, bool success)> Solve(QueryPoolItem<Server> item)
     {
         var server = item.Item;
         var pool = item.QueryConnectionPool;
@@ -25,12 +25,12 @@ public class PollSolver : IGenericAsyncSolver<QueryPoolItem<Server>, PollServerI
 
             if (info != null && rules != null && players != null)
             {
-                return new PollServerInfo(server, info, players, rules);
+                return (new PollServerInfo(server, info, players, rules), success: true);
             }
 #if DEBUG
             Console.WriteLine($"Failed to get {server.Address} - {server.Name} - {server.LastCheck}");
 #endif
-            return null;
+            return (new PollServerInfo(server, info, players, rules), success: false);
         }
         catch (Exception ex)
         {
@@ -38,10 +38,9 @@ public class PollSolver : IGenericAsyncSolver<QueryPoolItem<Server>, PollServerI
 #if DEBUG
             Console.WriteLine($"Failed to get {server.Address} - {server.Name} - {server.LastCheck}");
 #endif
-            return null;
         }
 
-        return null;
+        return (new PollServerInfo(server, null, null, null), success: false);
     }
 }
 

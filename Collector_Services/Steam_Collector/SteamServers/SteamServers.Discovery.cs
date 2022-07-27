@@ -20,7 +20,7 @@ public class DiscoverySolver : IGenericAsyncSolver<QueryPoolItem<SteamListServer
         _geoIpService = geoIpService;
     }
 
-    public async Task<DiscoveredServerInfo?> Solve(QueryPoolItem<SteamListServer> poolItem)
+    public async Task<(DiscoveredServerInfo? item, bool success)> Solve(QueryPoolItem<SteamListServer> poolItem)
     {
         var server = poolItem.Item;
         var pool = poolItem.QueryConnectionPool;
@@ -33,11 +33,13 @@ public class DiscoverySolver : IGenericAsyncSolver<QueryPoolItem<SteamListServer
             var players = await pool.GetPlayersSafeAsync(endPoint);
             var geoIpInformation = await _geoIpService.GetIpInformation(Host.ToString());
             if (info != null && rules != null && players != null)
-                return new DiscoveredServerInfo(Host, Port, server, info, players, rules, geoIpInformation);
+            {
+                return (new DiscoveredServerInfo(Host, Port, server, info, players, rules, geoIpInformation), success: true);
+            }
 #if DEBUG
             Console.WriteLine($"Failed to get {server.Address} - {server.Name} - {server.SteamID}");
 #endif
-            return null;
+            return (null, success: false);
         }
         catch (Exception ex)
         {
@@ -45,10 +47,9 @@ public class DiscoverySolver : IGenericAsyncSolver<QueryPoolItem<SteamListServer
 #if DEBUG
             Console.WriteLine($"Failed to get {server.Address} - {server.Name} - {server.SteamID}");
 #endif
-            return null;
         }
 
-        return null;
+        return (null, success: false);
     }
 }
 
