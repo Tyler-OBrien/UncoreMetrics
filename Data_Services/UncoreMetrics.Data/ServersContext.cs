@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Diagnostics;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 using UncoreMetrics.Data.GameData.ARK;
 using UncoreMetrics.Data.GameData.VRising;
@@ -46,8 +47,9 @@ public class ServersContext : DbContext
             .HasIndex(p => p.SearchVector)
             .HasMethod("GIN"); // Index method on the search vector (GIN or GIST)
 
-        modelBuilder.Entity<Server>().HasKey(server => new { server.IpAddressBytes, server.Port });
+
         modelBuilder.Entity<Server>().HasKey(server => server.ServerID);
+        modelBuilder.Entity<Server>().HasIndex(server => new { server.IpAddressBytes, server.Port }).IsUnique();
         modelBuilder.Entity<Server>().Property(p => p.SearchVector).ValueGeneratedOnAdd()
             .Metadata.SetBeforeSaveBehavior(PropertySaveBehavior.Ignore);
 
@@ -55,6 +57,7 @@ public class ServersContext : DbContext
         modelBuilder.Entity<VRisingServer>().ToTable("V_Rising_Servers");
         modelBuilder.Entity<VRisingServer>().HasIndex(server => server.HeartDamage);
         modelBuilder.Entity<VRisingServer>().HasIndex(server => server.BloodBoundEquipment);
+
 
         modelBuilder.Entity<ArkServer>().ToTable("Ark_Servers");
         modelBuilder.Entity<ArkServer>().HasIndex(server => server.Battleye);

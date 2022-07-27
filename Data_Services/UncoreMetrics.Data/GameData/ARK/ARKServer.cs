@@ -1,7 +1,10 @@
-﻿namespace UncoreMetrics.Data.GameData.ARK;
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace UncoreMetrics.Data.GameData.ARK;
 
 public class ArkServer : Server
 {
+
     public bool? Modded { get; set; }
 
 

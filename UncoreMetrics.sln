@@ -5,7 +5,7 @@ VisualStudioVersion = 17.2.32519.379
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Collector_Services", "Collector_Services", "{6BA5B9D6-F869-4231-8207-6F990CDDE85C}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Steam_Collector", "Collector_Services\V_Rising_Collector\Steam_Collector.csproj", "{5AA56B10-7441-4B91-AFF1-9CFB4437A0EE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Steam_Collector", "Collector_Services\Steam_Collector\Steam_Collector.csproj", "{5AA56B10-7441-4B91-AFF1-9CFB4437A0EE}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Integration_Services", "Integration_Services", "{FDE0F169-7104-49A4-8BB3-3A81DAA71846}"
 EndProject

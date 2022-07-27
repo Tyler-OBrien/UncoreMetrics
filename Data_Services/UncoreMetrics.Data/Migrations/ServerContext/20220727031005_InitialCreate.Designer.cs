@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Net;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using NpgsqlTypes;
@@ -14,9 +15,10 @@ using UncoreMetrics.Data;
 namespace UncoreMetrics.Data.Migrations.ServerContext
 {
     [DbContext(typeof(ServersContext))]
-    partial class ServersContextModelSnapshot : ModelSnapshot
+    [Migration("20220727031005_InitialCreate")]
+    partial class InitialCreate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

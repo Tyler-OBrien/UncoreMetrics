@@ -1,4 +1,6 @@
-﻿namespace UncoreMetrics.Data.GameData.VRising;
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace UncoreMetrics.Data.GameData.VRising;
 
 public enum CastleHeartDamageMode
 {
@@ -11,20 +13,6 @@ public enum CastleHeartDamageMode
 
 public class VRisingServer : Server
 {
-    public VRisingServer()
-    {
-    }
-
-    public VRisingServer(CastleHeartDamageMode? heartDamage, bool? bloodBoundEquipment, int? daysRunning,
-        string? description)
-    {
-        HeartDamage = heartDamage;
-        BloodBoundEquipment = bloodBoundEquipment;
-        DaysRunning = daysRunning;
-        Description = description;
-    }
-
-
     public CastleHeartDamageMode? HeartDamage { get; set; }
 
     public bool? BloodBoundEquipment { get; set; }

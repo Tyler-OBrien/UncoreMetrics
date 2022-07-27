@@ -7,7 +7,6 @@ namespace UncoreMetrics.Data;
 
 public class Server
 {
-    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     [Required]
     public Guid ServerID { get; set; }
 
