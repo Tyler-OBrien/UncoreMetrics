@@ -129,8 +129,8 @@ namespace Steam_Collector.Game_Collectors
                 }
             }
             await InsertGenericServer(servers.ToList<Server>());
-            await _genericServersContext.BulkInsertOrUpdateAsync(servers, config => config.UseTempDB = false );
-            //await transaction.CommitAsync();
+            await _genericServersContext.BulkInsertOrUpdateAsync(servers );
+            await transaction.CommitAsync();
         }
         private async Task InsertGenericServer(List<Server> servers)
         {
@@ -138,7 +138,6 @@ namespace Steam_Collector.Game_Collectors
             {
                 PropertiesToExclude = new List<string> { "SearchVector" },
                 PropertiesToExcludeOnUpdate = new List<string> { "FoundAt", "ServerID", "SearchVector" },
-                UseTempDB = false,
             };
 
 
