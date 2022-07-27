@@ -2,5 +2,5 @@
 
 public interface IGenericAsyncSolver<TIn, TOut>
 {
-    public Task<TOut?> Solve(TIn item);
+    public Task<(TOut? item, bool success)> Solve(TIn item);
 }

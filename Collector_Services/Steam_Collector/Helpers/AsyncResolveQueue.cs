@@ -84,15 +84,17 @@ public class AsyncResolveQueue<TIn, TOut> : IDisposable
                 {
                     Interlocked.Increment(ref _running);
                     var outItem = await _solvingMethod.Solve(item);
-                    if (outItem == null)
+                    if (outItem.success == false || outItem.item == null)
                     {
                         Interlocked.Increment(ref _failed);
                     }
                     else
                     {
                         Interlocked.Increment(ref _successful);
-                        Outgoing.Add(outItem);
                     }
+                    if (outItem.item != null)
+                        Outgoing.Add(outItem.item);
+                    
                 }
                 finally
                 {
@@ -103,7 +105,7 @@ public class AsyncResolveQueue<TIn, TOut> : IDisposable
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Exception in Consume of Thread {Thread.CurrentThread.ManagedThreadId}");
+            Console.WriteLine($"Exception in Consume of Thread {Environment.CurrentManagedThreadId}");
             Console.WriteLine(ex);
         }
     }

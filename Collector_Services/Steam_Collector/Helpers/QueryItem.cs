@@ -13,4 +13,5 @@ public class QueryPoolItem<T>
     public IQueryConnectionPool QueryConnectionPool { get; set; }
 
     public T Item { get; set; }
+
 }
