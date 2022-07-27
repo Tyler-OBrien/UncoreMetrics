@@ -18,7 +18,7 @@ namespace Steam_Collector
                 },
                 {
                     "ARK",
-                    typeof(VRisingResolver)
+                    typeof(ArkResolver)
                 }
             };
         public bool DoesGameResolverExist(string name)
