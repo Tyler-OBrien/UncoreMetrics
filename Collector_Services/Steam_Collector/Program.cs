@@ -37,7 +37,6 @@ public class Program
                 services.AddDbContext<ServersContext>(options =>
                 {
                     options.UseNpgsql(baseConfiguration.PostgresConnectionString);
-                    options.EnableSensitiveDataLogging();
                 });
 
                 services.AddSingleton<IGeoIPService, MaxMindService>();
