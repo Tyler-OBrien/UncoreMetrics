@@ -28,7 +28,7 @@ public class PollServerInfo : IGenericServerInfo
 
     internal void UpdateServer(int nextCheckSeconds, List<int> nextCheckFailed, int daysUntilServerMarkedAsDead)
     {
-        if (ServerInfo == null || String.IsNullOrWhiteSpace(ServerInfo.Folder))
+        if (ServerInfo == null)
         {
             ExistingServer.FailedChecks += 1;
             var nextCheckFailedSeconds = nextCheckFailed.ElementAtOrDefault(ExistingServer.FailedChecks - 1);
