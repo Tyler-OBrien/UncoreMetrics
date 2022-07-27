@@ -22,7 +22,7 @@ public class VRisingResolver : BaseResolver
 
 
 
-    public override string Name => "RVising";
+    public override string Name => "VRising";
     public override ulong AppId => 1604030;
 
     public override async Task HandleServersGeneric(List<IGenericServerInfo> servers)
@@ -39,17 +39,11 @@ public class VRisingResolver : BaseResolver
         if (server.ExistingServer != null)
             vRisingServer.Copy(server.ExistingServer);
 
+
         if (server.ServerRules != null)
         {
-            if (server.ServerRules.TryGetBoolean("blood-bound-enabled", out var bloodBound))
-                vRisingServer.BloodBoundEquipment = bloodBound;
-            if (server.ServerRules.TryGetEnum("castle-heart-damage-mode",
-                    out CastleHeartDamageMode castleHeartDamageMode))
-                vRisingServer.HeartDamage = castleHeartDamageMode;
-            if (server.ServerRules.TryGetInt("days-runningv2", out var daysRunning))
-                vRisingServer.DaysRunning = daysRunning;
-            if (server.ServerRules.TryGetRunningString("desc{0}", out var description))
-                vRisingServer.Description = description;
+            vRisingServer.ResolveGameDataPropertiesFromRules(server.ServerRules);
+            // Any Extra parsing
         }
 
         return vRisingServer;

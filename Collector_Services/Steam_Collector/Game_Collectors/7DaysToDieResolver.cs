@@ -8,10 +8,10 @@ using UncoreMetrics.Data.GameData.ARK;
 
 namespace Steam_Collector.Game_Collectors;
 
-public class ArkResolver : BaseResolver
+public class _7DaysToDie : BaseResolver
 {
 
-    public ArkResolver(
+    public _7DaysToDie(
         IOptions<BaseConfiguration> baseConfiguration, ServersContext serversContext, ISteamServers steamServers) :
         base(baseConfiguration, serversContext, steamServers)
     {
@@ -22,8 +22,8 @@ public class ArkResolver : BaseResolver
 
 
 
-    public override string Name => "ARK";
-    public override ulong AppId => 346110;
+    public override string Name => "7DTD";
+    public override ulong AppId => 251570;
 
 
 
@@ -45,8 +45,6 @@ public class ArkResolver : BaseResolver
 
         if (server.ServerRules != null)
         {
-            arkServer.ResolveGameDataPropertiesFromRules(server.ServerRules);
-
             if (server.ServerRules.TryGetBooleanExtended("ALLOWDOWNLOADCHARS_i", out var allowDownloadChars))
                 arkServer.DownloadCharacters = allowDownloadChars;
 
