@@ -37,6 +37,21 @@ public class Server
 
     [Required] public uint MaxPlayers { get; set; }
 
+
+    [Required] public bool Visibility { get; set; }
+
+
+    [Required] public byte Environment { get; set; }
+
+
+    [Required] public bool VAC { get; set; }
+
+    [Required] public string? Keywords { get; set; }
+
+
+    [Required] public ulong? SteamID { get; set; }
+
+
     public long? ASN { get; set; }
 
     public string? ISP { get; set; }

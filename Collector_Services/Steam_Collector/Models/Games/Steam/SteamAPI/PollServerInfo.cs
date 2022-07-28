@@ -1,4 +1,5 @@
-﻿using Okolni.Source.Query.Responses;
+﻿using Okolni.Source.Common;
+using Okolni.Source.Query.Responses;
 using UncoreMetrics.Data;
 
 namespace Steam_Collector.Models.Games.Steam.SteamAPI;
@@ -57,6 +58,13 @@ public class PollServerInfo : IGenericServerInfo
             ExistingServer.IsOnline = true;
             ExistingServer.Game = ServerInfo.Game;
             ExistingServer.Name = ServerInfo.Name;
+
+            ExistingServer.Keywords = ServerInfo.KeyWords;
+            ExistingServer.VAC = ServerInfo.VAC;
+            ExistingServer.Visibility = ServerInfo.Visibility == Enums.Visibility.Private ? true : false;
+            ExistingServer.Environment = (byte)ServerInfo.Environment;
+            ExistingServer.SteamID = ServerInfo.SteamID;
+
         }
     }
 }
