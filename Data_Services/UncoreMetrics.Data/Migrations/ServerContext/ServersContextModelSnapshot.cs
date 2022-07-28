@@ -47,7 +47,7 @@ namespace UncoreMetrics.Data.Migrations.ServerContext
                     b.Property<string>("Country")
                         .HasColumnType("text");
 
-                    b.Property<byte>("Environment")
+                    b.Property<byte?>("Environment")
                         .HasColumnType("smallint");
 
                     b.Property<int>("FailedChecks")
@@ -118,10 +118,10 @@ namespace UncoreMetrics.Data.Migrations.ServerContext
                     b.Property<string>("Timezone")
                         .HasColumnType("text");
 
-                    b.Property<bool>("VAC")
+                    b.Property<bool?>("VAC")
                         .HasColumnType("boolean");
 
-                    b.Property<bool>("Visibility")
+                    b.Property<bool?>("Visibility")
                         .HasColumnType("boolean");
 
                     b.HasKey("ServerID");

@@ -7,8 +7,7 @@ namespace UncoreMetrics.Data;
 
 public class Server
 {
-    [Required]
-    public Guid ServerID { get; set; }
+    [Required] public Guid ServerID { get; set; }
 
     [Required] public string Name { get; set; }
 
@@ -38,13 +37,13 @@ public class Server
     [Required] public uint MaxPlayers { get; set; }
 
 
-    [Required] public bool Visibility { get; set; }
+    public bool? Visibility { get; set; }
 
 
-    [Required] public byte Environment { get; set; }
+    public byte? Environment { get; set; }
 
 
-    [Required] public bool VAC { get; set; }
+    public bool? VAC { get; set; }
 
     public string? Keywords { get; set; }
 

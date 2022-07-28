@@ -15,7 +15,7 @@ using UncoreMetrics.Data;
 namespace UncoreMetrics.Data.Migrations.ServerContext
 {
     [DbContext(typeof(ServersContext))]
-    [Migration("20220728035719_InitialCreate")]
+    [Migration("20220728042810_InitialCreate")]
     partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -49,7 +49,7 @@ namespace UncoreMetrics.Data.Migrations.ServerContext
                     b.Property<string>("Country")
                         .HasColumnType("text");
 
-                    b.Property<byte>("Environment")
+                    b.Property<byte?>("Environment")
                         .HasColumnType("smallint");
 
                     b.Property<int>("FailedChecks")
@@ -120,10 +120,10 @@ namespace UncoreMetrics.Data.Migrations.ServerContext
                     b.Property<string>("Timezone")
                         .HasColumnType("text");
 
-                    b.Property<bool>("VAC")
+                    b.Property<bool?>("VAC")
                         .HasColumnType("boolean");
 
-                    b.Property<bool>("Visibility")
+                    b.Property<bool?>("Visibility")
                         .HasColumnType("boolean");
 
                     b.HasKey("ServerID");
