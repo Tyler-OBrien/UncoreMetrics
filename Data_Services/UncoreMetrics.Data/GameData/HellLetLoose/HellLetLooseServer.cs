@@ -2,9 +2,9 @@
 
 public class HellLetLooseServer : Server
 {
-    [GameDataRulesProperty("SESSIONFLAGS")]
+    [ServerRulesProperty("SESSIONFLAGS")]
 
     public int? SessionFlags { get; set; }
 
-    [GameDataRulesProperty("VISIB_i")] public int? Visible { get; set; }
+    [ServerRulesProperty("VISIB_i")] public int? Visible { get; set; }
 }

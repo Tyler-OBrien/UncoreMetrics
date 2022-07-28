@@ -2,18 +2,18 @@
 
 public class DayZServer : Server
 {
-    [GameDataRulesProperty("allowedBuild")]
+    [ServerRulesProperty("allowedBuild")]
     public bool? AllowedBuild { get; set; }
 
-    [GameDataRulesProperty("island")] public string? Island { get; set; }
+    [ServerRulesProperty("island")] public string? Island { get; set; }
 
-    [GameDataRulesProperty("language")] public string? Language { get; set; }
+    [ServerRulesProperty("language")] public string? Language { get; set; }
 
-    [GameDataRulesProperty("requiredBuild")]
+    [ServerRulesProperty("requiredBuild")]
     public int? RequiredBuild { get; set; }
 
-    [GameDataRulesProperty("requiredVersion")]
+    [ServerRulesProperty("requiredVersion")]
     public int? RequiredVersion { get; set; }
 
-    [GameDataRulesProperty("timeLeft")] public int? TimeLeft { get; set; }
+    [ServerRulesProperty("timeLeft")] public int? TimeLeft { get; set; }
 }

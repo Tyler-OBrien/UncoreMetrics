@@ -2,48 +2,48 @@
 
 public class PostScriptumServer : Server
 {
-    [GameDataRulesProperty("AllModsWhitelisted_b")]
+    [ServerRulesProperty("AllModsWhitelisted_b")]
     public bool? AllModsWhitelisted { get; set; }
 
-    [GameDataRulesProperty("CurrentModLoadedCount_i")]
+    [ServerRulesProperty("CurrentModLoadedCount_i")]
     public int? CurrentModLoadedCount { get; set; }
 
 
-    [GameDataRulesProperty("Flags_i")] public int? Flags { get; set; }
+    [ServerRulesProperty("Flags_i")] public int? Flags { get; set; }
 
 
-    [GameDataRulesProperty("GameMode_s")] public string? GameMode { get; set; }
+    [ServerRulesProperty("GameMode_s")] public string? GameMode { get; set; }
 
-    [GameDataRulesProperty("GameVersion_s")]
+    [ServerRulesProperty("GameVersion_s")]
     public string? GameVersion { get; set; }
 
 
-    [GameDataRulesProperty("MatchTimeout_f")]
+    [ServerRulesProperty("MatchTimeout_f")]
     public int? MatchTimeout { get; set; }
 
 
-    [GameDataRulesProperty("Password_b")] public bool? Password { get; set; }
+    [ServerRulesProperty("Password_b")] public bool? Password { get; set; }
 
 
-    [GameDataRulesProperty("PlayerReserveCount_i")]
+    [ServerRulesProperty("PlayerReserveCount_i")]
     public int? PlayerReserveCount { get; set; }
 
 
-    [GameDataRulesProperty("PublicQueue_i")]
+    [ServerRulesProperty("PublicQueue_i")]
     public int? PublicQueue { get; set; }
 
-    [GameDataRulesProperty("PlayerCount_i")]
+    [ServerRulesProperty("PlayerCount_i")]
     public int? PlayerCount { get; set; }
 
 
-    [GameDataRulesProperty("ReservedQueue_i")]
+    [ServerRulesProperty("ReservedQueue_i")]
     public int? ReservedQueue { get; set; }
 
 
-    [GameDataRulesProperty("SEARCHKEYWORDS_s")]
+    [ServerRulesProperty("SEARCHKEYWORDS_s")]
     public string? SearchKeywords { get; set; }
 
 
-    [GameDataRulesProperty("SESSIONFLAGS")]
+    [ServerRulesProperty("SESSIONFLAGS")]
     public int? SessionFlags { get; set; }
 }

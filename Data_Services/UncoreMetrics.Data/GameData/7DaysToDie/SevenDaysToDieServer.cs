@@ -2,158 +2,158 @@
 
 public class SevenDaysToDieServer : Server
 {
-    [GameDataRulesProperty("AirDropMarker")]
+    [ServerRulesProperty("AirDropMarker")]
     public bool? AirDropMarker { get; set; }
 
 
-    [GameDataRulesProperty("BedrollExpiryTime")]
+    [ServerRulesProperty("BedrollExpiryTime")]
     public int? BedrollExpiryTime { get; set; }
 
-    [GameDataRulesProperty("BloodMoonFrequency")]
+    [ServerRulesProperty("BloodMoonFrequency")]
     public string? BloodMoonFrequency { get; set; }
 
 
-    [GameDataRulesProperty("BuildCreate")] public bool? BuildCreate { get; set; }
+    [ServerRulesProperty("BuildCreate")] public bool? BuildCreate { get; set; }
 
 
-    [GameDataRulesProperty("CompatibilityVersion")]
+    [ServerRulesProperty("CompatibilityVersion")]
     public string? CompatibilityVersion { get; set; }
 
 
-    [GameDataRulesProperty("CurrentServerTime")]
+    [ServerRulesProperty("CurrentServerTime")]
     public int? CurrentServerTime { get; set; }
 
 
-    [GameDataRulesProperty("DayCount")] public int? DayCount { get; set; }
+    [ServerRulesProperty("DayCount")] public int? DayCount { get; set; }
 
 
-    [GameDataRulesProperty("DropOnDeath")] public bool? DropOnDeath { get; set; }
+    [ServerRulesProperty("DropOnDeath")] public bool? DropOnDeath { get; set; }
 
 
-    [GameDataRulesProperty("DropOnQuit")] public bool? DropOnQuit { get; set; }
+    [ServerRulesProperty("DropOnQuit")] public bool? DropOnQuit { get; set; }
 
 
-    [GameDataRulesProperty("EACEnabled")] public bool? EACEnabled { get; set; }
+    [ServerRulesProperty("EACEnabled")] public bool? EACEnabled { get; set; }
 
 
-    [GameDataRulesProperty("EnemyDifficulty")]
+    [ServerRulesProperty("EnemyDifficulty")]
     public int? EnemyDifficulty { get; set; }
 
 
-    [GameDataRulesProperty("GameDifficulty")]
+    [ServerRulesProperty("GameDifficulty")]
     public int? GameDifficulty { get; set; }
 
 
-    [GameDataRulesProperty("GameHost")] public string? GameHost { get; set; }
+    [ServerRulesProperty("GameHost")] public string? GameHost { get; set; }
 
 
-    [GameDataRulesProperty("GameName")] public string? GameName { get; set; }
+    [ServerRulesProperty("GameName")] public string? GameName { get; set; }
 
 
-    [GameDataRulesProperty("IsPasswordProtected")]
+    [ServerRulesProperty("IsPasswordProtected")]
     public bool? IsPasswordProtected { get; set; }
 
 
-    [GameDataRulesProperty("IsPublic")] public bool? IsPublic { get; set; }
+    [ServerRulesProperty("IsPublic")] public bool? IsPublic { get; set; }
 
 
-    [GameDataRulesProperty("LandClaimCount")]
+    [ServerRulesProperty("LandClaimCount")]
     public int? LandClaimCount { get; set; }
 
 
-    [GameDataRulesProperty("LandClaimDecayMode")]
+    [ServerRulesProperty("LandClaimDecayMode")]
     public int? LandClaimDecayMode { get; set; }
 
 
-    [GameDataRulesProperty("LandClaimExpiryTime")]
+    [ServerRulesProperty("LandClaimExpiryTime")]
     public int? LandClaimExpiryTime { get; set; }
 
 
-    [GameDataRulesProperty("Language")] public string? Language { get; set; }
+    [ServerRulesProperty("Language")] public string? Language { get; set; }
 
 
-    [GameDataRulesProperty("LevelName")] public string? LevelName { get; set; }
+    [ServerRulesProperty("LevelName")] public string? LevelName { get; set; }
 
 
-    [GameDataRulesProperty("LootAbundance")]
+    [ServerRulesProperty("LootAbundance")]
     public int? LootAbundance { get; set; }
 
 
-    [GameDataRulesProperty("LootRespawnDays")]
+    [ServerRulesProperty("LootRespawnDays")]
     public int? LootRespawnDays { get; set; }
 
 
-    [GameDataRulesProperty("MaxSpawnedAnimals")]
+    [ServerRulesProperty("MaxSpawnedAnimals")]
     public int? MaxSpawnedAnimals { get; set; }
 
 
-    [GameDataRulesProperty("MaxSpawnedZombies")]
+    [ServerRulesProperty("MaxSpawnedZombies")]
     public int? MaxSpawnedZombies { get; set; }
 
 
-    [GameDataRulesProperty("ModdedConfig")]
+    [ServerRulesProperty("ModdedConfig")]
     public bool? ModdedConfig { get; set; }
 
 
-    [GameDataRulesProperty("PlayerKillingMode")]
+    [ServerRulesProperty("PlayerKillingMode")]
     public int? PlayerKillingMode { get; set; }
 
-    [GameDataRulesProperty("Region")] public string? Region { get; set; }
+    [ServerRulesProperty("Region")] public string? Region { get; set; }
 
 
-    [GameDataRulesProperty("RequiresMod")] public bool? RequiresMod { get; set; }
+    [ServerRulesProperty("RequiresMod")] public bool? RequiresMod { get; set; }
 
 
-    [GameDataRulesProperty("ServerDescription")]
+    [ServerRulesProperty("ServerDescription")]
     public string? ServerDescription { get; set; }
 
 
-    [GameDataRulesProperty("ServerLoginConfirmationText")]
+    [ServerRulesProperty("ServerLoginConfirmationText")]
     public string? ServerLoginConfirmationText { get; set; }
 
 
-    [GameDataRulesProperty("ServerWebsiteURL")]
+    [ServerRulesProperty("ServerWebsiteURL")]
     public string? ServerWebsiteURL { get; set; }
 
 
-    [GameDataRulesProperty("ShowFriendPlayerOnMap")]
+    [ServerRulesProperty("ShowFriendPlayerOnMap")]
     public bool? ShowFriendPlayerOnMap { get; set; }
 
 
-    [GameDataRulesProperty("StockFiles")] public bool? StockFiles { get; set; }
+    [ServerRulesProperty("StockFiles")] public bool? StockFiles { get; set; }
 
 
-    [GameDataRulesProperty("StockSettings")]
+    [ServerRulesProperty("StockSettings")]
     public bool? StockSettings { get; set; }
 
 
-    [GameDataRulesProperty("Version")] public string? Version { get; set; }
+    [ServerRulesProperty("Version")] public string? Version { get; set; }
 
-    [GameDataRulesProperty("WorldSize")] public int? WorldSize { get; set; }
+    [ServerRulesProperty("WorldSize")] public int? WorldSize { get; set; }
 
 
-    [GameDataRulesProperty("XPMultiplier")]
+    [ServerRulesProperty("XPMultiplier")]
     public int? XPMultiplier { get; set; }
 
 
-    [GameDataRulesProperty("ZombieBMMove")]
+    [ServerRulesProperty("ZombieBMMove")]
     public int? ZombieBMMove { get; set; }
 
 
-    [GameDataRulesProperty("ZombieFeralMove")]
+    [ServerRulesProperty("ZombieFeralMove")]
     public int? ZombieFeralMove { get; set; }
 
 
-    [GameDataRulesProperty("ZombieFeralSense")]
+    [ServerRulesProperty("ZombieFeralSense")]
     public int? ZombieFeralSense { get; set; }
 
 
-    [GameDataRulesProperty("ZombieMove")] public int? ZombieMove { get; set; }
+    [ServerRulesProperty("ZombieMove")] public int? ZombieMove { get; set; }
 
 
-    [GameDataRulesProperty("ZombieMoveNight")]
+    [ServerRulesProperty("ZombieMoveNight")]
     public int? ZombieMoveNight { get; set; }
 
 
-    [GameDataRulesProperty("ZombiesRun")] public int? ZombiesRun { get; set; }
+    [ServerRulesProperty("ZombiesRun")] public int? ZombiesRun { get; set; }
 }
