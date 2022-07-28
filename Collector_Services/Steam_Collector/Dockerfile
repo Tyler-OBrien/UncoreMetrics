@@ -5,10 +5,11 @@ WORKDIR /app
 
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 WORKDIR /src
-COPY ["Steam_Collector/Steam_Collector.csproj", "Steam_Collector/"]
-RUN dotnet restore "Steam_Collector/Steam_Collector.csproj"
+COPY ["Collector_Services/Steam_Collector/Steam_Collector.csproj", "Collector_Services/Steam_Collector/"]
+COPY ["Data_Services/UncoreMetrics.Data/UncoreMetrics.Data.csproj", "Data_Services/UncoreMetrics.Data/"]
+RUN dotnet restore "Collector_Services/Steam_Collector/Steam_Collector.csproj"
 COPY . .
-WORKDIR "/src/Steam_Collector"
+WORKDIR "/src/Collector_Services/Steam_Collector"
 RUN dotnet build "Steam_Collector.csproj" -c Release -o /app/build
 
 FROM build AS publish
