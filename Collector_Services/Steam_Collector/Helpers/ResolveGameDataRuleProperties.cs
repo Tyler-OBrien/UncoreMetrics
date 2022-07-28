@@ -26,6 +26,7 @@ namespace Steam_Collector.Helpers
             PropertyInfo[] props = inputClass.GetType().GetProperties();
             foreach (PropertyInfo prop in props)
             {
+                var resolvedPropertyType = prop.PropertyType.TryGetUnderlyingNullable();
                 object[] attrs = prop.GetCustomAttributes(true);
                 foreach (object attr in attrs)
                 {
@@ -34,38 +35,38 @@ namespace Steam_Collector.Helpers
                         string propertyName = rulesProperty.PropertyName;
                         if (rulesProperty.ValueType == ValueType.Normal)
                         {
-                            if (prop.PropertyType.TryGetUnderlyingNullable() == typeof(string))
+                            if (resolvedPropertyType == typeof(string))
                             {
                                 if (rules.TryGetString(propertyName, out var foundValue))
                                 {
                                     prop.SetValue(inputClass, foundValue, null);
                                 }
                             }
-                            else if (prop.PropertyType.TryGetUnderlyingNullable() == typeof(bool))
+                            else if (resolvedPropertyType == typeof(bool))
                             {
                                 if (rules.TryGetBooleanExtended(propertyName, out var foundValue))
                                 {
                                     prop.SetValue(inputClass, foundValue, null);
                                 }
                             }
-                            else if (prop.PropertyType.TryGetUnderlyingNullable() == typeof(ulong))
+                            else if (resolvedPropertyType == typeof(ulong))
                             {
                                 if (rules.TryGetUlong(propertyName, out var foundValue))
                                 {
                                     prop.SetValue(inputClass, foundValue, null);
                                 }
                             }
-                            else if (prop.PropertyType.TryGetUnderlyingNullable() == typeof(int))
+                            else if (resolvedPropertyType == typeof(int))
                             {
                                 if (rules.TryGetInt(propertyName, out var foundValue))
                                 {
                                     prop.SetValue(inputClass, foundValue, null);
                                 }
                             }
-                            else if (prop.PropertyType.TryGetUnderlyingNullable().IsEnum)
+                            else if (resolvedPropertyType.IsEnum)
                             {
                                 if (rules.TryGetString(propertyName, out var rawValue) &&
-                                    Enum.TryParse(prop.PropertyType.TryGetUnderlyingNullable(), rawValue, true, out var foundValue))
+                                    Enum.TryParse(resolvedPropertyType, rawValue, true, out var foundValue))
                                 {
                                     prop.SetValue(inputClass, foundValue, null);
                                 }
@@ -73,30 +74,30 @@ namespace Steam_Collector.Helpers
                             else
                             {
                                 throw new InvalidOperationException(
-                                    $"Cannot resolve {prop.PropertyType.TryGetUnderlyingNullable().Name} / {rulesProperty.PropertyName} for Property {prop.Name} from A2S Rules Dict. This type probably isn't supported.");
+                                    $"Cannot resolve {resolvedPropertyType.Name} / {rulesProperty.PropertyName} for Property {prop.Name} from A2S Rules Dict. This type probably isn't supported.");
                             }
                         }
                         else if (rulesProperty.ValueType == ValueType.Running)
                         {
-                            if (prop.PropertyType.TryGetUnderlyingNullable() == typeof(string))
+                            if (resolvedPropertyType == typeof(string))
                             {
                                 if (rules.TryGetRunningString(propertyName, out var foundValue, rulesProperty.StartIndex))
                                 {
                                     prop.SetValue(inputClass, foundValue, null);
                                 }
                             }
-                            else if (prop.PropertyType.TryGetUnderlyingNullable() == typeof(List<ulong>))
+                            else if (resolvedPropertyType == typeof(List<ulong>))
                             {
                                 prop.SetValue(inputClass, rules.TryGetRunningUlong(propertyName, rulesProperty.StartIndex), null);
                             }
-                            else if (prop.PropertyType.TryGetUnderlyingNullable() == typeof(List<string>))
+                            else if (resolvedPropertyType == typeof(List<string>))
                             {
                                 prop.SetValue(inputClass, rules.TryGetRunningList(propertyName, rulesProperty.StartIndex), null);
                             }
                             else
                             {
                                 throw new InvalidOperationException(
-                                    $"Cannot resolve {prop.PropertyType.TryGetUnderlyingNullable().Name} / {rulesProperty.PropertyName} for Property {prop.Name} from A2S Rules Dict. This type probably isn't supported.");
+                                    $"Cannot resolve {resolvedPropertyType.Name} / {rulesProperty.PropertyName} for Property {prop.Name} from A2S Rules Dict. This type probably isn't supported.");
                             }
                         }
                     }
