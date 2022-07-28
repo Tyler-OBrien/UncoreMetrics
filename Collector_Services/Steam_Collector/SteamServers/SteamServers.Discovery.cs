@@ -72,7 +72,9 @@ public partial class SteamServers : ISteamServers
             await _steamApi.GetServerList(
                 queryListQueryBuilder,
                 int.MaxValue);
+#if DEBUG
         var serverListCount = serverList.Count;
+#endif
         foreach (var server in serverList.ToList())
         {
             var (Host, Port) = SteamServerQuery.ParseIPAndPort(server.Address);
