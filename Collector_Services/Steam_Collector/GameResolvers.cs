@@ -1,41 +1,67 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Steam_Collector.Game_Collectors;
+﻿using Steam_Collector.Game_Collectors;
 
-namespace Steam_Collector
+namespace Steam_Collector;
+
+public class GameResolvers
 {
-    public class GameResolvers
-    {
-        private static readonly Dictionary<string, Type> _gameResolvers =
-            new (StringComparer.OrdinalIgnoreCase)
+    private static readonly Dictionary<string, Type> _gameResolvers =
+        new(StringComparer.OrdinalIgnoreCase)
+        {
             {
-                {
-                    "VRising",
-                    typeof(VRisingResolver)
-                },
-                {
-                    "ARK",
-                    typeof(ArkResolver)
-                }
-            };
-        public bool DoesGameResolverExist(string name)
-        {
-            if (String.IsNullOrWhiteSpace(name)) return false;
-            return _gameResolvers.ContainsKey(name);
-        }
+                "VRising",
+                typeof(VRisingResolver)
+            },
+            {
+                "ARK",
+                typeof(ARKResolver)
+            },
+            {
+                "ProjectZomboid",
+                typeof(ProjectZomboidResolver)
+            },
+            {
+                "7DTD",
+                typeof(SevenDaysToDieResolver)
+            },
+            {
+                "Arma3",
+                typeof(Arma3Resolver)
+            },
+            {
+                "DayZ",
+                typeof(DayZResolver)
+            },
+            {
+                "HellLetLoose",
+                typeof(HellLetLooseResolver)
+            },
+            {
+                "PostScriptum",
+                typeof(PostScriptumResolver)
+            },
+            {
+                "Rust",
+                typeof(RustResolver)
+            },
+            {
+                "Unturned",
+                typeof(UnturnedResolver)
+            }
+        };
 
-        public Type GetResolver(string name)
-        {
-            return _gameResolvers[name];
-        }
+    public bool DoesGameResolverExist(string name)
+    {
+        if (string.IsNullOrWhiteSpace(name)) return false;
+        return _gameResolvers.ContainsKey(name);
+    }
 
-        public string GetValidResolvers()
-        {
-            return String.Join(", ", _gameResolvers.Keys.ToList());
-        }
+    public Type GetResolver(string name)
+    {
+        return _gameResolvers[name];
+    }
 
+    public string GetValidResolvers()
+    {
+        return string.Join(", ", _gameResolvers.Keys.ToList());
     }
 }
