@@ -34,7 +34,23 @@ public class UnturnedResolver : BaseResolver
         if (server.ExistingServer != null)
             customServer.Copy(server.ExistingServer);
 
-        if (server.ServerRules != null) customServer.ResolveGameDataPropertiesFromRules(server.ServerRules);
+        if (server.ServerRules != null)
+        {
+            customServer.ResolveGameDataPropertiesFromRules(server.ServerRules);
+            //Slightly Messy for now..
+            var messageDetails = server.ServerRules.TryGetRunningList("Custom_Link_Message_{0}");
+            var messageLinks = server.ServerRules.TryGetRunningList("Custom_Link_Url_{0}");
+            if (messageLinks.Count == messageDetails.Count && messageLinks.Count != 0)
+            {
+                customServer.CustomLinks = new List<string>(messageLinks.Count);
+                for (int i = 0; i < messageDetails.Count; i++)
+                {
+                    var details = messageDetails[i];
+                    var link = messageLinks[i];
+                    customServer.CustomLinks.Add($"{details}::{link}");
+                }
+            }
+        }
 
         return customServer;
     }
