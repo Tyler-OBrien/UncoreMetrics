@@ -1,4 +1,5 @@
 ﻿using Steam_Collector.Models.Games.Steam.SteamAPI;
+using Steam_Collector.SteamServers.WebAPI;
 using UncoreMetrics.Data;
 
 namespace Steam_Collector.SteamServers;
@@ -11,5 +12,5 @@ public partial interface ISteamServers
     /// </summary>
     /// <param name="appID"></param>
     /// <returns>Returns a list of full Server info to be actioned on with stats for that specific Server type</returns>
-    public Task<List<DiscoveredServerInfo>> GenericServerDiscovery(ulong appID);
+    public Task<List<DiscoveredServerInfo>> GenericServerDiscovery(SteamServerListQueryBuilder queryListQueryBuilder);
 }

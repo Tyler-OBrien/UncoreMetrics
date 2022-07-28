@@ -3,6 +3,7 @@ using Steam_Collector.Helpers;
 using Steam_Collector.Models;
 using Steam_Collector.Models.Games.Steam.SteamAPI;
 using Steam_Collector.SteamServers;
+using Steam_Collector.SteamServers.WebAPI;
 using UncoreMetrics.Data;
 using UncoreMetrics.Data.GameData.PostScriptum;
 
@@ -20,6 +21,9 @@ public class PostScriptumResolver : BaseResolver
     public override string Name => "PostScriptum";
     public override ulong AppId => 736220;
 
+    // Post Scriptum servers don't report their player count to steam, only visible through A2S_Rules...
+    public override SteamServerListQueryBuilder? CustomQuery => SteamServerListQueryBuilder.New().AppID(AppId.ToString()).Dedicated();
+
 
     public override async Task HandleServersGeneric(List<IGenericServerInfo> servers)
     {
@@ -34,7 +38,11 @@ public class PostScriptumResolver : BaseResolver
         if (server.ExistingServer != null)
             customServer.Copy(server.ExistingServer);
 
-        if (server.ServerRules != null) customServer.ResolveGameDataPropertiesFromRules(server.ServerRules);
+        if (server.ServerRules != null)
+        {
+            customServer.ResolveGameDataPropertiesFromRules(server.ServerRules);
+            customServer.Players = ((uint)customServer.PlayerCount)!;
+        }
 
         return customServer;
     }

@@ -62,16 +62,15 @@ public partial class SteamServers : ISteamServers
     /// </summary>
     /// <param name="appID"></param>
     /// <returns>Returns a list of full Server info to be actioned on with stats for that specific Server type</returns>
-    public async Task<List<DiscoveredServerInfo>> GenericServerDiscovery(ulong appID)
+    public async Task<List<DiscoveredServerInfo>> GenericServerDiscovery(SteamServerListQueryBuilder queryListQueryBuilder)
     {
         if (_steamApi == null) throw new NullReferenceException("Steam API cannot be null to use HandleGeneric");
 
-        // We should move to something more like EF Core
 
         // Worth noting, this will only get us 20k Servers max. Querying the Master Server Query List directly leads to too many timeouts though, 20k is more then enough servers if we include only ones with players.
         var serverList =
             await _steamApi.GetServerList(
-                SteamServerListQueryBuilder.New().AppID(appID.ToString()).Dedicated().NotEmpty(),
+                queryListQueryBuilder,
                 int.MaxValue);
         var serverListCount = serverList.Count;
         foreach (var server in serverList.ToList())

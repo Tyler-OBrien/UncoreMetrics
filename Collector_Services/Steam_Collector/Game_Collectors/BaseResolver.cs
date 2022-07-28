@@ -5,6 +5,7 @@ using Microsoft.Extensions.Options;
 using Steam_Collector.Models;
 using Steam_Collector.Models.Games.Steam.SteamAPI;
 using Steam_Collector.SteamServers;
+using Steam_Collector.SteamServers.WebAPI;
 using UncoreMetrics.Data;
 
 namespace Steam_Collector.Game_Collectors;
@@ -28,6 +29,8 @@ public abstract class BaseResolver
     public abstract string Name { get; }
 
     public abstract ulong AppId { get; }
+
+    public virtual SteamServerListQueryBuilder? CustomQuery { get;}
 
 
     public virtual async Task PollResult(List<PollServerInfo> servers)
@@ -62,7 +65,13 @@ public abstract class BaseResolver
 
     public virtual async Task<int> Discovery()
     {
-        var servers = await _steamServers.GenericServerDiscovery(AppId);
+        SteamServerListQueryBuilder query = CustomQuery;
+        if (query == null)
+        {
+            query = SteamServerListQueryBuilder.New().AppID(AppId.ToString()).Dedicated().NotEmpty();
+        }
+
+        var servers = await _steamServers.GenericServerDiscovery(query);
         await DiscoveryResult(servers);
         return servers.Count;
     }
