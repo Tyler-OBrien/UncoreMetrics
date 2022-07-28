@@ -13,7 +13,7 @@ public class UnturnedServer : Server
     public string? BrowserIcon { get; set; }
 
 
-    [GameDataRulesProperty("Custom_Link_Message_{0}")]
+    [GameDataRulesProperty("Custom_Link_Message_{0}", ValueType.Running)]
     public List<string>? CustomLinks { get; set; }
 
 
