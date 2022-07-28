@@ -348,6 +348,9 @@ namespace UncoreMetrics.Data.Migrations.ServerContext
                 {
                     b.HasBaseType("UncoreMetrics.Data.Server");
 
+                    b.Property<List<string>>("ModSignatures")
+                        .HasColumnType("text[]");
+
                     b.ToTable("Arma3_Servers", (string)null);
                 });
 
@@ -419,6 +422,9 @@ namespace UncoreMetrics.Data.Migrations.ServerContext
 
                     b.Property<bool?>("Password")
                         .HasColumnType("boolean");
+
+                    b.Property<int?>("PlayerCount")
+                        .HasColumnType("integer");
 
                     b.Property<int?>("PlayerReserveCount")
                         .HasColumnType("integer");

@@ -15,7 +15,7 @@ using UncoreMetrics.Data;
 namespace UncoreMetrics.Data.Migrations.ServerContext
 {
     [DbContext(typeof(ServersContext))]
-    [Migration("20220728042810_InitialCreate")]
+    [Migration("20220728051134_InitialCreate")]
     partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -350,6 +350,9 @@ namespace UncoreMetrics.Data.Migrations.ServerContext
                 {
                     b.HasBaseType("UncoreMetrics.Data.Server");
 
+                    b.Property<List<string>>("ModSignatures")
+                        .HasColumnType("text[]");
+
                     b.ToTable("Arma3_Servers", (string)null);
                 });
 
@@ -421,6 +424,9 @@ namespace UncoreMetrics.Data.Migrations.ServerContext
 
                     b.Property<bool?>("Password")
                         .HasColumnType("boolean");
+
+                    b.Property<int?>("PlayerCount")
+                        .HasColumnType("integer");
 
                     b.Property<int?>("PlayerReserveCount")
                         .HasColumnType("integer");

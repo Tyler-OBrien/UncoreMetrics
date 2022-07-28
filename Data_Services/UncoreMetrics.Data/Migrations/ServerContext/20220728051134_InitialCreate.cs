@@ -86,7 +86,8 @@ namespace UncoreMetrics.Data.Migrations.ServerContext
                 name: "Arma3_Servers",
                 columns: table => new
                 {
-                    ServerID = table.Column<Guid>(type: "uuid", nullable: false)
+                    ServerID = table.Column<Guid>(type: "uuid", nullable: false),
+                    ModSignatures = table.Column<List<string>>(type: "text[]", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -155,6 +156,7 @@ namespace UncoreMetrics.Data.Migrations.ServerContext
                     Password = table.Column<bool>(type: "boolean", nullable: true),
                     PlayerReserveCount = table.Column<int>(type: "integer", nullable: true),
                     PublicQueue = table.Column<int>(type: "integer", nullable: true),
+                    PlayerCount = table.Column<int>(type: "integer", nullable: true),
                     ReservedQueue = table.Column<int>(type: "integer", nullable: true),
                     SearchKeywords = table.Column<string>(type: "text", nullable: true),
                     SessionFlags = table.Column<int>(type: "integer", nullable: true)
