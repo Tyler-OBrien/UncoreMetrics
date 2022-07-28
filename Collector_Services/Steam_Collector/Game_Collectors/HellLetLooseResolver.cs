@@ -28,7 +28,7 @@ public class HellLetLooseResolver : BaseResolver
     public override async Task<List<Server>> GetServers()
     {
         var servers = await _genericServersContext.HellLetLooseServers
-            .Where(server => server.NextCheck < DateTime.UtcNow && server.AppID == AppId).AsNoTracking().Take(50000)
+            .Where(server => server.NextCheck < DateTime.UtcNow && server.AppID == AppId).AsNoTracking().OrderBy(server => server.NextCheck).Take(50000)
             .ToListAsync();
         return servers.ToList<Server>();
     }

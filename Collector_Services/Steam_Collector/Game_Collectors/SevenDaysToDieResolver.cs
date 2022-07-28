@@ -27,7 +27,7 @@ public class SevenDaysToDieResolver : BaseResolver
     public override async Task<List<Server>> GetServers()
     {
         var servers = await _genericServersContext.SevenDaysToDieServers
-            .Where(server => server.NextCheck < DateTime.UtcNow && server.AppID == AppId).AsNoTracking().Take(50000)
+            .Where(server => server.NextCheck < DateTime.UtcNow && server.AppID == AppId).AsNoTracking().OrderBy(server => server.NextCheck).Take(50000)
             .ToListAsync();
         return servers.ToList<Server>();
     }
