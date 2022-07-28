@@ -10,6 +10,9 @@ using UncoreMetrics.Data;
 
 namespace Steam_Collector.Game_Collectors;
 
+/// <summary>
+/// Base Resolver for all of the various Server Resolvers.
+/// </summary>
 public abstract class BaseResolver
 {
     private readonly BaseConfiguration _configuration;
@@ -25,14 +28,26 @@ public abstract class BaseResolver
         _steamServers = steamServers;
     }
 
-
+    /// <summary>
+    /// Name of Resolver
+    /// </summary>
     public abstract string Name { get; }
 
+    /// <summary>
+    /// Steam App Id (Ulong/64 bit unsigned number)
+    /// </summary>
     public abstract ulong AppId { get; }
 
+    /// <summary>
+    /// Allow overriding of Query for Steam Server List (Discovery). By default, it grabs all dedicated, non-empty servers matching the <see cref="AppId"/>
+    /// </summary>
     public virtual SteamServerListQueryBuilder? CustomQuery { get; }
 
-
+    /// <summary>
+    /// Can be overriden to handle the behavior of the result of Polls. By default, it updates each Server with the latest information, and calls HandleServersGeneric
+    /// </summary>
+    /// <param name="servers"></param>
+    /// <returns></returns>
     public virtual async Task PollResult(List<PollServerInfo> servers)
     {
         servers.ForEach(server => server.UpdateServer(_configuration.SecondsBetweenChecks,
@@ -40,7 +55,11 @@ public abstract class BaseResolver
         await HandleServersGeneric(servers.ToList<IGenericServerInfo>());
     }
 
-
+    /// <summary>
+    /// Can be overriden to handle the behavior of the result of Discovery. By default, it updates each Server with the latest information, and calls HandleServersGeneric
+    /// </summary>
+    /// <param name="servers"></param>
+    /// <returns></returns>
     public virtual async Task DiscoveryResult(List<DiscoveredServerInfo> servers)
     {
         servers.ForEach(server => server.UpdateServer(_configuration.SecondsBetweenChecks));
@@ -48,23 +67,33 @@ public abstract class BaseResolver
     }
 
     /// <summary>
-    ///     This mention is implemented by Game Resolvers. It takes in a list with generic server details, and must handle any
+    ///     This method is implemented by Game Resolvers. It takes in a list with generic server details, and must handle any
     ///     modifications and saving it wants to do.
     /// </summary>
     /// <param name="server"></param>
     /// <returns></returns>
     public abstract Task HandleServersGeneric(List<IGenericServerInfo> server);
 
+    /// <summary>
+    /// Used in polling, allows Game Resolvers to specify their own logic for retrieving a list of servers to poll. Allows filtering/limiting/etc.
+    /// </summary>
+    /// <returns></returns>
     public abstract Task<List<Server>> GetServers();
 
-
+    /// <summary>
+    /// Handles polling. By default, it calls GenericServerPoll with the result of GetServers, and then calls PollResult with the results. Can be overriden with custom logic.
+    /// </summary>
+    /// <returns></returns>
     public virtual async Task<int> Poll()
     {
         var servers = await _steamServers.GenericServerPoll(await GetServers());
         await PollResult(servers);
         return servers.Count;
     }
-
+    /// <summary>
+    /// Handles Discovery. By default, it grabs the Steam Server List Query or makes a default one with AppId and filtering for Dedicated, non-empty servers, uses GenericServerDiscovery and calls DiscoveryResults. Can be overriden.
+    /// </summary>
+    /// <returns></returns>
     public virtual async Task<int> Discovery()
     {
         var query = CustomQuery;

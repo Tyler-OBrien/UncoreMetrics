@@ -30,7 +30,7 @@ namespace Steam_Collector.Helpers
                 object[] attrs = prop.GetCustomAttributes(true);
                 foreach (object attr in attrs)
                 {
-                    if (attr is GameDataRulesProperty rulesProperty)
+                    if (attr is ServerRulesProperty rulesProperty)
                     {
                         string propertyName = rulesProperty.PropertyName;
                         if (rulesProperty.ValueType == ValueType.Normal)

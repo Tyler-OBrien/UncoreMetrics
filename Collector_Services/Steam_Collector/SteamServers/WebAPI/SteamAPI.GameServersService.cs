@@ -28,6 +28,7 @@ public partial class SteamAPI
 
     //Example:
     //https://api.steampowered.com/IGameServersService/GetServerList/v1/?key={key}&filter=\appid\1604030&limit=10
+    /// <inheritdoc />
     public async Task<List<SteamListServer>> GetServerList(SteamServerListQueryBuilder filterBuilder, int limit)
     {
         var serverResponse = await _httpClient.GetFromJsonAsync<ServerListQueryResult>(
