@@ -72,7 +72,6 @@ namespace UncoreMetrics.Data.Migrations.ServerContext
                         .HasColumnType("boolean");
 
                     b.Property<string>("Keywords")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<DateTime>("LastCheck")
@@ -113,7 +112,7 @@ namespace UncoreMetrics.Data.Migrations.ServerContext
                     b.Property<bool>("ServerDead")
                         .HasColumnType("boolean");
 
-                    b.Property<decimal>("SteamID")
+                    b.Property<decimal?>("SteamID")
                         .HasColumnType("numeric(20,0)");
 
                     b.Property<string>("Timezone")

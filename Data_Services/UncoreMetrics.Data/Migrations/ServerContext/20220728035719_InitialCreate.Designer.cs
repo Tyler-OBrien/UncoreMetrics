@@ -15,7 +15,7 @@ using UncoreMetrics.Data;
 namespace UncoreMetrics.Data.Migrations.ServerContext
 {
     [DbContext(typeof(ServersContext))]
-    [Migration("20220728034337_InitialCreate")]
+    [Migration("20220728035719_InitialCreate")]
     partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -74,7 +74,6 @@ namespace UncoreMetrics.Data.Migrations.ServerContext
                         .HasColumnType("boolean");
 
                     b.Property<string>("Keywords")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<DateTime>("LastCheck")
@@ -115,7 +114,7 @@ namespace UncoreMetrics.Data.Migrations.ServerContext
                     b.Property<bool>("ServerDead")
                         .HasColumnType("boolean");
 
-                    b.Property<decimal>("SteamID")
+                    b.Property<decimal?>("SteamID")
                         .HasColumnType("numeric(20,0)");
 
                     b.Property<string>("Timezone")

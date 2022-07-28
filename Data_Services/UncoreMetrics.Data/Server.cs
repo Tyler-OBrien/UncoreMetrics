@@ -46,10 +46,10 @@ public class Server
 
     [Required] public bool VAC { get; set; }
 
-    [Required] public string? Keywords { get; set; }
+    public string? Keywords { get; set; }
 
 
-    [Required] public ulong? SteamID { get; set; }
+    public ulong? SteamID { get; set; }
 
 
     public long? ASN { get; set; }
