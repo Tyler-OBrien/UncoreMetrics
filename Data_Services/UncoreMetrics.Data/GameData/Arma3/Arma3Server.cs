@@ -2,4 +2,5 @@
 
 public class Arma3Server : Server
 {
+    public List<string>? ModSignatures { get; set; }
 }
