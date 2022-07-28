@@ -6,7 +6,7 @@ public enum ValueType
     Running
 }
 
-[AttributeUsage(AttributeTargets.Property)]
+[AttributeUsage(AttributeTargets.Property, AllowMultiple = true)]
 public class GameDataRulesProperty : Attribute
 {
     public GameDataRulesProperty(string propertyName)
