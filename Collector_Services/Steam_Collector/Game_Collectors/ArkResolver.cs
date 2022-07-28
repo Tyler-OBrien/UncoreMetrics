@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Options;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Steam_Collector.Helpers;
 using Steam_Collector.Models;
 using Steam_Collector.Models.Games.Steam.SteamAPI;
@@ -10,10 +11,13 @@ namespace Steam_Collector.Game_Collectors;
 
 public class ARKResolver : BaseResolver
 {
+    private readonly ServersContext _genericServersContext;
+
     public ARKResolver(
         IOptions<BaseConfiguration> baseConfiguration, ServersContext serversContext, ISteamServers steamServers) :
         base(baseConfiguration, serversContext, steamServers)
     {
+        _genericServersContext = serversContext;
     }
 
 
@@ -25,6 +29,14 @@ public class ARKResolver : BaseResolver
     {
         var arkServers = new List<ArkServer>(servers.Select(ResolveServerDetails));
         await Submit(arkServers);
+    }
+
+    public override async Task<List<Server>> GetServers()
+    {
+        var servers = await _genericServersContext.ArkServers
+            .Where(server => server.NextCheck < DateTime.UtcNow && server.AppID == AppId).AsNoTracking().Take(50000)
+            .ToListAsync();
+        return servers.ToList<Server>();
     }
 
     private ArkServer ResolveServerDetails(IGenericServerInfo server)

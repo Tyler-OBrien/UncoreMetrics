@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Options;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Steam_Collector.Helpers;
 using Steam_Collector.Models;
 using Steam_Collector.Models.Games.Steam.SteamAPI;
@@ -10,10 +11,13 @@ namespace Steam_Collector.Game_Collectors;
 
 public class UnturnedResolver : BaseResolver
 {
+    private readonly ServersContext _genericServersContext;
+
     public UnturnedResolver(
         IOptions<BaseConfiguration> baseConfiguration, ServersContext serversContext, ISteamServers steamServers) :
         base(baseConfiguration, serversContext, steamServers)
     {
+        _genericServersContext = serversContext;
     }
 
 
@@ -25,6 +29,14 @@ public class UnturnedResolver : BaseResolver
     {
         var customServers = new List<UnturnedServer>(servers.Select(ResolveServerDetails));
         await Submit(customServers);
+    }
+
+    public override async Task<List<Server>> GetServers()
+    {
+        var servers = await _genericServersContext.UnturnedServers
+            .Where(server => server.NextCheck < DateTime.UtcNow && server.AppID == AppId).AsNoTracking().Take(50000)
+            .ToListAsync();
+        return servers.ToList<Server>();
     }
 
     private UnturnedServer ResolveServerDetails(IGenericServerInfo server)
@@ -43,7 +55,7 @@ public class UnturnedResolver : BaseResolver
             if (messageLinks.Count == messageDetails.Count && messageLinks.Count != 0)
             {
                 customServer.CustomLinks = new List<string>(messageLinks.Count);
-                for (int i = 0; i < messageDetails.Count; i++)
+                for (var i = 0; i < messageDetails.Count; i++)
                 {
                     var details = messageDetails[i];
                     var link = messageLinks[i];

@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Options;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Steam_Collector.Helpers;
 using Steam_Collector.Models;
 using Steam_Collector.Models.Games.Steam.SteamAPI;
@@ -10,10 +11,13 @@ namespace Steam_Collector.Game_Collectors;
 
 public class Arma3Resolver : BaseResolver
 {
+    private readonly ServersContext _genericServersContext;
+
     public Arma3Resolver(
         IOptions<BaseConfiguration> baseConfiguration, ServersContext serversContext, ISteamServers steamServers) :
         base(baseConfiguration, serversContext, steamServers)
     {
+        _genericServersContext = serversContext;
     }
 
 
@@ -25,6 +29,14 @@ public class Arma3Resolver : BaseResolver
     {
         var customServers = new List<Arma3Server>(servers.Select(ResolveServerDetails));
         await Submit(customServers);
+    }
+
+    public override async Task<List<Server>> GetServers()
+    {
+        var servers = await _genericServersContext.Arma3Servers
+            .Where(server => server.NextCheck < DateTime.UtcNow && server.AppID == AppId).AsNoTracking().Take(50000)
+            .ToListAsync();
+        return servers.ToList<Server>();
     }
 
     private Arma3Server ResolveServerDetails(IGenericServerInfo server)

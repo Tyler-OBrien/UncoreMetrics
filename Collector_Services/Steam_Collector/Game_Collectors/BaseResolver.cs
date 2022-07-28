@@ -30,7 +30,7 @@ public abstract class BaseResolver
 
     public abstract ulong AppId { get; }
 
-    public virtual SteamServerListQueryBuilder? CustomQuery { get;}
+    public virtual SteamServerListQueryBuilder? CustomQuery { get; }
 
 
     public virtual async Task PollResult(List<PollServerInfo> servers)
@@ -55,21 +55,20 @@ public abstract class BaseResolver
     /// <returns></returns>
     public abstract Task HandleServersGeneric(List<IGenericServerInfo> server);
 
+    public abstract Task<List<Server>> GetServers();
+
 
     public virtual async Task<int> Poll()
     {
-        var servers = await _steamServers.GenericServerPoll(AppId);
+        var servers = await _steamServers.GenericServerPoll(await GetServers());
         await PollResult(servers);
         return servers.Count;
     }
 
     public virtual async Task<int> Discovery()
     {
-        SteamServerListQueryBuilder query = CustomQuery;
-        if (query == null)
-        {
-            query = SteamServerListQueryBuilder.New().AppID(AppId.ToString()).Dedicated().NotEmpty();
-        }
+        var query = CustomQuery;
+        if (query == null) query = SteamServerListQueryBuilder.New().AppID(AppId.ToString()).Dedicated().NotEmpty();
 
         var servers = await _steamServers.GenericServerDiscovery(query);
         await DiscoveryResult(servers);
