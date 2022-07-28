@@ -52,17 +52,10 @@ public partial class SteamServers : ISteamServers
     /// </summary>
     /// <param name="appID"></param>
     /// <returns>Returns a list of full Server info to be actioned on with stats for that specific Server type</returns>
-    public async Task<List<PollServerInfo>> GenericServerPoll(ulong appID)
+    public async Task<List<PollServerInfo>> GenericServerPoll(List<Server> servers)
     {
-        if (_steamApi == null) throw new NullReferenceException("Steam API cannot be null to use HandleGeneric");
-
-        var servers = await _genericServersContext.Servers
-            .Where(server => server.NextCheck < DateTime.UtcNow && server.AppID == appID).ToListAsync();
-
 
         var polledServers = await GetAllServersPoll(servers);
-
-
 
 
 
@@ -95,7 +88,7 @@ public partial class SteamServers : ISteamServers
 
         // Wait a max of 60 seconds...
         var delayCount = 0;
-        while (!queue.Done && delayCount <= 500)
+        while (!queue.Done && delayCount <= 90)
         {
             LogStatus(pool, servers.Count, queue.Completed, queue.Failed, queue.Successful, maxConcurrency,
                 queue.Running);
@@ -103,7 +96,7 @@ public partial class SteamServers : ISteamServers
             delayCount++;
         }
 
-        if (delayCount >= 60)
+        if (delayCount >= 90)
             Console.WriteLine($"[Warning] Operation timed out, reached {delayCount} Seconds, so we terminated. ");
         queue.Dispose();
         var serverInfos = queue.Outgoing;

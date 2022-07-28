@@ -5,5 +5,5 @@ namespace Steam_Collector.SteamServers;
 
 public partial interface ISteamServers
 {
-    public Task<List<PollServerInfo>> GenericServerPoll(ulong appID);
+    public Task<List<PollServerInfo>> GenericServerPoll(List<Server> servers);
 }
