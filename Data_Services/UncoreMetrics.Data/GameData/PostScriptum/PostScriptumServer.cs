@@ -32,6 +32,9 @@ public class PostScriptumServer : Server
     [GameDataRulesProperty("PublicQueue_i")]
     public int? PublicQueue { get; set; }
 
+    [GameDataRulesProperty("PlayerCount_i")]
+    public int? PlayerCount { get; set; }
+
 
     [GameDataRulesProperty("ReservedQueue_i")]
     public int? ReservedQueue { get; set; }
