@@ -10,16 +10,11 @@ namespace Steam_Collector.Game_Collectors;
 
 public class VRisingResolver : BaseResolver
 {
-
-
-
-
     public VRisingResolver(
-        IOptions<BaseConfiguration> baseConfiguration, ServersContext serversContext, ISteamServers steamServers) : base(baseConfiguration, serversContext, steamServers)
+        IOptions<BaseConfiguration> baseConfiguration, ServersContext serversContext, ISteamServers steamServers) :
+        base(baseConfiguration, serversContext, steamServers)
     {
-        
     }
-
 
 
     public override string Name => "VRising";
@@ -27,10 +22,8 @@ public class VRisingResolver : BaseResolver
 
     public override async Task HandleServersGeneric(List<IGenericServerInfo> servers)
     {
-
-        List<VRisingServer> vRisingServers = new List<VRisingServer>(servers.Select(ResolveServerDetails));
+        var vRisingServers = new List<VRisingServer>(servers.Select(ResolveServerDetails));
         await Submit(vRisingServers);
-        
     }
 
     private VRisingServer ResolveServerDetails(IGenericServerInfo server)
@@ -41,10 +34,8 @@ public class VRisingResolver : BaseResolver
 
 
         if (server.ServerRules != null)
-        {
             vRisingServer.ResolveGameDataPropertiesFromRules(server.ServerRules);
-            // Any Extra parsing
-        }
+        // Any Extra parsing
 
         return vRisingServer;
     }
