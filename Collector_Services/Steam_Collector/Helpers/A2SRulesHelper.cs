@@ -123,9 +123,10 @@ public static class A2SRulesHelper
     {
         var stringBuilder = new StringBuilder();
         var count = startAt;
+        var totalFound = GetTotalFound(template, ruleResponse);
         while (true)
         {
-            if (ruleResponse.TryGetString(string.Format(template, count), out var item))
+            if (ruleResponse.TryGetString(string.Format(template, count, totalFound), out var item))
                 stringBuilder.Append(item);
             else
                 // Break when no more descriptions are found....
@@ -139,6 +140,20 @@ public static class A2SRulesHelper
         return false;
     }
 
+    private static int GetTotalFound(string template, RuleResponse ruleResponse)
+    {
+        // This is hacky and won't work in some cases... but is necessary for Project Zomboid which labels its descriptions as Description<Count>/<Max>, i.e Description0/6
+        int totalFound = 0;
+        var findPrefix = template.IndexOf("{0}", StringComparison.OrdinalIgnoreCase);
+        if (findPrefix != -1)
+        {
+            var text = template.Substring(0, findPrefix);
+            totalFound = ruleResponse.Rules.Count(items => items.Key.StartsWith(text, StringComparison.OrdinalIgnoreCase));
+        }
+
+        return totalFound;
+    }
+
     /// <summary>
     /// Replaces {0} in template to grab item from A2S_Rules Dictionary (i.e desc0) and returns back list of found items
     /// </summary>
@@ -150,9 +165,11 @@ public static class A2SRulesHelper
     {
         var items = new List<string>();
         var count = startAt;
+        var totalFound = GetTotalFound(template, ruleResponse);
+
         while (true)
         {
-            if (ruleResponse.TryGetString(string.Format(template, count), out var rawItem))
+            if (ruleResponse.TryGetString(string.Format(template, count, totalFound), out var rawItem))
                 items.Add(rawItem);
             else
                 // Break when no more descriptions are found....
@@ -173,9 +190,10 @@ public static class A2SRulesHelper
     {
         var items = new List<ulong>();
         var count = startAt;
+        var totalFound = GetTotalFound(template, ruleResponse);
         while (true)
         {
-            if (ruleResponse.TryGetString(string.Format(template, count), out var rawItem) && ulong.TryParse(rawItem, out var item))
+            if (ruleResponse.TryGetString(string.Format(template, count, totalFound), out var rawItem) && ulong.TryParse(rawItem, out var item))
                 items.Add(item);
             else
                 // Break when no more descriptions are found....
