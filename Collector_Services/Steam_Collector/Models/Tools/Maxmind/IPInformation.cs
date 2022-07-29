@@ -10,9 +10,17 @@ public class IPInformation
 
     public string? Continent { get; set; }
 
+    public string? ContinentCode { get; set; }
+
+
     public string? Country { get; set; }
 
+    public string? CountryCodeISO { get; set; }
+
     public string? City { get; set; }
+
+
+    public long? CityCode { get; set; }
 
     public double? Latitude { get; set; }
 

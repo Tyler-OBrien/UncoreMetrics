@@ -56,6 +56,11 @@ public class MaxMindService : IGeoIPService
             newIpInformation.TimeZone = City.Location.TimeZone;
             newIpInformation.City = City.City.Name;
             newIpInformation.Country = City.Country.Name;
+
+            newIpInformation.CountryCodeISO = City.Country.IsoCode;
+
+            newIpInformation.CityCode = City.City.GeoNameId;
+            newIpInformation.ContinentCode = City.Continent.Code;
         }
 
         return ValueTask.FromResult(newIpInformation);
