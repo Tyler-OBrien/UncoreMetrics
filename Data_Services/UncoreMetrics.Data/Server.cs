@@ -5,6 +5,17 @@ using NpgsqlTypes;
 
 namespace UncoreMetrics.Data;
 
+public enum Continent
+{
+    AF,
+    AN,
+    AS,
+    EU,
+    NA,
+    OC,
+    SA
+}
+
 public class Server
 {
     [Required] public Guid ServerID { get; set; }
@@ -16,6 +27,8 @@ public class Server
 
 
     [Required] public string Game { get; set; }
+
+    public string Map { get; set; }
 
     [Required] public ulong AppID { get; set; }
 
@@ -61,7 +74,7 @@ public class Server
 
     public string? Country { get; set; }
 
-    public string? Continent { get; set; }
+    public Continent? Continent { get; set; }
 
     public string? Timezone { get; set; }
 
@@ -84,6 +97,7 @@ public class Server
         Name = toCopy.Name;
         SearchVector = toCopy.SearchVector;
         Game = toCopy.Game;
+        Map = toCopy.Map;
         AppID = toCopy.AppID;
         IpAddressBytes = toCopy.IpAddressBytes;
         Address = toCopy.Address;

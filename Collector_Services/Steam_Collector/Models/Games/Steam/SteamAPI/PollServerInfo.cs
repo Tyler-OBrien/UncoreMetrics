@@ -57,6 +57,7 @@ public class PollServerInfo : IGenericServerInfo
             ExistingServer.AppID = ServerInfo.GameID ?? ExistingServer.AppID;
             ExistingServer.IsOnline = true;
             ExistingServer.Game = ServerInfo.Game;
+            ExistingServer.Map = ServerInfo.Map;
             ExistingServer.Name = ServerInfo.Name;
 
             ExistingServer.Keywords = ServerInfo.KeyWords;
