@@ -5,6 +5,7 @@ using Steam_Collector.Models;
 using Steam_Collector.Models.Games.Steam.SteamAPI;
 using Steam_Collector.SteamServers;
 using UncoreMetrics.Data;
+using UncoreMetrics.Data.ClickHouse;
 using UncoreMetrics.Data.GameData.HellLetLoose;
 
 namespace Steam_Collector.Game_Collectors;
@@ -14,8 +15,8 @@ public class HellLetLooseResolver : BaseResolver
     private readonly ServersContext _genericServersContext;
 
     public HellLetLooseResolver(
-        IOptions<BaseConfiguration> baseConfiguration, ServersContext serversContext, ISteamServers steamServers) :
-        base(baseConfiguration, serversContext, steamServers)
+        IOptions<SteamCollectorConfiguration> baseConfiguration, ServersContext serversContext, ISteamServers steamServers, IClickHouseService clickHouse) :
+        base(baseConfiguration, serversContext, steamServers, clickHouse)
     {
         _genericServersContext = serversContext;
     }

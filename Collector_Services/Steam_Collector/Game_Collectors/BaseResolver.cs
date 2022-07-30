@@ -7,6 +7,9 @@ using Steam_Collector.Models.Games.Steam.SteamAPI;
 using Steam_Collector.SteamServers;
 using Steam_Collector.SteamServers.WebAPI;
 using UncoreMetrics.Data;
+using UncoreMetrics.Data.ClickHouse;
+using UncoreMetrics.Data.ClickHouse.Data;
+using UncoreMetrics.Data.ClickHouse.Models;
 
 namespace Steam_Collector.Game_Collectors;
 
@@ -15,17 +18,19 @@ namespace Steam_Collector.Game_Collectors;
 /// </summary>
 public abstract class BaseResolver
 {
-    private readonly BaseConfiguration _configuration;
+    private readonly SteamCollectorConfiguration _configuration;
     private readonly ServersContext _genericServersContext;
     private readonly ISteamServers _steamServers;
+    private readonly IClickHouseService _clickHouseService;
 
 
     public BaseResolver(
-        IOptions<BaseConfiguration> baseConfiguration, ServersContext serversContext, ISteamServers steamServers)
+        IOptions<SteamCollectorConfiguration> baseConfiguration, ServersContext serversContext, ISteamServers steamServers, IClickHouseService clickHouse)
     {
         _genericServersContext = serversContext;
         _configuration = baseConfiguration.Value;
         _steamServers = steamServers;
+        _clickHouseService = clickHouse;
     }
 
     /// <summary>
@@ -104,6 +109,7 @@ public abstract class BaseResolver
         return servers.Count;
     }
 
+
     // This is super messy, and should be cleaned up at some point.
     // This is necessary due to us needing basically two primary keys
     // One being the GUID and { IPAddressBytes, Port}
@@ -140,9 +146,16 @@ public abstract class BaseResolver
         foreach (var server in servers)
             if (server.ServerID == Guid.Empty)
                 server.ServerID = Guid.NewGuid();
-        await InsertGenericServer(servers.ToList<Server>());
+        var serverList = servers.ToList<Server>();
+        await InsertGenericServer(serverList);
         await _genericServersContext.BulkInsertOrUpdateAsync(servers);
         await transaction.CommitAsync();
+        await ClickHouseSubmit(serverList);
+    }
+
+    private async Task ClickHouseSubmit(List<Server> servers)
+    {
+        await _clickHouseService.Insert(servers.Select(ClickHouseGenericServer.FromServer));
     }
 
     private async Task InsertGenericServer(List<Server> servers)
