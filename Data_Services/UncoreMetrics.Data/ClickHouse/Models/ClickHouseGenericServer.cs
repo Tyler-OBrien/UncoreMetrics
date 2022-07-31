@@ -14,7 +14,8 @@ namespace UncoreMetrics.Data.ClickHouse.Models
         {
 
         }
-        public ClickHouseGenericServer(Guid serverId, string serverName, ulong appId, IPAddress addressIPv4, IPAddress addressIPv6, ushort port, ushort queryPort, bool visibility, string environment, bool vac, string keywords, ulong serverSteamId, uint asn, string country, Continent continent, bool isOnline, bool isDead, uint failedChecks, DateTime lastCheck, DateTime nextCheck, DateTime currentCheckTime)
+
+        public ClickHouseGenericServer(Guid serverId, string serverName, ulong appId, IPAddress addressIPv4, IPAddress addressIPv6, ushort port, ushort queryPort, uint players, uint maxPlayers, ushort retriesUsed, bool visibility, string environment, bool vac, string keywords, ulong serverSteamId, uint asn, string country, Continent continent, bool isOnline, bool isDead, uint failedChecks, DateTime lastCheck, DateTime nextCheck, DateTime currentCheckTime)
         {
             ServerID = serverId;
             ServerName = serverName;
@@ -23,6 +24,9 @@ namespace UncoreMetrics.Data.ClickHouse.Models
             AddressIPv6 = addressIPv6;
             Port = port;
             QueryPort = queryPort;
+            Players = players;
+            MaxPlayers = maxPlayers;
+            RetriesUsed = retriesUsed;
             Visibility = visibility;
             Environment = environment;
             VAC = vac;
@@ -52,6 +56,12 @@ namespace UncoreMetrics.Data.ClickHouse.Models
         public ushort Port { get; set; }
 
         public ushort QueryPort { get; set; }
+
+        public uint Players { get; set; }
+
+        public uint MaxPlayers { get; set; }
+
+        public ushort RetriesUsed { get; set; }
 
         public bool Visibility { get; set; }
 
@@ -83,7 +93,7 @@ namespace UncoreMetrics.Data.ClickHouse.Models
 
         public static IEnumerable<object[]> ToDatabase(IEnumerable<ClickHouseGenericServer> genericServers)
         {
-            return genericServers.Select(server => new object[] { server.ServerID, server.ServerName, server.AppID, server.AddressIPv4, server.AddressIPv6, server.Port, server.QueryPort, server.Visibility, server.Environment, server.VAC, server.Keywords, server.ServerSteamID, server.ASN, server.Country, server.Continent, server.IsOnline, server.IsDead, server.FailedChecks, server.LastCheck, server.NextCheck, server.CurrentCheckTime });
+            return genericServers.Select(server => new object[] { server.ServerID, server.ServerName, server.AppID, server.AddressIPv4, server.AddressIPv6, server.Port, server.QueryPort, server.Players, server.MaxPlayers, server.RetriesUsed , server.Visibility, server.Environment, server.VAC, server.Keywords, server.ServerSteamID, server.ASN, server.Country, server.Continent, server.IsOnline, server.IsDead, server.FailedChecks, server.LastCheck, server.NextCheck, server.CurrentCheckTime });
         }
         /// <summary>
         /// Converts <param name="server"></param> to <see cref="ClickHouseGenericServer"/>
@@ -94,8 +104,8 @@ namespace UncoreMetrics.Data.ClickHouse.Models
         public static ClickHouseGenericServer FromServer(Server server) => new ClickHouseGenericServer(server.ServerID, server.Name, server.AppID,
             ReturnIPv4Address(server.Address),
             ReturnIPv6Address(server.Address),
-                (ushort)server.Port, (ushort)server.QueryPort, server.Visibility ?? false, server.Environment.ToString() ?? String.Empty,
-                server.VAC ?? false, server.Keywords ?? String.Empty, server.SteamID ?? UInt64.MinValue, server.ASN.HasValue ? (uint)server.ASN :  0, server.Country ?? string.Empty, server.Continent ?? Continent.Unknown,
+                (ushort)server.Port, (ushort)server.QueryPort, server.Players, server.MaxPlayers, server.RetriesUsed, server.Visibility ?? false, server.Environment.ToString() ?? string.Empty,
+                server.VAC ?? false, server.Keywords ?? string.Empty, server.SteamID ?? UInt64.MinValue, server.ASN.HasValue ? (uint)server.ASN :  0, server.Country ?? string.Empty, server.Continent ?? Continent.Unknown,
                 server.IsOnline, server.ServerDead, (uint)server.FailedChecks, server.LastCheck, server.NextCheck,
                 DateTime.UtcNow);
 
