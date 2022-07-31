@@ -112,7 +112,7 @@ public class ServersContext : DbContext
 
 
 
-        modelBuilder.Entity<PostScriptumServer>().ToTable("PostScriptsum_Servers");
+        modelBuilder.Entity<PostScriptumServer>().ToTable("PostScriptum_Servers");
         modelBuilder.Entity<PostScriptumServer>().HasIndex(server => server.CurrentModLoadedCount);
         modelBuilder.Entity<PostScriptumServer>().HasIndex(server => server.GameMode);
 
