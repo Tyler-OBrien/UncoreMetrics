@@ -41,8 +41,8 @@ namespace UncoreMetrics.Data.Migrations.ServerContext
                     b.Property<decimal>("AppID")
                         .HasColumnType("numeric(20,0)");
 
-                    b.Property<string>("Continent")
-                        .HasColumnType("text");
+                    b.Property<int?>("Continent")
+                        .HasColumnType("integer");
 
                     b.Property<string>("Country")
                         .HasColumnType("text");
@@ -82,6 +82,10 @@ namespace UncoreMetrics.Data.Migrations.ServerContext
 
                     b.Property<double?>("Longitude")
                         .HasColumnType("double precision");
+
+                    b.Property<string>("Map")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<long>("MaxPlayers")
                         .HasColumnType("bigint");
@@ -445,7 +449,7 @@ namespace UncoreMetrics.Data.Migrations.ServerContext
 
                     b.HasIndex("GameMode");
 
-                    b.ToTable("PostScriptsum_Servers", (string)null);
+                    b.ToTable("PostScriptum_Servers", (string)null);
                 });
 
             modelBuilder.Entity("UncoreMetrics.Data.GameData.ProjectZomboid.ProjectZomboidServer", b =>

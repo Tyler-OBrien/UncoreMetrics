@@ -22,6 +22,7 @@ namespace UncoreMetrics.Data.Migrations.ServerContext
                         .Annotation("Npgsql:TsVectorConfig", "english")
                         .Annotation("Npgsql:TsVectorProperties", new[] { "Name" }),
                     Game = table.Column<string>(type: "text", nullable: false),
+                    Map = table.Column<string>(type: "text", nullable: false),
                     AppID = table.Column<decimal>(type: "numeric(20,0)", nullable: false),
                     IpAddressBytes = table.Column<byte[]>(type: "bytea", maxLength: 16, nullable: false),
                     Address = table.Column<IPAddress>(type: "inet", nullable: false),
@@ -39,7 +40,7 @@ namespace UncoreMetrics.Data.Migrations.ServerContext
                     Latitude = table.Column<double>(type: "double precision", nullable: true),
                     Longitude = table.Column<double>(type: "double precision", nullable: true),
                     Country = table.Column<string>(type: "text", nullable: true),
-                    Continent = table.Column<string>(type: "text", nullable: true),
+                    Continent = table.Column<int>(type: "integer", nullable: true),
                     Timezone = table.Column<string>(type: "text", nullable: true),
                     IsOnline = table.Column<bool>(type: "boolean", nullable: false),
                     ServerDead = table.Column<bool>(type: "boolean", nullable: false),
@@ -143,7 +144,7 @@ namespace UncoreMetrics.Data.Migrations.ServerContext
                 });
 
             migrationBuilder.CreateTable(
-                name: "PostScriptsum_Servers",
+                name: "PostScriptum_Servers",
                 columns: table => new
                 {
                     ServerID = table.Column<Guid>(type: "uuid", nullable: false),
@@ -163,9 +164,9 @@ namespace UncoreMetrics.Data.Migrations.ServerContext
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_PostScriptsum_Servers", x => x.ServerID);
+                    table.PrimaryKey("PK_PostScriptum_Servers", x => x.ServerID);
                     table.ForeignKey(
-                        name: "FK_PostScriptsum_Servers_Servers_ServerID",
+                        name: "FK_PostScriptum_Servers_Servers_ServerID",
                         column: x => x.ServerID,
                         principalTable: "Servers",
                         principalColumn: "ServerID",
@@ -365,13 +366,13 @@ namespace UncoreMetrics.Data.Migrations.ServerContext
                 column: "Visible");
 
             migrationBuilder.CreateIndex(
-                name: "IX_PostScriptsum_Servers_CurrentModLoadedCount",
-                table: "PostScriptsum_Servers",
+                name: "IX_PostScriptum_Servers_CurrentModLoadedCount",
+                table: "PostScriptum_Servers",
                 column: "CurrentModLoadedCount");
 
             migrationBuilder.CreateIndex(
-                name: "IX_PostScriptsum_Servers_GameMode",
-                table: "PostScriptsum_Servers",
+                name: "IX_PostScriptum_Servers_GameMode",
+                table: "PostScriptum_Servers",
                 column: "GameMode");
 
             migrationBuilder.CreateIndex(
@@ -487,7 +488,7 @@ namespace UncoreMetrics.Data.Migrations.ServerContext
                 name: "HellLetLoose_Servers");
 
             migrationBuilder.DropTable(
-                name: "PostScriptsum_Servers");
+                name: "PostScriptum_Servers");
 
             migrationBuilder.DropTable(
                 name: "ProjectZomboid_Servers");
