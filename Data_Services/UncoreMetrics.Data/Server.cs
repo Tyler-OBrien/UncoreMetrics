@@ -7,13 +7,14 @@ namespace UncoreMetrics.Data;
 
 public enum Continent
 {
+    Unknown = 1,
     AF,
     AN,
     AS,
     EU,
     NA,
     OC,
-    SA
+    SA,
 }
 
 public class Server
@@ -49,8 +50,12 @@ public class Server
 
     [Required] public uint MaxPlayers { get; set; }
 
-
     public bool? Visibility { get; set; }
+
+    /// <summary>
+    /// Retries used to get information. Used only for ClickHouse.
+    /// </summary>
+    [NotMapped] public ushort RetriesUsed { get; set; }
 
 
     public byte? Environment { get; set; }
