@@ -98,19 +98,16 @@ public partial class SteamServers : ISteamServers
     private async Task<List<DiscoveredServerInfo>> GetAllServersDiscovery(List<SteamListServer> servers)
     {
         var stopwatch = Stopwatch.StartNew();
+        using var cancellationTokenSource = new CancellationTokenSource();
 
-
-        // Might want to make this configurable eventually..
-        var maxConcurrency = 512;
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-            // Linux doesn't seem to need one thread per connection..
-            maxConcurrency = 1024;
+        // Might want to make this configurable eventually.. Right now Windows runs way worse then other platforms like Linux
+        var maxConcurrency = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? 512 : 1024;
 
 
         Console.WriteLine("Queueing Tasks");
 
         var newSolver = new DiscoverySolver(_geoIpService);
-        var pool = new QueryConnectionPool();
+        using var pool = new QueryConnectionPool();
         pool.ReceiveTimeout = 750;
         pool.SendTimeout = 750;
         pool.Message += msg => { Console.WriteLine("Pool Message: " + msg); };
@@ -121,8 +118,8 @@ public partial class SteamServers : ISteamServers
         };
         pool.Setup();
 
-        var queue = new AsyncResolveQueue<QueryPoolItem<SteamListServer>, DiscoveredServerInfo>(
-            servers.Select(server => new QueryPoolItem<SteamListServer>(pool, server)), maxConcurrency, newSolver);
+        using var queue = new AsyncResolveQueue<QueryPoolItem<SteamListServer>, DiscoveredServerInfo>(
+            servers.Select(server => new QueryPoolItem<SteamListServer>(pool, server)), maxConcurrency, newSolver, cancellationTokenSource.Token);
 
         // Wait a max of 60 seconds...
         var delayCount = 0;
@@ -133,12 +130,10 @@ public partial class SteamServers : ISteamServers
             await Task.Delay(1000);
             delayCount++;
         }
-
+        cancellationTokenSource.Cancel();
         if (delayCount >= 60)
             Console.WriteLine($"[Warning] Operation timed out, reached {delayCount} Seconds, so we terminated. ");
-        queue.Dispose();
         var serverInfos = queue.Outgoing.ToList();
-        pool.Dispose();
 
         stopwatch.Stop();
         Console.WriteLine($"Took {stopwatch.ElapsedMilliseconds}ms to get {servers.Count} Server infos from list");

@@ -6,45 +6,27 @@ public class AsyncResolveQueue<TIn, TOut> : IDisposable
 {
     private readonly IGenericAsyncSolver<TIn, TOut> _solvingMethod;
 
-    private readonly CancellationTokenSource _tokenSource;
+    private readonly CancellationToken _token;
     private int _completed;
     private int _failed;
     private readonly ConcurrentQueue<TIn> _incoming = new();
     private readonly int _incomingItems;
     private int _running;
     private int _successful;
+    private bool _beingDisposed;
 
-
-    public AsyncResolveQueue(IEnumerable<TIn> items, int workerCount, IGenericAsyncSolver<TIn, TOut> solver)
-    {
-        _tokenSource = new CancellationTokenSource();
-
-
-        _solvingMethod = solver;
-
-        _incoming = new ConcurrentQueue<TIn>(items);
-        Interlocked.Add(ref _incomingItems, items.Count());
-        for (var i = 0; i < workerCount; i++)
-        {
-            Consume(_tokenSource.Token).ContinueWith(t => Console.WriteLine(t.Exception),
-                TaskContinuationOptions.OnlyOnFaulted).ContinueWith(
-                t => Console.WriteLine($"Worker exited safely {t.Status}"),
-                TaskContinuationOptions.OnlyOnRanToCompletion);
-            ;
-        }
-    }
 
     public AsyncResolveQueue(IEnumerable<TIn> items, int workerCount, IGenericAsyncSolver<TIn, TOut> solver,
         CancellationToken token)
     {
-        _tokenSource = CancellationTokenSource.CreateLinkedTokenSource(token);
+        _token = token;
 
         _solvingMethod = solver;
 
         _incoming = new ConcurrentQueue<TIn>(items);
         Interlocked.Add(ref _incomingItems, items.Count());
         for (var i = 0; i < workerCount; i++)
-            Consume(_tokenSource.Token).ContinueWith(t => Console.WriteLine(t.Exception),
+            Consume(token).ContinueWith(t => Console.WriteLine(t.Exception),
                 TaskContinuationOptions.OnlyOnFaulted).ContinueWith(
                 t => Console.WriteLine($"Worker exited safely {t.Status}"),
                 TaskContinuationOptions.OnlyOnRanToCompletion);
@@ -66,9 +48,10 @@ public class AsyncResolveQueue<TIn, TOut> : IDisposable
 
     public bool Done => _incomingItems == _completed;
 
+
     public void Dispose()
     {
-        _tokenSource.Dispose();
+        _beingDisposed = true;
     }
 
 
@@ -78,7 +61,7 @@ public class AsyncResolveQueue<TIn, TOut> : IDisposable
         {
             while (_incoming.TryDequeue(out var item))
             {
-                if (token.IsCancellationRequested)
+                if (token.IsCancellationRequested || _beingDisposed)
                     break;
                 try
                 {

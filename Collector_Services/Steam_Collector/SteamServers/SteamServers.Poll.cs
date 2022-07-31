@@ -66,14 +66,13 @@ public partial class SteamServers : ISteamServers
     private async Task<List<PollServerInfo>> GetAllServersPoll(List<Server> servers)
     {
         var stopwatch = Stopwatch.StartNew();
-        // Might want to make this configurable eventually..
-        var maxConcurrency = 512;
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-            // Linux doesn't seem to need one thread per connection..
-            maxConcurrency = 1024;
+        using var cancellationTokenSource = new CancellationTokenSource();
+
+        // Might want to make this configurable eventually.. Right now Windows runs way worse then other platforms like Linux
+        var maxConcurrency = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? 512 : 1024;
 
         var newSolver = new PollSolver();
-        var pool = new QueryConnectionPool();
+        using var pool = new QueryConnectionPool();
         pool.ReceiveTimeout = 750;
         pool.SendTimeout = 750;
         pool.Message += msg => { Console.WriteLine("Pool Message: " + msg); };
@@ -83,8 +82,8 @@ public partial class SteamServers : ISteamServers
             throw exception;
         };
         pool.Setup();
-        var queue = new AsyncResolveQueue<QueryPoolItem<Server>, PollServerInfo>(
-            servers.Select(server => new QueryPoolItem<Server>(pool, server)), maxConcurrency, newSolver);
+        using var queue = new AsyncResolveQueue<QueryPoolItem<Server>, PollServerInfo>(
+            servers.Select(server => new QueryPoolItem<Server>(pool, server)), maxConcurrency, newSolver, cancellationTokenSource.Token);
 
         // Wait a max of 60 seconds...
         var delayCount = 0;
@@ -95,12 +94,10 @@ public partial class SteamServers : ISteamServers
             await Task.Delay(1000);
             delayCount++;
         }
-
+        cancellationTokenSource.Cancel();
         if (delayCount >= 90)
             Console.WriteLine($"[Warning] Operation timed out, reached {delayCount} Seconds, so we terminated. ");
-        queue.Dispose();
         var serverInfos = queue.Outgoing;
-        pool.Dispose();
 
 
         stopwatch.Stop();
