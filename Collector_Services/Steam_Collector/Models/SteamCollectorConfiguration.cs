@@ -1,6 +1,8 @@
-﻿namespace Steam_Collector.Models;
+﻿using UncoreMetrics.Data.Configuration;
 
-public class BaseConfiguration
+namespace Steam_Collector.Models;
+
+public class SteamCollectorConfiguration : BaseConfiguration
 {
     public string PostgresConnectionString { get; set; }
 

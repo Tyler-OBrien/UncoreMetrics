@@ -1,9 +1,12 @@
+using System.Net;
 using Microsoft.Extensions.Options;
 using Steam_Collector.Game_Collectors;
 using Steam_Collector.Models;
 using Steam_Collector.Models.Games.Steam.SteamAPI;
 using Steam_Collector.SteamServers;
 using UncoreMetrics.Data;
+using UncoreMetrics.Data.ClickHouse;
+using UncoreMetrics.Data.ClickHouse.Models;
 using UncoreMetrics.Data.GameData.VRising;
 
 namespace Steam_Collector;
@@ -17,13 +20,13 @@ public class Worker : BackgroundService
 
     private readonly IServiceScopeFactory _scopeFactory;
 
-    private readonly BaseConfiguration _configuration;
+    private readonly SteamCollectorConfiguration _configuration;
 
     private DateTime _nextDiscoveryTime = DateTime.UnixEpoch;
 
 
 
-    public Worker(ILogger<Worker> logger, IServiceScopeFactory steamStats, IOptions<BaseConfiguration> baseConfiguration)
+    public Worker(ILogger<Worker> logger, IServiceScopeFactory steamStats, IOptions<SteamCollectorConfiguration> baseConfiguration)
     {
         _logger = logger;
         _scopeFactory = steamStats;

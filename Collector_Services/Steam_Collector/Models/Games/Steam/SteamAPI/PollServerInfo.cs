@@ -1,6 +1,7 @@
 ﻿using Okolni.Source.Common;
 using Okolni.Source.Query.Responses;
 using UncoreMetrics.Data;
+using UncoreMetrics.Data.ClickHouse.Models;
 
 namespace Steam_Collector.Models.Games.Steam.SteamAPI;
 
@@ -13,10 +14,13 @@ public class PollServerInfo : IGenericServerInfo
         ServerInfo = serverInfo;
         ServerPlayers = serverPlayers;
         ServerRules = serverRules;
+        LastCheck = existingServer.LastCheck;
     }
 
 
     public Server ExistingServer { get; set; }
+
+    public DateTime LastCheck { get; set; }
 
 
     public InfoResponse? ServerInfo { get; set; }
@@ -25,6 +29,7 @@ public class PollServerInfo : IGenericServerInfo
 
 
     public RuleResponse? ServerRules { get; set; }
+
 
 
     internal void UpdateServer(int nextCheckSeconds, List<int> nextCheckFailed, int daysUntilServerMarkedAsDead)

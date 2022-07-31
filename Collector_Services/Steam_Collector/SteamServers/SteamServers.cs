@@ -9,14 +9,14 @@ namespace Steam_Collector.SteamServers;
 
 public partial class SteamServers : ISteamServers
 {
-    private readonly BaseConfiguration _configuration;
+    private readonly SteamCollectorConfiguration _configuration;
     private readonly ServersContext _genericServersContext;
     private readonly IGeoIPService _geoIpService;
     private readonly ISteamAPI _steamApi;
 
 
     public SteamServers(ISteamAPI steamAPI, IGeoIPService geoIPService,
-        IOptions<BaseConfiguration> baseConfiguration, ServersContext serversContext)
+        IOptions<SteamCollectorConfiguration> baseConfiguration, ServersContext serversContext)
     {
         _steamApi = steamAPI;
         _geoIpService = geoIPService;
