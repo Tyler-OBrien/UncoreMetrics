@@ -1,6 +1,7 @@
 ﻿using System.Net;
 using EFCore.BulkExtensions;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.Extensions.Options;
 using Steam_Collector.Models;
 using Steam_Collector.Models.Games.Steam.SteamAPI;
@@ -123,18 +124,18 @@ public abstract class BaseResolver
         if (servers.Any(server => server.ServerID == Guid.Empty))
         {
             var addresses = servers.Select(i => i.Address).ToList();
-            var ports = servers.Select(i => i.Port).ToList();
+            var ports = servers.Select(i => i.QueryPort).ToList();
 
             var entities = _genericServersContext.Servers
-                .Where(a => addresses.Contains(a.Address) || ports.Contains(a.Port)).AsNoTracking()
-                .Select(i => new { i.Address, i.Port, i.ServerID }).ToList(); // SQL IN
+                .Where(a => addresses.Contains(a.Address) || ports.Contains(a.QueryPort)).AsNoTracking()
+                .Select(i => new { i.Address, i.QueryPort, i.ServerID }).ToList(); // SQL IN
 
             var hashMapDictionary = new Dictionary<IPEndPoint, Guid>();
             foreach (var server in entities)
-                hashMapDictionary.Add(new IPEndPoint(server.Address, server.Port), server.ServerID);
+                hashMapDictionary.Add(new IPEndPoint(server.Address, server.QueryPort), server.ServerID);
 
             foreach (var server in servers)
-                if (hashMapDictionary.TryGetValue(new IPEndPoint(server.Address, server.Port), out var value))
+                if (hashMapDictionary.TryGetValue(new IPEndPoint(server.Address, server.QueryPort), out var value))
                     server.ServerID = value;
 
 #if DEBUG

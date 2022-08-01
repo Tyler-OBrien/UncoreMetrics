@@ -406,9 +406,9 @@ namespace UncoreMetrics.Data.Migrations.ServerContext
                 column: "Continent");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Servers_IpAddressBytes_Port",
+                name: "IX_Servers_IpAddressBytes_QueryPort",
                 table: "Servers",
-                columns: new[] { "IpAddressBytes", "Port" },
+                columns: new[] { "IpAddressBytes", "QueryPort" },
                 unique: true);
 
             migrationBuilder.CreateIndex(

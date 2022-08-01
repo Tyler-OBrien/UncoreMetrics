@@ -79,7 +79,7 @@ public class ServersContext : DbContext
 
 
         modelBuilder.Entity<Server>().HasKey(server => server.ServerID);
-        modelBuilder.Entity<Server>().HasIndex(server => new { server.IpAddressBytes, server.Port }).IsUnique();
+        modelBuilder.Entity<Server>().HasIndex(server => new { server.IpAddressBytes, server.QueryPort }).IsUnique();
         modelBuilder.Entity<Server>().Property(p => p.SearchVector).ValueGeneratedOnAdd()
             .Metadata.SetBeforeSaveBehavior(PropertySaveBehavior.Ignore);
 

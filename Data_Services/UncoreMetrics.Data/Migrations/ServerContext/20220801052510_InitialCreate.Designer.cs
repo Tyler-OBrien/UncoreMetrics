@@ -15,7 +15,7 @@ using UncoreMetrics.Data;
 namespace UncoreMetrics.Data.Migrations.ServerContext
 {
     [DbContext(typeof(ServersContext))]
-    [Migration("20220801042745_InitialCreate")]
+    [Migration("20220801052510_InitialCreate")]
     partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -146,7 +146,7 @@ namespace UncoreMetrics.Data.Migrations.ServerContext
 
                     b.HasIndex("ServerDead");
 
-                    b.HasIndex("IpAddressBytes", "Port")
+                    b.HasIndex("IpAddressBytes", "QueryPort")
                         .IsUnique();
 
                     b.ToTable("Servers", (string)null);

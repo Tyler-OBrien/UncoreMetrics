@@ -144,7 +144,7 @@ namespace UncoreMetrics.Data.Migrations.ServerContext
 
                     b.HasIndex("ServerDead");
 
-                    b.HasIndex("IpAddressBytes", "Port")
+                    b.HasIndex("IpAddressBytes", "QueryPort")
                         .IsUnique();
 
                     b.ToTable("Servers", (string)null);
