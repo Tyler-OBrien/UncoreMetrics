@@ -3,6 +3,7 @@ using System.Net;
 using System.Runtime.InteropServices;
 using Microsoft.EntityFrameworkCore;
 using Okolni.Source.Query.Source;
+using Sentry;
 using Steam_Collector.Helpers;
 using Steam_Collector.Models.Games.Steam.SteamAPI;
 using Steam_Collector.SteamServers.ServerQuery;
@@ -12,6 +13,12 @@ namespace Steam_Collector.SteamServers;
 
 public class PollSolver : IGenericAsyncSolver<QueryPoolItem<Server>, PollServerInfo>
 {
+    private readonly ILogger _logger;
+
+    public PollSolver( ILogger logger)
+    {
+        _logger = logger;
+    }
     public async Task<(PollServerInfo? item, bool success)> Solve(QueryPoolItem<Server> item)
     {
         var server = item.Item;
@@ -28,15 +35,16 @@ public class PollSolver : IGenericAsyncSolver<QueryPoolItem<Server>, PollServerI
                 return (new PollServerInfo(server, info, players, rules), success: true);
             }
 #if DEBUG
-            Console.WriteLine($"Failed to get {server.Address} - {server.Name} - {server.LastCheck}");
+            _logger.LogDebug("Failed to get {Address} - {Name} - {LastCheck}", server.Address, server.Name, server.LastCheck);
 #endif
             return (new PollServerInfo(server, info, players, rules), success: false);
         }
         catch (Exception ex)
         {
-            Console.WriteLine("Unexpected error" + ex);
+            _logger.LogError(ex, "Unexpected error");
+            SentrySdk.CaptureException(ex);
 #if DEBUG
-            Console.WriteLine($"Failed to get {server.Address} - {server.Name} - {server.LastCheck}");
+            _logger.LogDebug("Failed to get {Address} - {Name} - {LastCheck}", server.Address, server.Name, server.LastCheck);
 #endif
         }
 
@@ -46,6 +54,8 @@ public class PollSolver : IGenericAsyncSolver<QueryPoolItem<Server>, PollServerI
 
 public partial class SteamServers : ISteamServers
 {
+
+
     /// <summary>
     ///     Handles generic Steam Stats, grabbing active servers from the Steam Web API Server List, grabbing Server info /
     ///     rules / players, and submitting to postgres & Clickhouse.
@@ -71,18 +81,18 @@ public partial class SteamServers : ISteamServers
         // Might want to make this configurable eventually.. Right now Windows runs way worse then other platforms like Linux
         var maxConcurrency = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? 512 : 1024;
 
-        var newSolver = new PollSolver();
+        var newSolver = new PollSolver(_logger);
         using var pool = new QueryConnectionPool();
         pool.ReceiveTimeout = 750;
         pool.SendTimeout = 750;
-        pool.Message += msg => { Console.WriteLine("Pool Message: " + msg); };
+        pool.Message += msg => { _logger.LogInformation("Pool Message: {msg}", msg); };
         pool.Error += exception =>
         {
-            Console.WriteLine("Exception from pool: " + exception);
+            _logger.LogError(exception, "Exception from pool");
             throw exception;
         };
         pool.Setup();
-        using var queue = new AsyncResolveQueue<QueryPoolItem<Server>, PollServerInfo>(
+        using var queue = new AsyncResolveQueue<QueryPoolItem<Server>, PollServerInfo>(_logger,
             servers.Select(server => new QueryPoolItem<Server>(pool, server)), maxConcurrency, newSolver, cancellationTokenSource.Token);
 
         // Wait a max of 60 seconds...
@@ -96,17 +106,17 @@ public partial class SteamServers : ISteamServers
         }
         cancellationTokenSource.Cancel();
         if (delayCount >= 90)
-            Console.WriteLine($"[Warning] Operation timed out, reached {delayCount} Seconds, so we terminated. ");
+            _logger.LogWarning("[Warning] Operation timed out, reached {delayMax} Seconds, so we terminated. ", delayCount);
         var serverInfos = queue.Outgoing;
 
 
         stopwatch.Stop();
-        Console.WriteLine($"Took {stopwatch.ElapsedMilliseconds}ms to get {servers.Count} Server infos from list");
-        Console.WriteLine("-----------------------------------------");
-        Console.WriteLine(
-            $"We were able to connect to {serverInfos.Count} out of {servers.Count} {(int)Math.Round(serverInfos.Count / (double)servers.Count * 100)}%");
-        Console.WriteLine(
-            $"Total Players: {serverInfos.Sum(info => info.ServerInfo?.Players)}, Total Servers: {serverInfos.Count}");
+        _logger.LogInformation("Took {ElapsedMilliseconds}ms to get {ServersCount} Server infos from list", stopwatch.ElapsedMilliseconds, servers.Count);
+        _logger.LogInformation("-----------------------------------------");
+        _logger.LogInformation(
+            "We were able to connect to {serverInfosCount} out of {serversCount} {successPercentage}%", serverInfos.Count, servers.Count, (int)Math.Round(serverInfos.Count / (double)servers.Count * 100));
+        _logger.LogInformation(
+            "Total Players: {playersCount}, Total Servers: {serverInfosCount}", serverInfos.Sum(info => info.ServerInfo?.Players), serverInfos.Count);
         return serverInfos.ToList();
     }
 }

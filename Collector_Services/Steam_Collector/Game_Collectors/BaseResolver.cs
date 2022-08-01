@@ -23,15 +23,17 @@ public abstract class BaseResolver
     private readonly ServersContext _genericServersContext;
     private readonly ISteamServers _steamServers;
     private readonly IClickHouseService _clickHouseService;
+    private readonly ILogger _logger;
 
 
     public BaseResolver(
-        IOptions<SteamCollectorConfiguration> baseConfiguration, ServersContext serversContext, ISteamServers steamServers, IClickHouseService clickHouse)
+        IOptions<SteamCollectorConfiguration> baseConfiguration, ServersContext serversContext, ISteamServers steamServers, IClickHouseService clickHouse, ILogger logger)
     {
         _genericServersContext = serversContext;
         _configuration = baseConfiguration.Value;
         _steamServers = steamServers;
         _clickHouseService = clickHouse;
+        _logger = logger;
     }
 
     /// <summary>
@@ -139,8 +141,8 @@ public abstract class BaseResolver
                     server.ServerID = value;
 
 #if DEBUG
-            Console.WriteLine(
-                $"Found {servers.Count(server => server.ServerID != Guid.Empty)} UUIDs Non-New Servers, out of {servers.Count}.");
+            _logger.LogDebug(
+                "Found {serversFoundUUIDsCount} UUIDs Non-New Servers, out of {serversCount}.", servers.Count(server => server.ServerID != Guid.Empty), servers.Count);
 #endif
         }
 

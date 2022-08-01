@@ -15,8 +15,8 @@ public class HellLetLooseResolver : BaseResolver
     private readonly ServersContext _genericServersContext;
 
     public HellLetLooseResolver(
-        IOptions<SteamCollectorConfiguration> baseConfiguration, ServersContext serversContext, ISteamServers steamServers, IClickHouseService clickHouse) :
-        base(baseConfiguration, serversContext, steamServers, clickHouse)
+        IOptions<SteamCollectorConfiguration> baseConfiguration, ServersContext serversContext, ISteamServers steamServers, IClickHouseService clickHouse, ILogger<HellLetLooseResolver> logger) :
+        base(baseConfiguration, serversContext, steamServers, clickHouse, logger)
     {
         _genericServersContext = serversContext;
     }

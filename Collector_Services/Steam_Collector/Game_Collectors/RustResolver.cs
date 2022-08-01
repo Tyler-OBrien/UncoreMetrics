@@ -15,8 +15,8 @@ public class RustResolver : BaseResolver
     private readonly ServersContext _genericServersContext;
 
     public RustResolver(
-        IOptions<SteamCollectorConfiguration> baseConfiguration, ServersContext serversContext, ISteamServers steamServers, IClickHouseService clickHouse) :
-        base(baseConfiguration, serversContext, steamServers, clickHouse)
+        IOptions<SteamCollectorConfiguration> baseConfiguration, ServersContext serversContext, ISteamServers steamServers, IClickHouseService clickHouse, ILogger<RustResolver> logger) :
+        base(baseConfiguration, serversContext, steamServers, clickHouse, logger)
     {
         _genericServersContext = serversContext;
     }

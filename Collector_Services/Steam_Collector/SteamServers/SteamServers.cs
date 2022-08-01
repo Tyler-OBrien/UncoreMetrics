@@ -13,14 +13,16 @@ public partial class SteamServers : ISteamServers
     private readonly ServersContext _genericServersContext;
     private readonly IGeoIPService _geoIpService;
     private readonly ISteamAPI _steamApi;
+    private readonly ILogger _logger;
 
 
     public SteamServers(ISteamAPI steamAPI, IGeoIPService geoIPService,
-        IOptions<SteamCollectorConfiguration> baseConfiguration, ServersContext serversContext)
+        IOptions<SteamCollectorConfiguration> baseConfiguration, ServersContext serversContext, ILogger<SteamServers> logger)
     {
         _steamApi = steamAPI;
         _geoIpService = geoIPService;
         _genericServersContext = serversContext;
         _configuration = baseConfiguration.Value;
+        _logger = logger;
     }
 }

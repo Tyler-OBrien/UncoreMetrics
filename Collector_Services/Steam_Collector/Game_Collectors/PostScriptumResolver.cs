@@ -16,8 +16,8 @@ public class PostScriptumResolver : BaseResolver
     private readonly ServersContext _genericServersContext;
 
     public PostScriptumResolver(
-        IOptions<SteamCollectorConfiguration> baseConfiguration, ServersContext serversContext, ISteamServers steamServers, IClickHouseService clickHouse) :
-        base(baseConfiguration, serversContext, steamServers, clickHouse)
+        IOptions<SteamCollectorConfiguration> baseConfiguration, ServersContext serversContext, ISteamServers steamServers, IClickHouseService clickHouse, ILogger<PostScriptumResolver> logger) :
+        base(baseConfiguration, serversContext, steamServers, clickHouse, logger)
     {
         _genericServersContext = serversContext;
     }

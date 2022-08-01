@@ -15,8 +15,8 @@ public class VRisingResolver : BaseResolver
     private readonly ServersContext _genericServersContext;
 
     public VRisingResolver(
-        IOptions<SteamCollectorConfiguration> baseConfiguration, ServersContext serversContext, ISteamServers steamServers, IClickHouseService clickHouse) :
-        base(baseConfiguration, serversContext, steamServers, clickHouse)
+        IOptions<SteamCollectorConfiguration> baseConfiguration, ServersContext serversContext, ISteamServers steamServers, IClickHouseService clickHouse, ILogger<VRisingResolver> logger) :
+        base(baseConfiguration, serversContext, steamServers, clickHouse, logger)
     {
         _genericServersContext = serversContext;
     }

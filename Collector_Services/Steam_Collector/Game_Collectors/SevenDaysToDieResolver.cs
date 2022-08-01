@@ -15,8 +15,8 @@ public class SevenDaysToDieResolver : BaseResolver
     private readonly ServersContext _genericServersContext;
 
     public SevenDaysToDieResolver(
-        IOptions<SteamCollectorConfiguration> baseConfiguration, ServersContext serversContext, ISteamServers steamServers, IClickHouseService clickHouse) :
-        base(baseConfiguration, serversContext, steamServers, clickHouse)
+        IOptions<SteamCollectorConfiguration> baseConfiguration, ServersContext serversContext, ISteamServers steamServers, IClickHouseService clickHouse, ILogger<SevenDaysToDieResolver> logger) :
+        base(baseConfiguration, serversContext, steamServers, clickHouse, logger)
     {
         _genericServersContext = serversContext;
     }

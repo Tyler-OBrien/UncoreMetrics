@@ -13,14 +13,14 @@ public class MaxMindService : IGeoIPService
     private readonly DatabaseReader? _dbReaderASN;
 
     private readonly DatabaseReader? _dbReaderCity;
+    private readonly ILogger _logger;
 
-    public MaxMindService()
+    public MaxMindService(ILogger<MaxMindService> logger)
     {
+        _logger = logger;
         if (File.Exists(ASNFileName) == false)
         {
-#if DEBUG
-            Console.WriteLine("Can't find ASN File for Maxmind...");
-#endif
+            _logger.LogWarning("Can't find ASN File for Maxmind Service... will not grab ASN Info");
             _dbReaderASN = null;
         }
         else
@@ -29,7 +29,10 @@ public class MaxMindService : IGeoIPService
         }
 
         if (File.Exists(CityFileName) == false)
+        {
+            _logger.LogWarning("Can't find City File for Maxmind Service...will not grab Geo Info");
             _dbReaderCity = null;
+        }
         else
             _dbReaderCity = new DatabaseReader(CityFileName);
     }

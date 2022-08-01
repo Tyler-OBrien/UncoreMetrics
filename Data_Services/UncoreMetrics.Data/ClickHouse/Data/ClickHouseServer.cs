@@ -38,7 +38,6 @@ namespace UncoreMetrics.Data.ClickHouse.Data
 
             // Example data to insert
             await bulkCopyInterface.WriteToServerAsync(ClickHouseGenericServer.ToDatabase(servers));
-            Console.WriteLine(bulkCopyInterface.RowsWritten);
         }
 
         public async Task<float> GetServerUptime(string serverId, int lastHours = 0)

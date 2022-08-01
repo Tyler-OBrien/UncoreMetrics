@@ -7,6 +7,7 @@ public class AsyncResolveQueue<TIn, TOut> : IDisposable
     private readonly IGenericAsyncSolver<TIn, TOut> _solvingMethod;
 
     private readonly CancellationToken _token;
+    private readonly ILogger _logger;
     private int _completed;
     private int _failed;
     private readonly ConcurrentQueue<TIn> _incoming = new();
@@ -16,19 +17,19 @@ public class AsyncResolveQueue<TIn, TOut> : IDisposable
     private bool _beingDisposed;
 
 
-    public AsyncResolveQueue(IEnumerable<TIn> items, int workerCount, IGenericAsyncSolver<TIn, TOut> solver,
+    public AsyncResolveQueue(ILogger logger, IEnumerable<TIn> items, int workerCount, IGenericAsyncSolver<TIn, TOut> solver,
         CancellationToken token)
     {
+        _logger = logger;
         _token = token;
-
         _solvingMethod = solver;
 
         _incoming = new ConcurrentQueue<TIn>(items);
         Interlocked.Add(ref _incomingItems, items.Count());
         for (var i = 0; i < workerCount; i++)
-            Consume(token).ContinueWith(t => Console.WriteLine(t.Exception),
+            Consume(token).ContinueWith(t => _logger.LogError(t.Exception, "Worker Exception"),
                 TaskContinuationOptions.OnlyOnFaulted).ContinueWith(
-                t => Console.WriteLine($"Worker exited safely {t.Status}"),
+                t => _logger.LogDebug("Worker exited safely {workerStatus}", t.Status),
                 TaskContinuationOptions.OnlyOnRanToCompletion);
     }
 
@@ -88,8 +89,7 @@ public class AsyncResolveQueue<TIn, TOut> : IDisposable
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Exception in Consume of Thread {Environment.CurrentManagedThreadId}");
-            Console.WriteLine(ex);
+            _logger.LogError(ex, "Exception in Consume of Thread {CurrentManagedThreadId}", Environment.CurrentManagedThreadId);
         }
     }
 

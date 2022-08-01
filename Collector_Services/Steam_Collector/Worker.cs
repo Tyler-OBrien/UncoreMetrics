@@ -13,7 +13,6 @@ namespace Steam_Collector;
 
 public class Worker : BackgroundService
 {
-    private const ulong VRisingAppId = 1604030;
 
     public const int SECONDS_BETWEEN_DISCOVERY = 600;
     private readonly ILogger<Worker> _logger;
@@ -41,7 +40,7 @@ public class Worker : BackgroundService
 
             await RunActions();
             //await AltRun();
-            Console.WriteLine("Finished Run...");
+            _logger.LogInformation("Finished Run...");
             await Task.Delay(30000, stoppingToken);
         }
     }
@@ -56,24 +55,24 @@ public class Worker : BackgroundService
 
         if (_nextDiscoveryTime < DateTime.UtcNow)
         {
-            Console.WriteLine("----------------------");
-            Console.WriteLine("Starting Discovery...");
-            Console.WriteLine("----------------------");
+            _logger.LogInformation("----------------------");
+            _logger.LogInformation("Starting Discovery...");
+            _logger.LogInformation("----------------------");
             _nextDiscoveryTime = DateTime.UtcNow.AddSeconds(SECONDS_BETWEEN_DISCOVERY);
             var serversCount = await resolver.Discovery();
-            Console.WriteLine("----------------------");
-            Console.WriteLine($"Discovery Complete... Found {serversCount} Servers.");
-            Console.WriteLine("----------------------");
+            _logger.LogInformation("----------------------");
+            _logger.LogInformation("Discovery Complete... Found {serversCount} Servers.", serversCount);
+            _logger.LogInformation("----------------------");
         }
         else
         {
-            Console.WriteLine("----------------------");
-            Console.WriteLine("Starting Poll...");
-            Console.WriteLine("----------------------");
+            _logger.LogInformation("----------------------");
+            _logger.LogInformation("Starting Poll...");
+            _logger.LogInformation("----------------------");
             var serversCount = await resolver.Poll();
-            Console.WriteLine("----------------------");
-            Console.WriteLine($"Poll Complete... Reached {serversCount} Servers.");
-            Console.WriteLine("----------------------");
+            _logger.LogInformation("----------------------");
+            _logger.LogInformation("Poll Complete... Reached {serversCount} Servers.", serversCount);
+            _logger.LogInformation("----------------------");
         }
     }
 
