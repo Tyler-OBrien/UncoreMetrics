@@ -58,7 +58,8 @@ public class Server
     [NotMapped] public ushort RetriesUsed { get; set; }
 
 
-    public byte? Environment { get; set; }
+    public char? Environment { get; set; }
+
 
 
     public bool? VAC { get; set; }

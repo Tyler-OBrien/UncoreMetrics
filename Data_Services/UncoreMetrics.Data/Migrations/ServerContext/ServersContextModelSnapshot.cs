@@ -47,8 +47,8 @@ namespace UncoreMetrics.Data.Migrations.ServerContext
                     b.Property<string>("Country")
                         .HasColumnType("text");
 
-                    b.Property<byte?>("Environment")
-                        .HasColumnType("smallint");
+                    b.Property<char?>("Environment")
+                        .HasColumnType("character(1)");
 
                     b.Property<int>("FailedChecks")
                         .HasColumnType("integer");

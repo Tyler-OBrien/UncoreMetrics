@@ -31,7 +31,7 @@ namespace UncoreMetrics.Data.Migrations.ServerContext
                     Players = table.Column<long>(type: "bigint", nullable: false),
                     MaxPlayers = table.Column<long>(type: "bigint", nullable: false),
                     Visibility = table.Column<bool>(type: "boolean", nullable: true),
-                    Environment = table.Column<byte>(type: "smallint", nullable: true),
+                    Environment = table.Column<char>(type: "character(1)", nullable: true),
                     VAC = table.Column<bool>(type: "boolean", nullable: true),
                     Keywords = table.Column<string>(type: "text", nullable: true),
                     SteamID = table.Column<decimal>(type: "numeric(20,0)", nullable: true),
