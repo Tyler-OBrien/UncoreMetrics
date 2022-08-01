@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using Okolni.Source.Common;
 using Okolni.Source.Query.Responses;
 
 namespace Steam_Collector.Helpers;
@@ -203,9 +204,26 @@ public static class A2SRulesHelper
 
         return items;
     }
+    /// <summary>
+    /// Checks if the property exists in the rule Response
+    /// </summary>
+    /// <param name="ruleResponse"></param>
+    /// <param name="name"></param>
+    /// <returns>If the property exists, true, else false</returns>
     public static bool DoesPropertyExist(this RuleResponse ruleResponse, string name)
     {
         if (string.IsNullOrWhiteSpace(name)) return false;
         return ruleResponse.Rules.ContainsKey(name);
+    }
+
+    public static char ResolveEnvironment(this Okolni.Source.Common.Enums.Environment env)
+    {
+        switch (env)
+        {
+            case Enums.Environment.Linux: return 'l';
+            case Enums.Environment.Mac: return 'm';
+            case Enums.Environment.Windows: return 'w';
+            default: return 'e';// unknown
+        }
     }
 }
