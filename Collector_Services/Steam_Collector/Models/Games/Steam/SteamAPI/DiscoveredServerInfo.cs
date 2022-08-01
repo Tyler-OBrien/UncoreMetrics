@@ -1,6 +1,7 @@
 ﻿using System.Net;
 using Okolni.Source.Common;
 using Okolni.Source.Query.Responses;
+using Steam_Collector.Helpers;
 using Steam_Collector.Models.Tools.Maxmind;
 using UncoreMetrics.Data;
 
@@ -50,7 +51,7 @@ public class DiscoveredServerInfo : IGenericServerInfo
         ExistingServer.Keywords = ServerInfo.KeyWords;
         ExistingServer.VAC = ServerInfo.VAC;
         ExistingServer.Visibility = ServerInfo.Visibility == Enums.Visibility.Private ? true : false;
-        ExistingServer.Environment = (byte)ServerInfo.Environment;
+        ExistingServer.Environment = ServerInfo.Environment.ResolveEnvironment();
         ExistingServer.SteamID = ServerInfo.SteamID;
         ExistingServer.ASN = IpInformation?.AutonomousSystemNumber;
         if (IpInformation != null && Enum.TryParse(IpInformation.ContinentCode, true, out Continent continent))

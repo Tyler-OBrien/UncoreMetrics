@@ -1,5 +1,6 @@
 ﻿using Okolni.Source.Common;
 using Okolni.Source.Query.Responses;
+using Steam_Collector.Helpers;
 using UncoreMetrics.Data;
 using UncoreMetrics.Data.ClickHouse.Models;
 
@@ -68,7 +69,7 @@ public class PollServerInfo : IGenericServerInfo
             ExistingServer.Keywords = ServerInfo.KeyWords;
             ExistingServer.VAC = ServerInfo.VAC;
             ExistingServer.Visibility = ServerInfo.Visibility == Enums.Visibility.Private ? true : false;
-            ExistingServer.Environment = (byte)ServerInfo.Environment;
+            ExistingServer.Environment = ServerInfo.Environment.ResolveEnvironment();
             ExistingServer.SteamID = ServerInfo.SteamID;
 
         }
