@@ -11,5 +11,8 @@ namespace UncoreMetrics.Data.ClickHouse
     {
 
         public Task Insert(IEnumerable<ClickHouseGenericServer> servers);
+
+
+        public Task<float> GetServerUptime(string serverId, int lastHours = 0);
     }
 }
