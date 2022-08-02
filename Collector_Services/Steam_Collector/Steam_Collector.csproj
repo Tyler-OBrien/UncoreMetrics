@@ -22,7 +22,7 @@
     </PackageReference>
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="6.0.1" />
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.15.1" />
-    <PackageReference Include="Okolni.Source.Query" Version="1.2.3" />
+    <PackageReference Include="Okolni.Source.Query" Version="1.2.4" />
     <PackageReference Include="Sentry" Version="3.20.1" />
     <PackageReference Include="Sentry.AspNetCore" Version="3.20.1" />
     <PackageReference Include="Sentry.EntityFramework" Version="3.20.1" />
