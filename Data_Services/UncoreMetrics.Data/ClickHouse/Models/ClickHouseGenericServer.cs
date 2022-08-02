@@ -15,10 +15,9 @@ namespace UncoreMetrics.Data.ClickHouse.Models
 
         }
 
-        public ClickHouseGenericServer(Guid serverId, string serverName, ulong appId, IPAddress addressIPv4, IPAddress addressIPv6, ushort port, ushort queryPort, uint players, uint maxPlayers, ushort retriesUsed, bool visibility, string environment, bool vac, string keywords, ulong serverSteamId, uint asn, string country, Continent continent, bool isOnline, bool isDead, uint failedChecks, DateTime lastCheck, DateTime nextCheck, DateTime currentCheckTime)
+        public ClickHouseGenericServer(Guid serverId, ulong appId, IPAddress addressIPv4, IPAddress addressIPv6, ushort port, ushort queryPort, uint players, uint maxPlayers, ushort retriesUsed, bool visibility, string environment, bool vac, string keywords, ulong serverSteamId, uint asn, string country, Continent continent, bool isOnline, bool isDead, uint failedChecks, DateTime lastCheck, DateTime nextCheck, DateTime currentCheckTime)
         {
             ServerID = serverId;
-            ServerName = serverName;
             AppID = appId;
             AddressIPv4 = addressIPv4;
             AddressIPv6 = addressIPv6;
@@ -44,8 +43,6 @@ namespace UncoreMetrics.Data.ClickHouse.Models
         }
 
         public Guid ServerID { get; set; }
-
-        public string ServerName { get; set; }
 
         public ulong AppID { get; set; }
 
@@ -93,7 +90,7 @@ namespace UncoreMetrics.Data.ClickHouse.Models
 
         public static IEnumerable<object[]> ToDatabase(IEnumerable<ClickHouseGenericServer> genericServers)
         {
-            return genericServers.Select(server => new object[] { server.ServerID, server.ServerName, server.AppID, server.AddressIPv4, server.AddressIPv6, server.Port, server.QueryPort, server.Players, server.MaxPlayers, server.RetriesUsed , server.Visibility, server.Environment, server.VAC, server.Keywords, server.ServerSteamID, server.ASN, server.Country, server.Continent, server.IsOnline, server.IsDead, server.FailedChecks, server.LastCheck, server.NextCheck, server.CurrentCheckTime });
+            return genericServers.Select(server => new object[] { server.ServerID, server.AppID, server.AddressIPv4, server.AddressIPv6, server.Port, server.QueryPort, server.Players, server.MaxPlayers, server.RetriesUsed , server.Visibility, server.Environment, server.VAC, server.Keywords, server.ServerSteamID, server.ASN, server.Country, server.Continent, server.IsOnline, server.IsDead, server.FailedChecks, server.LastCheck, server.NextCheck, server.CurrentCheckTime });
         }
         /// <summary>
         /// Converts <param name="server"></param> to <see cref="ClickHouseGenericServer"/>
@@ -101,7 +98,7 @@ namespace UncoreMetrics.Data.ClickHouse.Models
         /// <param name="server"></param>
         /// <returns></returns>
         // This is messy because our Maxmind library and Query Pool library are trying to remain CLS complaint by not using unsigned numbers, and our Server model is Postgres which doesn't implement unsigned numbers
-        public static ClickHouseGenericServer FromServer(Server server) => new ClickHouseGenericServer(server.ServerID, server.Name, server.AppID,
+        public static ClickHouseGenericServer FromServer(Server server) => new ClickHouseGenericServer(server.ServerID,server.AppID,
             ReturnIPv4Address(server.Address),
             ReturnIPv6Address(server.Address),
                 (ushort)server.Port, (ushort)server.QueryPort, server.Players, server.MaxPlayers, server.RetriesUsed, server.Visibility ?? false, server.Environment.ToString() ?? string.Empty,

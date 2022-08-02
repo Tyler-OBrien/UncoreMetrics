@@ -11,14 +11,13 @@ Clickhouse:
 CREATE TABLE generic_server_stats
 (
  `server_id` UUID,
- `server_name` String,
  `appid` UInt64,
  `address_ipv4` IPv4, 
  `address_ipv6` IPv6,
  `port` UInt16,
  `query_port` UInt16, 
- `players` UInt16,
- `max_players` UInt16,
+ `players` UInt32,
+ `max_players` UInt32,
  `retries_used` UInt8,
  `visibility` Bool,
  `environment` char, 
