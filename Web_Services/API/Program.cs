@@ -44,9 +44,11 @@ namespace API
                 BuildHost(args).Run();
                 return 0;
             }
-            catch (Exception ex)
+            // Note: This will change in .net 7 https://github.com/dotnet/runtime/issues/60600#issuecomment-1068323222
+            // This is being done so we don't report errors about the Host being quit/exited.
+            catch (Exception e) when (e is not OperationCanceledException && e.GetType().Name != "StopTheHostException")
             {
-                Log.Fatal(ex, "Host terminated unexpectedly");
+                Log.Fatal(e, "Host terminated unexpectedly");
                 return 1;
             }
             finally
@@ -119,17 +121,16 @@ namespace API
                 app.UseMetricServer(apiConfiguration.Prometheus_Metrics_Port);
             }
 
+            app.UseSwagger();
+            app.UseSwaggerUI();
 
             // Configure the HTTP request pipeline.
-            if (app.Environment.IsDevelopment())
-            {
-                app.UseSwagger();
-                app.UseSwaggerUI();
-            }
-            else
+            if (!app.Environment.IsDevelopment())
             {
                 app.UseHttpsRedirection();
+
             }
+
 
             app.UseMiddleware<JSONErrorMiddleware>();
 
