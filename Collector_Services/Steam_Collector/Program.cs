@@ -91,6 +91,7 @@ public class Program
                 {
                     gameType = env;
                     baseConfiguration.GameType = env;
+                    services.Configure<SteamCollectorConfiguration>(config => config.GameType = env);
                 }
 
                 if (resolver.DoesGameResolverExist(gameType) == false)
