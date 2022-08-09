@@ -41,7 +41,7 @@ public class Worker : BackgroundService
             await RunActions();
             //await AltRun();
             _logger.LogInformation("Finished Run...");
-            await Task.Delay(30000, stoppingToken);
+            await Task.Delay(5000, stoppingToken);
         }
     }
 
