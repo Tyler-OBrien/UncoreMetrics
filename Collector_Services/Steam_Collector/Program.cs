@@ -31,6 +31,7 @@ public class Program
             extraLogName = $"{env}-";
 
         Log.Logger = new LoggerConfiguration().MinimumLevel.Information()
+            .MinimumLevel.Override("Microsoft.EntityFrameworkCore", LogEventLevel.Warning)
             .WriteTo.Async(config =>
             {
                 config.File($"Logs/{extraLogName}Log.log", outputTemplate: outputFormat,
