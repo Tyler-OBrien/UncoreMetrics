@@ -15,6 +15,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Data_Services", "Data_Servi
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UncoreMetrics.Data", "Data_Services\UncoreMetrics.Data\UncoreMetrics.Data.csproj", "{6F98F9BC-DA17-4F10-AFC2-92263ECB53AC}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "API", "Web_Services\API\API.csproj", "{E2B360F6-F5EC-4E82-852D-7C9E578B87B8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -29,6 +31,10 @@ Global
 		{6F98F9BC-DA17-4F10-AFC2-92263ECB53AC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6F98F9BC-DA17-4F10-AFC2-92263ECB53AC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6F98F9BC-DA17-4F10-AFC2-92263ECB53AC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E2B360F6-F5EC-4E82-852D-7C9E578B87B8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E2B360F6-F5EC-4E82-852D-7C9E578B87B8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E2B360F6-F5EC-4E82-852D-7C9E578B87B8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E2B360F6-F5EC-4E82-852D-7C9E578B87B8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -36,6 +42,7 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{5AA56B10-7441-4B91-AFF1-9CFB4437A0EE} = {6BA5B9D6-F869-4231-8207-6F990CDDE85C}
 		{6F98F9BC-DA17-4F10-AFC2-92263ECB53AC} = {59D666AC-21AC-4E6A-ABDC-0217EA5AB0F2}
+		{E2B360F6-F5EC-4E82-852D-7C9E578B87B8} = {FEE2070E-977D-4884-8FC6-B2B8870CB4D8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {4696E927-2217-439C-AA5E-0FF1538A3DD8}
