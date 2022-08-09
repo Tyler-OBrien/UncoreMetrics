@@ -32,7 +32,6 @@ namespace Steam_Collector.Helpers.ScrapeJobStatus
             _genericServersContext = serversContext;
             _configuration = baseConfiguration.Value;
             _logger = logger;
-            _runid = 0;
         }
 
         public async Task StartRun(int totalCount, string runType, CancellationToken token = default)
