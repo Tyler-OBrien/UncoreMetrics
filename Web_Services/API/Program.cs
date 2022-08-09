@@ -27,6 +27,9 @@ namespace API
 #if !DEBUG
                 .MinimumLevel.Override("Microsoft.EntityFrameworkCore", LogEventLevel.Warning)
 #endif
+                .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
+                .MinimumLevel.Override("System", LogEventLevel.Warning)
+                .MinimumLevel.Override("Microsoft.Hosting.Lifetime", LogEventLevel.Information)
                 .WriteTo.Async(config =>
                 {
                     config.File($"Logs/Log.log", outputTemplate: outputFormat,
