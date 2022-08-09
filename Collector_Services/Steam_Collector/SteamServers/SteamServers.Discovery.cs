@@ -3,6 +3,7 @@ using System.Net;
 using System.Runtime.InteropServices;
 using Okolni.Source.Query.Source;
 using Sentry;
+using Serilog.Context;
 using Serilog.Data;
 using Steam_Collector.Helpers;
 using Steam_Collector.Helpers.IPAddressExtensions;
@@ -100,6 +101,7 @@ public partial class SteamServers : ISteamServers
     private async Task<List<DiscoveredServerInfo>> GetAllServersDiscovery(List<SteamListServer> servers)
     {
         const string runType = "Discovery";
+        using var context = LogContext.PushProperty("RunType", runType);
         var stopwatch = Stopwatch.StartNew();
         using var cancellationTokenSource = new CancellationTokenSource();
         await _scrapeJobStatusService.StartRun(servers.Count, runType, cancellationTokenSource.Token);

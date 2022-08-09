@@ -4,6 +4,7 @@ using System.Runtime.InteropServices;
 using Microsoft.EntityFrameworkCore;
 using Okolni.Source.Query.Source;
 using Sentry;
+using Serilog.Context;
 using Steam_Collector.Helpers;
 using Steam_Collector.Models.Games.Steam.SteamAPI;
 using Steam_Collector.SteamServers.ServerQuery;
@@ -76,6 +77,7 @@ public partial class SteamServers : ISteamServers
     private async Task<List<PollServerInfo>> GetAllServersPoll(List<Server> servers)
     {
         const string runType = "Poll";
+        using var context = LogContext.PushProperty("RunType", runType);
         var stopwatch = Stopwatch.StartNew();
         using var cancellationTokenSource = new CancellationTokenSource();
         await _scrapeJobStatusService.StartRun(servers.Count, runType, cancellationTokenSource.Token);

@@ -4,6 +4,7 @@ using Sentry;
 using Sentry.Extensibility;
 using Sentry.Extensions.Logging;
 using Serilog;
+using Serilog.Context;
 using Serilog.Events;
 using Steam_Collector.Game_Collectors;
 using Steam_Collector.Helpers.Maxmind;
@@ -20,7 +21,7 @@ namespace Steam_Collector;
 public class Program
 {
     private const string outputFormat =
-        "[{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz}] [{Level:u3}] [{SourceContext}] {Message:lj} {Exception}{NewLine}";
+        "[{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz}] [{Level:u3}] [{SourceContext}:{Resolver}:{RunType}] {Message:lj} {Exception}{NewLine}";
 
     public static int Main(string[] args)
     {
@@ -31,7 +32,9 @@ public class Program
             extraLogName = $"{env}-";
 
         Log.Logger = new LoggerConfiguration().MinimumLevel.Information()
+#if DEBUG
             .MinimumLevel.Override("Microsoft.EntityFrameworkCore", LogEventLevel.Warning)
+#endif
             .WriteTo.Async(config =>
             {
                 config.File($"Logs/{extraLogName}Log.log", outputTemplate: outputFormat,
@@ -68,7 +71,6 @@ public class Program
                 services.Configure<SteamCollectorConfiguration>(configuration);
                 services.Configure<BaseConfiguration>(configuration);
 
-
                 services.Configure<SentryLoggingOptions>(options =>
                 {
                     options.Dsn = baseConfiguration.SENTRY_DSN;
@@ -95,9 +97,10 @@ public class Program
                     throw new InvalidOperationException(
                         $"Could not find Game Type Resolver: {baseConfiguration.GameType}, Valid Options: {resolver.GetValidResolvers()}");
                 services.AddScoped(typeof(BaseResolver), resolver.GetResolver(gameType));
-
-
-
+                LogContext.PushProperty("Resolver", gameType, true);
+                Serilog.Log.Logger.Warning("Starting up with Resolver: {gameType}", gameType);
+                
+                
 
                 services.AddSingleton<ISteamAPI, SteamAPI>();
                 services.AddDbContext<ServersContext>(options =>
