@@ -7,6 +7,7 @@ using Serilog;
 using Serilog.Events;
 using Steam_Collector.Game_Collectors;
 using Steam_Collector.Helpers.Maxmind;
+using Steam_Collector.Helpers.ScrapeJobStatus;
 using Steam_Collector.Models;
 using Steam_Collector.SteamServers;
 using Steam_Collector.SteamServers.WebAPI;
@@ -28,9 +29,7 @@ public class Program
         var env = Environment.GetEnvironmentVariable("UNCORE_COLLECTOR_GAMETYPE");
         if (env != null)
             extraLogName = $"{env}-";
-        
 
-        var timestamp = DateTime.Now.ToString("yyyyMMdd_HHmm");
         Log.Logger = new LoggerConfiguration().MinimumLevel.Information()
             .WriteTo.Async(config =>
             {
@@ -86,7 +85,10 @@ public class Program
                 var gameType = baseConfiguration.GameType;
                 var env = Environment.GetEnvironmentVariable("UNCORE_COLLECTOR_GAMETYPE");
                 if (string.IsNullOrWhiteSpace(env) == false)
+                {
                     gameType = env;
+                    baseConfiguration.GameType = env;
+                }
 
                 if (resolver.DoesGameResolverExist(gameType) == false)
                     throw new InvalidOperationException(
@@ -105,6 +107,7 @@ public class Program
                 services.AddSingleton<IGeoIPService, MaxMindService>();
                 services.AddScoped<ISteamServers, SteamServers.SteamServers>();
                 services.AddScoped<IClickHouseService, ClickHouseService>();
+                services.AddScoped<IScrapeJobStatusService, ScrapeJobStatusService>();
 
                 services.AddHostedService<Worker>();
 

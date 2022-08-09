@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Net;
+using System.Text.Json.Serialization;
 using NpgsqlTypes;
 
 namespace UncoreMetrics.Data;
@@ -24,6 +25,7 @@ public class Server
     [Required] public string Name { get; set; }
 
     [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
+    [JsonIgnore]
     public NpgsqlTsVector SearchVector { get; set; }
 
 
@@ -40,7 +42,10 @@ public class Server
     public byte[] IpAddressBytes { get; set; }
 
 
-    [Column(TypeName = "inet")] [Required] public IPAddress Address { get; set; }
+    [Column(TypeName = "inet")] [Required] [JsonIgnore] public IPAddress Address { get; set; }
+
+    // IPAddress isn't seralizable...
+    [NotMapped] public string IpAddress => Address.ToString();
 
     [Required] public int Port { get; set; }
 

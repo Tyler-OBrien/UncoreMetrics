@@ -28,6 +28,7 @@ public class ServersContext : DbContext
 
     public DbSet<Server> Servers { get; set; }
 
+    public DbSet<ScrapeJob> ScrapeJobs { get; set; }
 
     public DbSet<SevenDaysToDieServer> SevenDaysToDieServers { get; set; }
 
@@ -134,5 +135,8 @@ public class ServersContext : DbContext
         modelBuilder.Entity<VRisingServer>().HasIndex(server => server.HeartDamage);
         modelBuilder.Entity<VRisingServer>().HasIndex(server => server.BloodBoundEquipment);
 
+
+        modelBuilder.Entity<ScrapeJob>().ToTable("Scrape_Jobs");
+        modelBuilder.Entity<ScrapeJob>().HasKey(job => job.InternalId);
     }
 }

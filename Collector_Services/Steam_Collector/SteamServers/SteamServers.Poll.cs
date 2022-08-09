@@ -75,8 +75,10 @@ public partial class SteamServers : ISteamServers
 
     private async Task<List<PollServerInfo>> GetAllServersPoll(List<Server> servers)
     {
+        const string runType = "Poll";
         var stopwatch = Stopwatch.StartNew();
         using var cancellationTokenSource = new CancellationTokenSource();
+        await _scrapeJobStatusService.StartRun(servers.Count, runType, cancellationTokenSource.Token);
 
         // Might want to make this configurable eventually.. Right now Windows runs way worse then other platforms like Linux
         var maxConcurrency = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? 512 : 1024;
@@ -101,7 +103,10 @@ public partial class SteamServers : ISteamServers
         {
             LogStatus(pool, servers.Count, queue.Completed, queue.Failed, queue.Successful, maxConcurrency,
                 queue.Running);
-            await Task.Delay(1000);
+            var scrapeJobUpdate = _scrapeJobStatusService.UpdateStatus(
+                (int)Math.Round(queue.Completed / (double)servers.Count * 100), queue.Completed, servers.Count,
+                runType, cancellationTokenSource.Token);
+            await Task.WhenAll(Task.Delay(1000, cancellationTokenSource.Token), scrapeJobUpdate);
             delayCount++;
         }
         cancellationTokenSource.Cancel();
@@ -117,6 +122,7 @@ public partial class SteamServers : ISteamServers
             "We were able to connect to {serverInfosCount} out of {serversCount} {successPercentage}%", serverInfos.Count, servers.Count, (int)Math.Round(serverInfos.Count / (double)servers.Count * 100));
         _logger.LogInformation(
             "Total Players: {playersCount}, Total Servers: {serverInfosCount}", serverInfos.Sum(info => info.ServerInfo?.Players), serverInfos.Count);
+        await _scrapeJobStatusService.EndRun(runType);
         return serverInfos.ToList();
     }
 }

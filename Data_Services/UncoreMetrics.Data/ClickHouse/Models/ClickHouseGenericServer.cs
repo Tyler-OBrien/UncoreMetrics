@@ -82,6 +82,7 @@ namespace UncoreMetrics.Data.ClickHouse.Models
 
         public uint FailedChecks { get; set; }
 
+
         public DateTime LastCheck { get; set; }
 
         public DateTime NextCheck { get; set; }
