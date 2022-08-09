@@ -32,7 +32,7 @@ public class Program
             extraLogName = $"{env}-";
 
         Log.Logger = new LoggerConfiguration().MinimumLevel.Information()
-#if DEBUG
+#if !DEBUG
             .MinimumLevel.Override("Microsoft.EntityFrameworkCore", LogEventLevel.Warning)
 #endif
             .WriteTo.Async(config =>
