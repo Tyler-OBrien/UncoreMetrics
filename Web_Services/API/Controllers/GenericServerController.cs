@@ -33,6 +33,9 @@ public class GenericServerController : ControllerBase
         if (pageSize > 100)
             return BadRequest(new ErrorResponse(HttpStatusCode.BadRequest, "Max Page Size is 100",
                 "page_size_out_of_range"));
+        if (page <= 0)
+            return BadRequest(new ErrorResponse(HttpStatusCode.BadRequest, "Minimum Page is 0",
+                "page_out_of_range"));
         if (includeDead == false)
             return Ok(new DataResponse<PagedResult<Server>>(await _genericServersContext.Servers.OrderByDescending(server => server.Players)
                 .Where(server => server.ServerDead == includeDead).GetPaged(page, pageSize)));
@@ -45,6 +48,9 @@ public class GenericServerController : ControllerBase
         if (pageSize > 100)
             return BadRequest(new ErrorResponse(HttpStatusCode.BadRequest, "Max Page Size is 100",
                 "page_size_out_of_range"));
+        if (page <= 0)
+            return BadRequest(new ErrorResponse(HttpStatusCode.BadRequest, "Minimum Page is 0",
+                "page_out_of_range"));
         if (includeDead == false)
             return Ok(new DataResponse<PagedResult<Server>>(await _genericServersContext.Servers.Where(server => server.SearchVector.Matches(search))
                 .Where(server => server.ServerDead == includeDead).OrderByDescending(server => server.Players).GetPaged(page, pageSize)));
