@@ -11,6 +11,7 @@ import TableSortLabel from "@mui/material/TableSortLabel";
 import Paper from "@mui/material/Paper";
 import { visuallyHidden } from "@mui/utils";
 import { PageData, Server, ServerResponse } from "../../interfaces/servers";
+import { useRouter } from 'next/router'
 
 function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
   if (b[orderBy] < a[orderBy]) {
@@ -177,6 +178,8 @@ export default function ServerDisplay() {
   const [loading, setLoading] = React.useState<boolean>(true);
   const [error, setError] = React.useState<string>("");
   const [search, setSearch] = React.useState<string>("");
+  const router = useRouter()
+
 
   const updateData = async (page: number, rowsPerPage: number, search?: string) => {
     let response: Response;
@@ -239,6 +242,10 @@ export default function ServerDisplay() {
 
   const handleClick = (event: React.MouseEvent<unknown>, name: string) => {
     const selectedIndex = selected.indexOf(name);
+    if (selectedIndex !== -1)
+        router.push(`/server/${name}`);
+
+
     let newSelected: readonly string[] = [];
 
     if (selectedIndex === -1) {
