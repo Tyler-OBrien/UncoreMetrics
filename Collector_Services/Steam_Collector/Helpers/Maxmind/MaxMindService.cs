@@ -34,7 +34,9 @@ public class MaxMindService : IGeoIPService
             _dbReaderCity = null;
         }
         else
+        {
             _dbReaderCity = new DatabaseReader(CityFileName);
+        }
     }
 
 

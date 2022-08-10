@@ -9,8 +9,7 @@ public class UnturnedServer : Server
     [ServerRulesProperty("Browser_Desc_Hint")]
     public string? BrowserDescriptionHint { get; set; }
 
-    [ServerRulesProperty("Browser_Icon")]
-    public string? BrowserIcon { get; set; }
+    [ServerRulesProperty("Browser_Icon")] public string? BrowserIcon { get; set; }
 
 
     [ServerRulesProperty("Custom_Link_Message_{0}", ValueType.Running)]
@@ -23,6 +22,5 @@ public class UnturnedServer : Server
     [ServerRulesProperty("Mod_{0}", ValueType.Running)]
     public string? Mods { get; set; }
 
-    [ServerRulesProperty("rocketplugins")]
-    public string? RocketPlugins { get; set; }
+    [ServerRulesProperty("rocketplugins")] public string? RocketPlugins { get; set; }
 }

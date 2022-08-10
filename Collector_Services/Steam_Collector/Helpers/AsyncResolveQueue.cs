@@ -4,20 +4,21 @@ namespace UncoreMetrics.Steam_Collector.Helpers;
 
 public class AsyncResolveQueue<TIn, TOut> : IDisposable
 {
+    private readonly ConcurrentQueue<TIn> _incoming = new();
+    private readonly int _incomingItems;
+    private readonly ILogger _logger;
     private readonly IGenericAsyncSolver<TIn, TOut> _solvingMethod;
 
     private readonly CancellationToken _token;
-    private readonly ILogger _logger;
+    private bool _beingDisposed;
     private int _completed;
     private int _failed;
-    private readonly ConcurrentQueue<TIn> _incoming = new();
-    private readonly int _incomingItems;
     private int _running;
     private int _successful;
-    private bool _beingDisposed;
 
 
-    public AsyncResolveQueue(ILogger logger, IEnumerable<TIn> items, int workerCount, IGenericAsyncSolver<TIn, TOut> solver,
+    public AsyncResolveQueue(ILogger logger, IEnumerable<TIn> items, int workerCount,
+        IGenericAsyncSolver<TIn, TOut> solver,
         CancellationToken token)
     {
         _logger = logger;
@@ -69,16 +70,11 @@ public class AsyncResolveQueue<TIn, TOut> : IDisposable
                     Interlocked.Increment(ref _running);
                     var outItem = await _solvingMethod.Solve(item);
                     if (outItem.success == false || outItem.item == null)
-                    {
                         Interlocked.Increment(ref _failed);
-                    }
                     else
-                    {
                         Interlocked.Increment(ref _successful);
-                    }
                     if (outItem.item != null)
                         Outgoing.Add(outItem.item);
-
                 }
                 finally
                 {
@@ -89,7 +85,8 @@ public class AsyncResolveQueue<TIn, TOut> : IDisposable
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Exception in Consume of Thread {CurrentManagedThreadId}", Environment.CurrentManagedThreadId);
+            _logger.LogError(ex, "Exception in Consume of Thread {CurrentManagedThreadId}",
+                Environment.CurrentManagedThreadId);
         }
     }
 

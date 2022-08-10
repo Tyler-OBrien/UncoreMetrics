@@ -1,5 +1,4 @@
-﻿using System.Net;
-using Sentry;
+﻿using Sentry;
 using Serilog;
 using UncoreMetrics.API.Models.Responses.API;
 

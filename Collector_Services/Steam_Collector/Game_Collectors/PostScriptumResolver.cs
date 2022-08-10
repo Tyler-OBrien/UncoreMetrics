@@ -1,12 +1,12 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using UncoreMetrics.Steam_Collector.SteamServers;
 using UncoreMetrics.Data;
 using UncoreMetrics.Data.ClickHouse;
 using UncoreMetrics.Data.GameData.PostScriptum;
 using UncoreMetrics.Steam_Collector.Helpers;
 using UncoreMetrics.Steam_Collector.Models;
 using UncoreMetrics.Steam_Collector.Models.Games.Steam.SteamAPI;
+using UncoreMetrics.Steam_Collector.SteamServers;
 using UncoreMetrics.Steam_Collector.SteamServers.WebAPI;
 
 namespace UncoreMetrics.Steam_Collector.Game_Collectors;
@@ -16,7 +16,8 @@ public class PostScriptumResolver : BaseResolver
     private readonly ServersContext _genericServersContext;
 
     public PostScriptumResolver(
-        IOptions<SteamCollectorConfiguration> baseConfiguration, ServersContext serversContext, ISteamServers steamServers, IClickHouseService clickHouse, ILogger<PostScriptumResolver> logger) :
+        IOptions<SteamCollectorConfiguration> baseConfiguration, ServersContext serversContext,
+        ISteamServers steamServers, IClickHouseService clickHouse, ILogger<PostScriptumResolver> logger) :
         base(baseConfiguration, serversContext, steamServers, clickHouse, logger)
     {
         _genericServersContext = serversContext;
@@ -33,7 +34,8 @@ public class PostScriptumResolver : BaseResolver
     public override async Task<List<Server>> GetServers()
     {
         var servers = await _genericServersContext.PostScriptumServers
-            .Where(server => server.NextCheck < DateTime.UtcNow && server.AppID == AppId).AsNoTracking().OrderBy(server => server.NextCheck).Take(50000)
+            .Where(server => server.NextCheck < DateTime.UtcNow && server.AppID == AppId).AsNoTracking()
+            .OrderBy(server => server.NextCheck).Take(50000)
             .ToListAsync();
         return servers.ToList<Server>();
     }

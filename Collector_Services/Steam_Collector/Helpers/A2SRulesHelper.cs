@@ -7,7 +7,7 @@ namespace UncoreMetrics.Steam_Collector.Helpers;
 public static class A2SRulesHelper
 {
     /// <summary>
-    /// Try get Boolean from Rule Response Dictionary with specified name.
+    ///     Try get Boolean from Rule Response Dictionary with specified name.
     /// </summary>
     /// <param name="ruleResponse"></param>
     /// <param name="name"></param>
@@ -22,8 +22,10 @@ public static class A2SRulesHelper
             return true;
         return false;
     }
+
     /// <summary>
-    /// Try get Boolean from Rule Response Dictionary with specified name. Extended, will try to resolve other strings as bools as well. For example "1" will return as true.
+    ///     Try get Boolean from Rule Response Dictionary with specified name. Extended, will try to resolve other strings as
+    ///     bools as well. For example "1" will return as true.
     /// </summary>
     /// <param name="ruleResponse"></param>
     /// <param name="name"></param>
@@ -42,13 +44,15 @@ public static class A2SRulesHelper
             value = true;
             return true;
         }
+
         if (!string.Equals(rawvalue, "0", StringComparison.OrdinalIgnoreCase) &&
             !string.Equals(rawvalue, "false", StringComparison.OrdinalIgnoreCase)) return false;
         value = false;
         return true;
     }
+
     /// <summary>
-    /// Try get String from Rule Response Dictionary with specified name
+    ///     Try get String from Rule Response Dictionary with specified name
     /// </summary>
     /// <param name="ruleResponse"></param>
     /// <param name="name"></param>
@@ -62,8 +66,9 @@ public static class A2SRulesHelper
 
         return true;
     }
+
     /// <summary>
-    /// Try get Int from Rule Response Dictionary with specified name
+    ///     Try get Int from Rule Response Dictionary with specified name
     /// </summary>
     /// <param name="ruleResponse"></param>
     /// <param name="name"></param>
@@ -78,8 +83,9 @@ public static class A2SRulesHelper
             return true;
         return false;
     }
+
     /// <summary>
-    /// Try get enum from Rule Response Dictionary with specified name
+    ///     Try get enum from Rule Response Dictionary with specified name
     /// </summary>
     /// <typeparam name="TEnum"></typeparam>
     /// <param name="ruleResponse"></param>
@@ -96,8 +102,9 @@ public static class A2SRulesHelper
             return true;
         return false;
     }
+
     /// <summary>
-    /// Try get Ulong from Rule Response Dictionary with specified name
+    ///     Try get Ulong from Rule Response Dictionary with specified name
     /// </summary>
     /// <param name="ruleResponse"></param>
     /// <param name="name"></param>
@@ -112,8 +119,9 @@ public static class A2SRulesHelper
             return true;
         return false;
     }
+
     /// <summary>
-    /// Replaces {0} in template to grab item from A2S_Rules Dictionary (i.e desc0) and returns back list of found items
+    ///     Replaces {0} in template to grab item from A2S_Rules Dictionary (i.e desc0) and returns back list of found items
     /// </summary>
     /// <param name="ruleResponse">The Rules Response</param>
     /// <param name="template">Inserts current number at {0}</param>
@@ -144,19 +152,20 @@ public static class A2SRulesHelper
     private static int GetTotalFound(string template, RuleResponse ruleResponse)
     {
         // This is hacky and won't work in some cases... but is necessary for Project Zomboid which labels its descriptions as Description<Count>/<Max>, i.e Description0/6
-        int totalFound = 0;
+        var totalFound = 0;
         var findPrefix = template.IndexOf("{0}", StringComparison.OrdinalIgnoreCase);
         if (findPrefix != -1)
         {
             var text = template.Substring(0, findPrefix);
-            totalFound = ruleResponse.Rules.Count(items => items.Key.StartsWith(text, StringComparison.OrdinalIgnoreCase));
+            totalFound =
+                ruleResponse.Rules.Count(items => items.Key.StartsWith(text, StringComparison.OrdinalIgnoreCase));
         }
 
         return totalFound;
     }
 
     /// <summary>
-    /// Replaces {0} in template to grab item from A2S_Rules Dictionary (i.e desc0) and returns back list of found items
+    ///     Replaces {0} in template to grab item from A2S_Rules Dictionary (i.e desc0) and returns back list of found items
     /// </summary>
     /// <param name="ruleResponse">The Rules Response</param>
     /// <param name="template">Inserts current number at {0}</param>
@@ -180,8 +189,10 @@ public static class A2SRulesHelper
 
         return items;
     }
+
     /// <summary>
-    /// Replaces {0} in template to grab item from A2S_Rules Dictionary (i.e desc0) and returns back list of found items converted to ulong.
+    ///     Replaces {0} in template to grab item from A2S_Rules Dictionary (i.e desc0) and returns back list of found items
+    ///     converted to ulong.
     /// </summary>
     /// <param name="ruleResponse">The Rules Response</param>
     /// <param name="template">Inserts current number at {0}</param>
@@ -194,7 +205,8 @@ public static class A2SRulesHelper
         var totalFound = GetTotalFound(template, ruleResponse);
         while (true)
         {
-            if (ruleResponse.TryGetString(string.Format(template, count, totalFound), out var rawItem) && ulong.TryParse(rawItem, out var item))
+            if (ruleResponse.TryGetString(string.Format(template, count, totalFound), out var rawItem) &&
+                ulong.TryParse(rawItem, out var item))
                 items.Add(item);
             else
                 // Break when no more descriptions are found....
@@ -204,8 +216,9 @@ public static class A2SRulesHelper
 
         return items;
     }
+
     /// <summary>
-    /// Checks if the property exists in the rule Response
+    ///     Checks if the property exists in the rule Response
     /// </summary>
     /// <param name="ruleResponse"></param>
     /// <param name="name"></param>
@@ -215,8 +228,9 @@ public static class A2SRulesHelper
         if (string.IsNullOrWhiteSpace(name)) return false;
         return ruleResponse.Rules.ContainsKey(name);
     }
+
     /// <summary>
-    /// Resolve Environment to char, 'l' for linux, 'm' for mac, 'w' for windows, 'e' for unknown/error
+    ///     Resolve Environment to char, 'l' for linux, 'm' for mac, 'w' for windows, 'e' for unknown/error
     /// </summary>
     /// <param name="env"></param>
     /// <returns> 'l' for linux, 'm' for mac, 'w' for windows, 'e' for unknown/error</returns>
@@ -227,7 +241,7 @@ public static class A2SRulesHelper
             case Enums.Environment.Linux: return 'l';
             case Enums.Environment.Mac: return 'm';
             case Enums.Environment.Windows: return 'w';
-            default: return 'e';// unknown
+            default: return 'e'; // unknown
         }
     }
 }

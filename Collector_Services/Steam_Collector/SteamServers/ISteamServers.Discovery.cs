@@ -1,5 +1,4 @@
-﻿using UncoreMetrics.Data;
-using UncoreMetrics.Steam_Collector.Models.Games.Steam.SteamAPI;
+﻿using UncoreMetrics.Steam_Collector.Models.Games.Steam.SteamAPI;
 using UncoreMetrics.Steam_Collector.SteamServers.WebAPI;
 
 namespace UncoreMetrics.Steam_Collector.SteamServers;

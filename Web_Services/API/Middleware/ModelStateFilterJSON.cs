@@ -1,9 +1,10 @@
 ﻿using System.Net;
-using UncoreMetrics.API.Models.Responses.API;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using UncoreMetrics.API.Models.Responses.API;
 
 namespace UncoreMetrics.API.Middleware;
+
 public class ModelStateFilterJSON : IActionResult
 {
     // Handles converting Model Validation errors into our own error format
@@ -29,8 +30,8 @@ public class ModelStateFilterJSON : IActionResult
     {
         var output = new List<string>();
         foreach (var entry in state.Values)
-            foreach (var error in entry.Errors)
-                output.Add(error.ErrorMessage);
+        foreach (var error in entry.Errors)
+            output.Add(error.ErrorMessage);
         return output;
     }
 }

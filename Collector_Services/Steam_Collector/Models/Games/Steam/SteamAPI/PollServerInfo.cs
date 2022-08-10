@@ -1,7 +1,6 @@
 ﻿using Okolni.Source.Common;
 using Okolni.Source.Query.Responses;
 using UncoreMetrics.Data;
-using UncoreMetrics.Data.ClickHouse.Models;
 using UncoreMetrics.Steam_Collector.Helpers;
 
 namespace UncoreMetrics.Steam_Collector.Models.Games.Steam.SteamAPI;
@@ -18,10 +17,10 @@ public class PollServerInfo : IGenericServerInfo
         LastCheck = existingServer.LastCheck;
     }
 
+    public DateTime LastCheck { get; set; }
+
 
     public Server ExistingServer { get; set; }
-
-    public DateTime LastCheck { get; set; }
 
 
     public InfoResponse? ServerInfo { get; set; }
@@ -30,7 +29,6 @@ public class PollServerInfo : IGenericServerInfo
 
 
     public RuleResponse? ServerRules { get; set; }
-
 
 
     internal void UpdateServer(int nextCheckSeconds, List<int> nextCheckFailed, int daysUntilServerMarkedAsDead)
@@ -71,7 +69,6 @@ public class PollServerInfo : IGenericServerInfo
             ExistingServer.Visibility = ServerInfo.Visibility == Enums.Visibility.Private ? true : false;
             ExistingServer.Environment = ServerInfo.Environment.ResolveEnvironment();
             ExistingServer.SteamID = ServerInfo.SteamID;
-
         }
     }
 }

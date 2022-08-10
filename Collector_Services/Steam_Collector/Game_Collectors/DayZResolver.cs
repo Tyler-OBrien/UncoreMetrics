@@ -1,12 +1,12 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using UncoreMetrics.Steam_Collector.SteamServers;
 using UncoreMetrics.Data;
 using UncoreMetrics.Data.ClickHouse;
 using UncoreMetrics.Data.GameData.DayZ;
 using UncoreMetrics.Steam_Collector.Helpers;
 using UncoreMetrics.Steam_Collector.Models;
 using UncoreMetrics.Steam_Collector.Models.Games.Steam.SteamAPI;
+using UncoreMetrics.Steam_Collector.SteamServers;
 
 namespace UncoreMetrics.Steam_Collector.Game_Collectors;
 
@@ -15,7 +15,8 @@ public class DayZResolver : BaseResolver
     private readonly ServersContext _genericServersContext;
 
     public DayZResolver(
-        IOptions<SteamCollectorConfiguration> baseConfiguration, ServersContext serversContext, ISteamServers steamServers, IClickHouseService clickHouse, ILogger<DayZResolver> logger) :
+        IOptions<SteamCollectorConfiguration> baseConfiguration, ServersContext serversContext,
+        ISteamServers steamServers, IClickHouseService clickHouse, ILogger<DayZResolver> logger) :
         base(baseConfiguration, serversContext, steamServers, clickHouse, logger)
     {
         _genericServersContext = serversContext;
@@ -29,7 +30,8 @@ public class DayZResolver : BaseResolver
     public override async Task<List<Server>> GetServers()
     {
         var servers = await _genericServersContext.Arma3Servers
-            .Where(server => server.NextCheck < DateTime.UtcNow && server.AppID == AppId).AsNoTracking().OrderBy(server => server.NextCheck).Take(50000)
+            .Where(server => server.NextCheck < DateTime.UtcNow && server.AppID == AppId).AsNoTracking()
+            .OrderBy(server => server.NextCheck).Take(50000)
             .ToListAsync();
         return servers.ToList<Server>();
     }

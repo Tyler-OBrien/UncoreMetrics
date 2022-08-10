@@ -1,33 +1,32 @@
 ﻿using System.Net;
 using EFCore.BulkExtensions;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.Extensions.Options;
-using UncoreMetrics.Steam_Collector.SteamServers;
 using UncoreMetrics.Data;
 using UncoreMetrics.Data.ClickHouse;
-using UncoreMetrics.Data.ClickHouse.Data;
 using UncoreMetrics.Data.ClickHouse.Models;
 using UncoreMetrics.Steam_Collector.Models;
 using UncoreMetrics.Steam_Collector.Models.Games.Steam.SteamAPI;
+using UncoreMetrics.Steam_Collector.SteamServers;
 using UncoreMetrics.Steam_Collector.SteamServers.WebAPI;
 
 namespace UncoreMetrics.Steam_Collector.Game_Collectors;
 
 /// <summary>
-/// Base Resolver for all of the various Server Resolvers.
+///     Base Resolver for all of the various Server Resolvers.
 /// </summary>
 public abstract class BaseResolver
 {
+    private readonly IClickHouseService _clickHouseService;
     private readonly SteamCollectorConfiguration _configuration;
     private readonly ServersContext _genericServersContext;
-    private readonly ISteamServers _steamServers;
-    private readonly IClickHouseService _clickHouseService;
     private readonly ILogger _logger;
+    private readonly ISteamServers _steamServers;
 
 
     public BaseResolver(
-        IOptions<SteamCollectorConfiguration> baseConfiguration, ServersContext serversContext, ISteamServers steamServers, IClickHouseService clickHouse, ILogger logger)
+        IOptions<SteamCollectorConfiguration> baseConfiguration, ServersContext serversContext,
+        ISteamServers steamServers, IClickHouseService clickHouse, ILogger logger)
     {
         _genericServersContext = serversContext;
         _configuration = baseConfiguration.Value;
@@ -37,22 +36,24 @@ public abstract class BaseResolver
     }
 
     /// <summary>
-    /// Name of Resolver
+    ///     Name of Resolver
     /// </summary>
     public abstract string Name { get; }
 
     /// <summary>
-    /// Steam App Id (Ulong/64 bit unsigned number)
+    ///     Steam App Id (Ulong/64 bit unsigned number)
     /// </summary>
     public abstract ulong AppId { get; }
 
     /// <summary>
-    /// Allow overriding of Query for Steam Server List (Discovery). By default, it grabs all dedicated, non-empty servers matching the <see cref="AppId"/>
+    ///     Allow overriding of Query for Steam Server List (Discovery). By default, it grabs all dedicated, non-empty servers
+    ///     matching the <see cref="AppId" />
     /// </summary>
     public virtual SteamServerListQueryBuilder? CustomQuery { get; }
 
     /// <summary>
-    /// Can be overriden to handle the behavior of the result of Polls. By default, it updates each Server with the latest information, and calls HandleServersGeneric
+    ///     Can be overriden to handle the behavior of the result of Polls. By default, it updates each Server with the latest
+    ///     information, and calls HandleServersGeneric
     /// </summary>
     /// <param name="servers"></param>
     /// <returns></returns>
@@ -64,7 +65,8 @@ public abstract class BaseResolver
     }
 
     /// <summary>
-    /// Can be overriden to handle the behavior of the result of Discovery. By default, it updates each Server with the latest information, and calls HandleServersGeneric
+    ///     Can be overriden to handle the behavior of the result of Discovery. By default, it updates each Server with the
+    ///     latest information, and calls HandleServersGeneric
     /// </summary>
     /// <param name="servers"></param>
     /// <returns></returns>
@@ -83,13 +85,15 @@ public abstract class BaseResolver
     public abstract Task HandleServersGeneric(List<IGenericServerInfo> server);
 
     /// <summary>
-    /// Used in polling, allows Game Resolvers to specify their own logic for retrieving a list of servers to poll. Allows filtering/limiting/etc.
+    ///     Used in polling, allows Game Resolvers to specify their own logic for retrieving a list of servers to poll. Allows
+    ///     filtering/limiting/etc.
     /// </summary>
     /// <returns></returns>
     public abstract Task<List<Server>> GetServers();
 
     /// <summary>
-    /// Handles polling. By default, it calls GenericServerPoll with the result of GetServers, and then calls PollResult with the results. Can be overriden with custom logic.
+    ///     Handles polling. By default, it calls GenericServerPoll with the result of GetServers, and then calls PollResult
+    ///     with the results. Can be overriden with custom logic.
     /// </summary>
     /// <returns></returns>
     public virtual async Task<int> Poll()
@@ -98,8 +102,10 @@ public abstract class BaseResolver
         await PollResult(servers);
         return servers.Count;
     }
+
     /// <summary>
-    /// Handles Discovery. By default, it grabs the Steam Server List Query or makes a default one with AppId and filtering for Dedicated, non-empty servers, uses GenericServerDiscovery and calls DiscoveryResults. Can be overriden.
+    ///     Handles Discovery. By default, it grabs the Steam Server List Query or makes a default one with AppId and filtering
+    ///     for Dedicated, non-empty servers, uses GenericServerDiscovery and calls DiscoveryResults. Can be overriden.
     /// </summary>
     /// <returns></returns>
     public virtual async Task<int> Discovery()
@@ -142,7 +148,8 @@ public abstract class BaseResolver
 
 #if DEBUG
             _logger.LogDebug(
-                "Found {serversFoundUUIDsCount} UUIDs Non-New Servers, out of {serversCount}.", servers.Count(server => server.ServerID != Guid.Empty), servers.Count);
+                "Found {serversFoundUUIDsCount} UUIDs Non-New Servers, out of {serversCount}.",
+                servers.Count(server => server.ServerID != Guid.Empty), servers.Count);
 #endif
         }
 

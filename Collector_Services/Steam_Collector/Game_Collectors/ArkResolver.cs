@@ -1,12 +1,12 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using UncoreMetrics.Steam_Collector.SteamServers;
 using UncoreMetrics.Data;
 using UncoreMetrics.Data.ClickHouse;
 using UncoreMetrics.Data.GameData.ARK;
 using UncoreMetrics.Steam_Collector.Helpers;
 using UncoreMetrics.Steam_Collector.Models;
 using UncoreMetrics.Steam_Collector.Models.Games.Steam.SteamAPI;
+using UncoreMetrics.Steam_Collector.SteamServers;
 
 namespace UncoreMetrics.Steam_Collector.Game_Collectors;
 
@@ -15,7 +15,8 @@ public class ARKResolver : BaseResolver
     private readonly ServersContext _genericServersContext;
 
     public ARKResolver(
-        IOptions<SteamCollectorConfiguration> baseConfiguration, ServersContext serversContext, ISteamServers steamServers, IClickHouseService clickHouse, ILogger<ARKResolver> logger) :
+        IOptions<SteamCollectorConfiguration> baseConfiguration, ServersContext serversContext,
+        ISteamServers steamServers, IClickHouseService clickHouse, ILogger<ARKResolver> logger) :
         base(baseConfiguration, serversContext, steamServers, clickHouse, logger)
     {
         _genericServersContext = serversContext;
@@ -35,7 +36,8 @@ public class ARKResolver : BaseResolver
     public override async Task<List<Server>> GetServers()
     {
         var servers = await _genericServersContext.ArkServers
-            .Where(server => server.NextCheck < DateTime.UtcNow && server.AppID == AppId).AsNoTracking().OrderBy(server => server.NextCheck).Take(50000)
+            .Where(server => server.NextCheck < DateTime.UtcNow && server.AppID == AppId).AsNoTracking()
+            .OrderBy(server => server.NextCheck).Take(50000)
             .ToListAsync();
         return servers.ToList<Server>();
     }

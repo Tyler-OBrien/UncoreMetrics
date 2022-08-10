@@ -1,7 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Net;
 using System.Runtime.InteropServices;
-using Microsoft.EntityFrameworkCore;
 using Okolni.Source.Query.Source;
 using Sentry;
 using Serilog.Context;
@@ -16,10 +15,11 @@ public class PollSolver : IGenericAsyncSolver<QueryPoolItem<Server>, PollServerI
 {
     private readonly ILogger _logger;
 
-    public PollSolver( ILogger logger)
+    public PollSolver(ILogger logger)
     {
         _logger = logger;
     }
+
     public async Task<(PollServerInfo? item, bool success)> Solve(QueryPoolItem<Server> item)
     {
         var server = item.Item;
@@ -32,11 +32,10 @@ public class PollSolver : IGenericAsyncSolver<QueryPoolItem<Server>, PollServerI
             var players = await pool.GetPlayersSafeAsync(endPoint);
 
             if (info != null && rules != null && players != null)
-            {
                 return (new PollServerInfo(server, info, players, rules), success: true);
-            }
 #if DEBUG
-            _logger.LogDebug("Failed to get {Address} - {Name} - {LastCheck}", server.Address, server.Name, server.LastCheck);
+            _logger.LogDebug("Failed to get {Address} - {Name} - {LastCheck}", server.Address, server.Name,
+                server.LastCheck);
 #endif
             return (new PollServerInfo(server, info, players, rules), success: false);
         }
@@ -45,7 +44,8 @@ public class PollSolver : IGenericAsyncSolver<QueryPoolItem<Server>, PollServerI
             _logger.LogError(ex, "Unexpected error");
             SentrySdk.CaptureException(ex);
 #if DEBUG
-            _logger.LogDebug("Failed to get {Address} - {Name} - {LastCheck}", server.Address, server.Name, server.LastCheck);
+            _logger.LogDebug("Failed to get {Address} - {Name} - {LastCheck}", server.Address, server.Name,
+                server.LastCheck);
 #endif
         }
 
@@ -55,8 +55,6 @@ public class PollSolver : IGenericAsyncSolver<QueryPoolItem<Server>, PollServerI
 
 public partial class SteamServers : ISteamServers
 {
-
-
     /// <summary>
     ///     Handles generic Steam Stats, grabbing active servers from the Steam Web API Server List, grabbing Server info /
     ///     rules / players, and submitting to postgres & Clickhouse.
@@ -65,9 +63,7 @@ public partial class SteamServers : ISteamServers
     /// <returns>Returns a list of full Server info to be actioned on with stats for that specific Server type</returns>
     public async Task<List<PollServerInfo>> GenericServerPoll(List<Server> servers)
     {
-
         var polledServers = await GetAllServersPoll(servers);
-
 
 
         return polledServers;
@@ -97,7 +93,8 @@ public partial class SteamServers : ISteamServers
         };
         pool.Setup();
         using var queue = new AsyncResolveQueue<QueryPoolItem<Server>, PollServerInfo>(_logger,
-            servers.Select(server => new QueryPoolItem<Server>(pool, server)), maxConcurrency, newSolver, cancellationTokenSource.Token);
+            servers.Select(server => new QueryPoolItem<Server>(pool, server)), maxConcurrency, newSolver,
+            cancellationTokenSource.Token);
 
         // Wait a max of 60 seconds...
         var delayCount = 0;
@@ -111,19 +108,24 @@ public partial class SteamServers : ISteamServers
             await Task.WhenAll(Task.Delay(1000, cancellationTokenSource.Token), scrapeJobUpdate);
             delayCount++;
         }
+
         cancellationTokenSource.Cancel();
         if (delayCount >= 90)
-            _logger.LogWarning("[Warning] Operation timed out, reached {delayMax} Seconds, so we terminated. ", delayCount);
+            _logger.LogWarning("[Warning] Operation timed out, reached {delayMax} Seconds, so we terminated. ",
+                delayCount);
         var serverInfos = queue.Outgoing;
 
 
         stopwatch.Stop();
-        _logger.LogInformation("Took {ElapsedMilliseconds}ms to get {ServersCount} Server infos from list", stopwatch.ElapsedMilliseconds, servers.Count);
+        _logger.LogInformation("Took {ElapsedMilliseconds}ms to get {ServersCount} Server infos from list",
+            stopwatch.ElapsedMilliseconds, servers.Count);
         _logger.LogInformation("-----------------------------------------");
         _logger.LogInformation(
-            "We were able to connect to {serverInfosCount} out of {serversCount} {successPercentage}%", serverInfos.Count, servers.Count, (int)Math.Round(serverInfos.Count / (double)servers.Count * 100));
+            "We were able to connect to {serverInfosCount} out of {serversCount} {successPercentage}%",
+            serverInfos.Count, servers.Count, (int)Math.Round(serverInfos.Count / (double)servers.Count * 100));
         _logger.LogInformation(
-            "Total Players: {playersCount}, Total Servers: {serverInfosCount}", serverInfos.Sum(info => info.ServerInfo?.Players), serverInfos.Count);
+            "Total Players: {playersCount}, Total Servers: {serverInfosCount}",
+            serverInfos.Sum(info => info.ServerInfo?.Players), serverInfos.Count);
         await _scrapeJobStatusService.EndRun(runType);
         return serverInfos.ToList();
     }

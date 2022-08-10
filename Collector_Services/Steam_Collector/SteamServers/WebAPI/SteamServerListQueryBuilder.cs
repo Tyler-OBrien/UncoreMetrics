@@ -1,5 +1,4 @@
-﻿using UncoreMetrics.Steam_Collector.SteamServers.WebAPI;
-using System.Text;
+﻿using System.Text;
 
 namespace UncoreMetrics.Steam_Collector.SteamServers.WebAPI;
 

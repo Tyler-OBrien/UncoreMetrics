@@ -14,8 +14,7 @@ public class PostScriptumServer : Server
 
     [ServerRulesProperty("GameMode_s")] public string? GameMode { get; set; }
 
-    [ServerRulesProperty("GameVersion_s")]
-    public string? GameVersion { get; set; }
+    [ServerRulesProperty("GameVersion_s")] public string? GameVersion { get; set; }
 
 
     [ServerRulesProperty("MatchTimeout_f")]
@@ -29,11 +28,9 @@ public class PostScriptumServer : Server
     public int? PlayerReserveCount { get; set; }
 
 
-    [ServerRulesProperty("PublicQueue_i")]
-    public int? PublicQueue { get; set; }
+    [ServerRulesProperty("PublicQueue_i")] public int? PublicQueue { get; set; }
 
-    [ServerRulesProperty("PlayerCount_i")]
-    public int? PlayerCount { get; set; }
+    [ServerRulesProperty("PlayerCount_i")] public int? PlayerCount { get; set; }
 
 
     [ServerRulesProperty("ReservedQueue_i")]
@@ -44,6 +41,5 @@ public class PostScriptumServer : Server
     public string? SearchKeywords { get; set; }
 
 
-    [ServerRulesProperty("SESSIONFLAGS")]
-    public int? SessionFlags { get; set; }
+    [ServerRulesProperty("SESSIONFLAGS")] public int? SessionFlags { get; set; }
 }

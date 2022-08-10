@@ -16,8 +16,7 @@ public class ArkServer : Server
 
     [ServerRulesProperty("DayTime_s")] public int? DaysRunning { get; set; }
 
-    [ServerRulesProperty("SESSIONFLAGS")]
-    public int? SessionFlags { get; set; }
+    [ServerRulesProperty("SESSIONFLAGS")] public int? SessionFlags { get; set; }
 
     [ServerRulesProperty("ClusterId_s")] public string? ClusterID { get; set; }
 

@@ -3,7 +3,6 @@ using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Unicode;
 using UncoreMetrics.Steam_Collector.Models.Games.Steam.SteamAPI;
-using UncoreMetrics.Steam_Collector.SteamServers.WebAPI;
 
 namespace UncoreMetrics.Steam_Collector.SteamServers.WebAPI;
 
