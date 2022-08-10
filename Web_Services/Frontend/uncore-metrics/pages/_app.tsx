@@ -82,7 +82,7 @@ function MyApp({ Component, pageProps }: AppProps) {
                 placeholder="Search Servers…"
                 inputProps={{ "aria-label": "search" }}
                 onChange={(e) => {
-                  // @ts-ignore
+                  // @ts-ignore - Really messy, should use something like Redux in the future, or higher order components
                   if (globalThis.onSearchChange)
                     // @ts-ignore
                     globalThis.onSearchChange(e.target.value);
