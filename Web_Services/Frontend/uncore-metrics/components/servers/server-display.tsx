@@ -175,13 +175,18 @@ export default function ServerDisplay() {
   // @ts-ignore
   const [data, setData] = React.useState<PageData>(undefined);
 
-  const [loading, setLoading] = React.useState<boolean>(true);
+  const [loading, setLoading] = React.useState<boolean>(false);
   const [error, setError] = React.useState<string>("");
-  const [search, setSearch] = React.useState<string>("");
   const router = useRouter()
+  const queryKey = 'search';
+  // Hack from https://github.com/vercel/next.js/discussions/11484
+  const searchValue = router.query[queryKey] || router.asPath.match(new RegExp(`[&?]${queryKey}=(.*)(&|$)`))?.[1];
+  const [search, setSearch] = React.useState<string>(searchValue as string);
+
 
 
   const updateData = async (page: number, rowsPerPage: number, search?: string) => {
+    setLoading(true);
     let response: Response;
     if (search) {
          response = await fetch(
@@ -189,6 +194,7 @@ export default function ServerDisplay() {
               page + 1
             }&pageSize=${rowsPerPage}`
           );
+
     }
     else {
     response = await fetch(
@@ -206,16 +212,26 @@ export default function ServerDisplay() {
     }
     setLoading(false);
   };
-  if (loading && !error && !data) {
-    updateData(page, rowsPerPage);
+  React.useEffect(() => {
+    updateData(page, rowsPerPage, search);
+
+}, []);
+
+
     // @ts-ignore
     globalThis.onSearchChange = (search: string) => {
+      router.push({
+        pathname: '',
+        query: { search: search }
+      }, 
+      undefined, { shallow: true }
+      )
     updateData(page, rowsPerPage, search);
     setSearch(search);
     }
-  }
 
-  if (loading) {
+
+  if (loading || !data) {
     return <div>Loading...</div>;
   }
   if (error) {
