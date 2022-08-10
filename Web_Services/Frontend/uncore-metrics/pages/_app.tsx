@@ -51,7 +51,7 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 }));
 
 function MyApp({ Component, pageProps }: AppProps) {
-  const router = useRouter()
+  const router = useRouter();
   return (
     <div>
       <Box sx={{ flexGrow: 1 }}>
@@ -85,17 +85,14 @@ function MyApp({ Component, pageProps }: AppProps) {
                 inputProps={{ "aria-label": "search" }}
                 onChange={(e) => {
                   // @ts-ignore - Really messy, should use something like Redux in the future, or higher order components
-                  if (globalThis.onSearchChange)
-                  {
+                  if (globalThis.onSearchChange) {
                     // @ts-ignore
                     globalThis.onSearchChange(e.target.value);
-                  }
-                  else {
+                  } else {
                     router.push({
-                      pathname: '/',
-                      query: { search: e.target.value }
-                    }, 
-                    )
+                      pathname: "/",
+                      query: { search: e.target.value },
+                    });
                   }
                 }}
               />

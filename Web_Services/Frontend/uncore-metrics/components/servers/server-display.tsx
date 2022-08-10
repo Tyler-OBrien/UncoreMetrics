@@ -11,7 +11,7 @@ import TableSortLabel from "@mui/material/TableSortLabel";
 import Paper from "@mui/material/Paper";
 import { visuallyHidden } from "@mui/utils";
 import { PageData, Server, ServerResponse } from "../../interfaces/servers";
-import { useRouter } from 'next/router'
+import { useRouter } from "next/router";
 
 function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
   if (b[orderBy] < a[orderBy]) {
@@ -177,31 +177,33 @@ export default function ServerDisplay() {
 
   const [loading, setLoading] = React.useState<boolean>(false);
   const [error, setError] = React.useState<string>("");
-  const router = useRouter()
-  const queryKey = 'search';
+  const router = useRouter();
+  const queryKey = "search";
   // Hack from https://github.com/vercel/next.js/discussions/11484
-  const searchValue = router.query[queryKey] || router.asPath.match(new RegExp(`[&?]${queryKey}=(.*)(&|$)`))?.[1];
+  const searchValue =
+    router.query[queryKey] ||
+    router.asPath.match(new RegExp(`[&?]${queryKey}=(.*)(&|$)`))?.[1];
   const [search, setSearch] = React.useState<string>(searchValue as string);
 
-
-
-  const updateData = async (page: number, rowsPerPage: number, search?: string) => {
+  const updateData = async (
+    page: number,
+    rowsPerPage: number,
+    search?: string
+  ) => {
     setLoading(true);
     let response: Response;
     if (search) {
-         response = await fetch(
-            `https://api.uncore.app/v1/servers/search/${encodeURIComponent(search)}?page=${
-              page + 1
-            }&pageSize=${rowsPerPage}`
-          );
-
-    }
-    else {
-    response = await fetch(
-      `https://api.uncore.app/v1/servers?page=${
-        page + 1
-      }&pageSize=${rowsPerPage}`
-    );
+      response = await fetch(
+        `https://api.uncore.app/v1/servers/search/${encodeURIComponent(
+          search
+        )}?page=${page + 1}&pageSize=${rowsPerPage}`
+      );
+    } else {
+      response = await fetch(
+        `https://api.uncore.app/v1/servers?page=${
+          page + 1
+        }&pageSize=${rowsPerPage}`
+      );
     }
     const serverResponse: ServerResponse = await response.json();
     if (serverResponse.error) {
@@ -214,22 +216,21 @@ export default function ServerDisplay() {
   };
   React.useEffect(() => {
     updateData(page, rowsPerPage, search);
+  }, []);
 
-}, []);
-
-
-    // @ts-ignore
-    globalThis.onSearchChange = (search: string) => {
-      router.push({
-        pathname: '',
-        query: { search: search }
-      }, 
-      undefined, { shallow: true }
-      )
+  // @ts-ignore
+  globalThis.onSearchChange = (search: string) => {
+    router.push(
+      {
+        pathname: "",
+        query: { search: search },
+      },
+      undefined,
+      { shallow: true }
+    );
     updateData(page, rowsPerPage, search);
     setSearch(search);
-    }
-
+  };
 
   if (loading || !data) {
     return <div>Loading...</div>;
@@ -258,9 +259,7 @@ export default function ServerDisplay() {
 
   const handleClick = (event: React.MouseEvent<unknown>, name: string) => {
     const selectedIndex = selected.indexOf(name);
-    if (selectedIndex !== -1)
-        router.push(`/server/${name}`);
-
+    if (selectedIndex !== -1) router.push(`/server/${name}`);
 
     let newSelected: readonly string[] = [];
 
