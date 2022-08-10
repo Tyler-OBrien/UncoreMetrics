@@ -1,1 +1,10 @@
-# UncoreMetrics
+# Uncore Metrics - Very Work In Progress
+Uncore Metrics collects metrics and information on servers for various steam games, using the steam server query protocol. Postgres is used for full text search and storing/querying of server information directly. Clickhouse is used to store statistics from each query, eventually being used to display graphs of player count over time, etc.
+
+The [Steam Collector](https://github.com/Tyler-OBrien/UncoreMetrics/tree/master/Collector_Services/Steam_Collector) is a generic service worker that is used to query and collect statistics on all of the various games. Each game has its own resolver, used modify how the servers for that game are queried/collected. For example, [Post Scriptum](https://github.com/Tyler-OBrien/UncoreMetrics/blob/master/Collector_Services/Steam_Collector/Game_Collectors/PostScriptumResolver.cs). The [models themselves](https://github.com/Tyler-OBrien/UncoreMetrics/blob/master/Data_Services/UncoreMetrics.Data/GameData/Rust/RustServer.cs) for each game type contain information about how each custom property matches to what is received from the steam queries, mainly A2S_Rules. 
+
+[UncoreMetrics.Data](https://github.com/Tyler-OBrien/UncoreMetrics/tree/master/Data_Services/UncoreMetrics.Data), contains the models for each of the database models and various EF Core/Clickhouse setup items.
+
+The [API](https://github.com/Tyler-OBrien/UncoreMetrics/tree/master/Web_Services/API) is implemented in ASP.NET Core as a simple REST API, and is used to get information displayed by the [Front end](https://github.com/Tyler-OBrien/UncoreMetrics/tree/master/Web_Services/Frontend/uncore-metrics), which is in Next.js using Typescript.
+
+The Steam Collector uses a [modified Steam Query Library](https://github.com/Tyler-OBrien/Okolni-Source-Query-Pool) that uses a single UDP Socket to send/recv from mutiple servers at once, instead of spawning a single socket per connection/server. It can scan a few thousand servers a second, the biggest slow down being servers which are dead/won't respond.
