@@ -22,7 +22,7 @@ public class SevenDaysToDieResolver : BaseResolver
     }
 
 
-    public override string Name => "7DTD";
+    public override string Name => "7 Days To Die";
     public override ulong AppId => 251570;
 
     public override async Task<List<Server>> GetServers()
@@ -45,6 +45,9 @@ public class SevenDaysToDieResolver : BaseResolver
 
         if (server.ExistingServer != null)
             customServer.Copy(server.ExistingServer);
+
+        // Update Game Name -- This may throw away some custom data returned by Game A2S_Info, but easier for queries to tell what game it is.
+        customServer.Game = Name;
 
         if (server.ServerRules != null) customServer.ResolveGameDataPropertiesFromRules(server.ServerRules);
 

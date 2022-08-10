@@ -22,7 +22,7 @@ public class VRisingResolver : BaseResolver
     }
 
 
-    public override string Name => "VRising";
+    public override string Name => "V Rising";
     public override ulong AppId => 1604030;
 
     public override async Task<List<Server>> GetServers()
@@ -44,7 +44,8 @@ public class VRisingResolver : BaseResolver
         var vRisingServer = new VRisingServer();
         if (server.ExistingServer != null)
             vRisingServer.Copy(server.ExistingServer);
-
+        // Update Game Name -- This may throw away some custom data returned by Game A2S_Info, but easier for queries to tell what game it is.
+        vRisingServer.Game = Name;
 
         if (server.ServerRules != null)
             vRisingServer.ResolveGameDataPropertiesFromRules(server.ServerRules);

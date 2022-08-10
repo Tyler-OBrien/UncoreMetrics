@@ -22,7 +22,7 @@ public class Arma3Resolver : BaseResolver
     }
 
 
-    public override string Name => "Arma3";
+    public override string Name => "Arma 3";
     public override ulong AppId => 107410;
 
 
@@ -46,7 +46,8 @@ public class Arma3Resolver : BaseResolver
 
         if (server.ExistingServer != null)
             customServer.Copy(server.ExistingServer);
-
+        // Update Game Name -- This may throw away some custom data returned by Game A2S_Info, but easier for queries to tell what game it is.
+        customServer.Game = Name;
         if (server.ServerRules != null) customServer.ResolveGameDataPropertiesFromRules(server.ServerRules);
 
         return customServer;

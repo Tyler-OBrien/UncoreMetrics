@@ -23,7 +23,7 @@ public class PostScriptumResolver : BaseResolver
     }
 
 
-    public override string Name => "PostScriptum";
+    public override string Name => "Post Scriptum";
     public override ulong AppId => 736220;
 
     // Post Scriptum servers don't report their player count to steam, only visible through A2S_Rules...
@@ -50,6 +50,9 @@ public class PostScriptumResolver : BaseResolver
 
         if (server.ExistingServer != null)
             customServer.Copy(server.ExistingServer);
+
+        // Update Game Name -- This may throw away some custom data returned by Game A2S_Info, but easier for queries to tell what game it is.
+        customServer.Game = Name;
 
         if (server.ServerRules != null)
         {
