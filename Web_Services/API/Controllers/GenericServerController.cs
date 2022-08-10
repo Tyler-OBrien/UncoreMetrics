@@ -41,6 +41,13 @@ public class GenericServerController : ControllerBase
                 .Where(server => server.ServerDead == includeDead).GetPaged(page, pageSize)));
         return Ok(new DataResponse<PagedResult<Server>>(await _genericServersContext.Servers.OrderByDescending(server => server.Players).GetPaged(page, pageSize)));
     }
+    [HttpGet("{id}")]
+    public async Task<ActionResult<IResponse>> GetServer(Guid id)
+    {
+        return Ok(new DataResponse<Server?>(await _genericServersContext.Servers.Where(server => server.ServerID == id).FirstOrDefaultAsync()));
+    }
+
+
     [HttpGet("search/{search}")]
     public async Task<ActionResult<IResponse>> GetServers(string search, [FromQuery] bool? includeDead = false,
         [FromQuery] int page = 1, [FromQuery] int pageSize = 25)
