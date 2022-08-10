@@ -63,7 +63,7 @@ public class PollServerInfo : IGenericServerInfo
             ExistingServer.Game = ServerInfo.Game;
             ExistingServer.Map = ServerInfo.Map;
             ExistingServer.Name = ServerInfo.Name;
-
+            ExistingServer.LastCheck = DateTime.UtcNow;
             ExistingServer.Keywords = ServerInfo.KeyWords;
             ExistingServer.VAC = ServerInfo.VAC;
             ExistingServer.Visibility = ServerInfo.Visibility == Enums.Visibility.Private ? true : false;
