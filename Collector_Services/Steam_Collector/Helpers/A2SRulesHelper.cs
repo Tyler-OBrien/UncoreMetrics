@@ -2,7 +2,7 @@
 using Okolni.Source.Common;
 using Okolni.Source.Query.Responses;
 
-namespace Steam_Collector.Helpers;
+namespace UncoreMetrics.Steam_Collector.Helpers;
 
 public static class A2SRulesHelper
 {
@@ -220,7 +220,7 @@ public static class A2SRulesHelper
     /// </summary>
     /// <param name="env"></param>
     /// <returns> 'l' for linux, 'm' for mac, 'w' for windows, 'e' for unknown/error</returns>
-    public static char ResolveEnvironment(this Okolni.Source.Common.Enums.Environment env)
+    public static char ResolveEnvironment(this Enums.Environment env)
     {
         switch (env)
         {

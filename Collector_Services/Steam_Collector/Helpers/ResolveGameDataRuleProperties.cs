@@ -8,7 +8,7 @@ using Okolni.Source.Query.Responses;
 using UncoreMetrics.Data.GameData;
 using ValueType = UncoreMetrics.Data.GameData.ValueType;
 
-namespace Steam_Collector.Helpers
+namespace UncoreMetrics.Steam_Collector.Helpers
 {
     public static class ResolveGameDataRuleProperties
     {

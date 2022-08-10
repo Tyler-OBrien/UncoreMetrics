@@ -1,6 +1,5 @@
 using System.Text.Json.Serialization;
-using API.Middleware;
-using API.Models;
+using UncoreMetrics.API.Middleware;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -8,11 +7,13 @@ using Prometheus;
 using Sentry.Extensibility;
 using Serilog;
 using Serilog.Events;
+using UncoreMetrics.API.Middleware;
+using UncoreMetrics.API.Models;
 using UncoreMetrics.Data;
 using UncoreMetrics.Data.ClickHouse;
 using UncoreMetrics.Data.Configuration;
 
-namespace API
+namespace UncoreMetrics.API
 {
     public class Program
     {

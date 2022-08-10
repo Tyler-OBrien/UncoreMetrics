@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace API.Models.Responses.API;
+namespace UncoreMetrics.API.Models.Responses.API;
 
 /// <summary>
 ///     Default Rest API Data Response (i.e not an error)

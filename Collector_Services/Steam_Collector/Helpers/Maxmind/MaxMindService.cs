@@ -1,8 +1,8 @@
 ﻿using MaxMind.GeoIP2;
 using MaxMind.GeoIP2.Responses;
-using Steam_Collector.Models.Tools.Maxmind;
+using UncoreMetrics.Steam_Collector.Models.Tools.Maxmind;
 
-namespace Steam_Collector.Helpers.Maxmind;
+namespace UncoreMetrics.Steam_Collector.Helpers.Maxmind;
 
 public class MaxMindService : IGeoIPService
 {

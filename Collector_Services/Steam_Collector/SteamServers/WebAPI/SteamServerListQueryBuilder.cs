@@ -1,6 +1,7 @@
-﻿using System.Text;
+﻿using UncoreMetrics.Steam_Collector.SteamServers.WebAPI;
+using System.Text;
 
-namespace Steam_Collector.SteamServers.WebAPI;
+namespace UncoreMetrics.Steam_Collector.SteamServers.WebAPI;
 
 /// <summary>
 ///     This class can be used to built up a filter for GetServerList:

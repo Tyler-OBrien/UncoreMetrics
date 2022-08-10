@@ -1,7 +1,7 @@
 ﻿using System.Net;
 using System.Text.Json.Serialization;
 
-namespace API.Models.Responses.API;
+namespace UncoreMetrics.API.Models.Responses.API;
 
 public class GenericDataResponse : DataResponse<GenericData>
 {

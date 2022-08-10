@@ -6,17 +6,17 @@ using Sentry.Extensions.Logging;
 using Serilog;
 using Serilog.Context;
 using Serilog.Events;
-using Steam_Collector.Game_Collectors;
-using Steam_Collector.Helpers.Maxmind;
-using Steam_Collector.Helpers.ScrapeJobStatus;
-using Steam_Collector.Models;
-using Steam_Collector.SteamServers;
-using Steam_Collector.SteamServers.WebAPI;
+using UncoreMetrics.Steam_Collector.SteamServers;
+using UncoreMetrics.Steam_Collector.SteamServers.WebAPI;
 using UncoreMetrics.Data;
 using UncoreMetrics.Data.ClickHouse;
 using UncoreMetrics.Data.Configuration;
+using UncoreMetrics.Steam_Collector.Game_Collectors;
+using UncoreMetrics.Steam_Collector.Helpers.Maxmind;
+using UncoreMetrics.Steam_Collector.Helpers.ScrapeJobStatus;
+using UncoreMetrics.Steam_Collector.Models;
 
-namespace Steam_Collector;
+namespace UncoreMetrics.Steam_Collector;
 
 public class Program
 {
@@ -65,7 +65,7 @@ public class Program
         Host.CreateDefaultBuilder(args)
             .ConfigureServices((hostContext, services) =>
             {
-                
+
                 IConfiguration configuration = hostContext.Configuration.GetSection("Base");
                 var baseConfiguration = configuration.Get<SteamCollectorConfiguration>();
                 services.Configure<SteamCollectorConfiguration>(configuration);
@@ -99,9 +99,9 @@ public class Program
                         $"Could not find Game Type Resolver: {baseConfiguration.GameType}, Valid Options: {resolver.GetValidResolvers()}");
                 services.AddScoped(typeof(BaseResolver), resolver.GetResolver(gameType));
                 LogContext.PushProperty("Resolver", gameType, true);
-                Serilog.Log.Logger.Warning("Starting up with Resolver: {gameType}", gameType);
-                
-                
+                Log.Logger.Warning("Starting up with Resolver: {gameType}", gameType);
+
+
 
                 services.AddSingleton<ISteamAPI, SteamAPI>();
                 services.AddDbContext<ServersContext>(options =>
@@ -123,7 +123,7 @@ public class Program
 
     private static void TaskSchedulerOnUnobservedTaskException(object? sender, UnobservedTaskExceptionEventArgs e)
     {
-        Serilog.Log.Logger.Error(e.Exception, "[ERROR] Unobserved Error: {UnobservedTaskExceptionEventArgs} - {UnobservedTaskExceptionEventArgsException} - {senderObj}", e, e.Exception, sender);
+        Log.Logger.Error(e.Exception, "[ERROR] Unobserved Error: {UnobservedTaskExceptionEventArgs} - {UnobservedTaskExceptionEventArgsException} - {senderObj}", e, e.Exception, sender);
         throw e.Exception;
     }
 

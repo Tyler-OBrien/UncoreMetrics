@@ -6,12 +6,12 @@ using System.Threading.Tasks;
 using EFCore.BulkExtensions;
 using Microsoft.Extensions.Options;
 using Sentry;
-using Steam_Collector.Models;
-using Steam_Collector.SteamServers;
+using UncoreMetrics.Steam_Collector.SteamServers;
 using UncoreMetrics.Data;
 using UncoreMetrics.Data.ClickHouse;
+using UncoreMetrics.Steam_Collector.Models;
 
-namespace Steam_Collector.Helpers.ScrapeJobStatus
+namespace UncoreMetrics.Steam_Collector.Helpers.ScrapeJobStatus
 {
 
     public class ScrapeJobStatusService : IScrapeJobStatusService
@@ -43,7 +43,7 @@ namespace Steam_Collector.Helpers.ScrapeJobStatus
             await UpdateStatus(newScrapeJob, token);
         }
 
-        public async Task  EndRun(string runType, CancellationToken token = default)
+        public async Task EndRun(string runType, CancellationToken token = default)
         {
             var newScrapeJob = new ScrapeJob(_configuration.GameType, runType, _configuration.NodeName, _runid, 0,
                 0, 0, _runGuid, false, _startedAt, DateTime.UtcNow);
@@ -63,9 +63,9 @@ namespace Steam_Collector.Helpers.ScrapeJobStatus
             var bulkConfig = new BulkConfig
             {
             };
-      
-                await _genericServersContext.BulkInsertOrUpdateAsync(new ScrapeJob[] { job }, bulkConfig,
-                    cancellationToken: token);
+
+            await _genericServersContext.BulkInsertOrUpdateAsync(new ScrapeJob[] { job }, bulkConfig,
+                cancellationToken: token);
         }
 
     }

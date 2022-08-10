@@ -1,6 +1,6 @@
 ﻿using UncoreMetrics.Data.Configuration;
 
-namespace Steam_Collector.Models;
+namespace UncoreMetrics.Steam_Collector.Models;
 
 public class SteamCollectorConfiguration : BaseConfiguration
 {

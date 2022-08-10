@@ -1,6 +1,6 @@
 ﻿using Okolni.Source.Query.Source;
 
-namespace Steam_Collector.Helpers;
+namespace UncoreMetrics.Steam_Collector.Helpers;
 
 public class QueryPoolItem<T>
 {

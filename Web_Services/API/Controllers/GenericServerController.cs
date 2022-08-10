@@ -1,12 +1,13 @@
 ﻿using System.Net;
-using API.Models.PagedResults;
-using API.Models.Responses.API;
+using UncoreMetrics.API.Models.Responses.API;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using UncoreMetrics.API.Models.PagedResults;
+using UncoreMetrics.API.Models.Responses.API;
 using UncoreMetrics.Data;
 using UncoreMetrics.Data.ClickHouse;
 
-namespace API.Controllers;
+namespace UncoreMetrics.API.Controllers;
 
 [ApiController]
 [Route("v1/servers")]

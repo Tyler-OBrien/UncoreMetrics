@@ -7,6 +7,7 @@
     <UserSecretsId>e9bb8556-288f-4e12-aa16-2640ecf71ee6</UserSecretsId>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     <DockerfileContext>..\..</DockerfileContext>
+    <RootNamespace>UncoreMetrics.$(MSBuildProjectName.Replace(" ", "_"))</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>

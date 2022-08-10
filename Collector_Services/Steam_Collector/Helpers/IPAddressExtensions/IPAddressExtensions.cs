@@ -6,10 +6,10 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Steam_Collector.Helpers.IPAddressExtensions
+namespace UncoreMetrics.Steam_Collector.Helpers.IPAddressExtensions
 {
     /// <summary>
-    /// Extension methods on <see cref="System.Net.IPAddress"/>.
+    /// Extension methods on <see cref="IPAddress"/>.
     /// </summary>
     public static class IPAddressExtensions
     {
@@ -21,7 +21,7 @@ namespace Steam_Collector.Helpers.IPAddressExtensions
         /// <param name="ip">The IP address.</param>
         /// <returns>True if the IP address was in a private range.</returns>
         /// <example><code>bool isPrivate = IPAddress.Parse("127.0.0.1").IsPrivate();</code></example>
-        public static bool IsPrivate(this System.Net.IPAddress ip)
+        public static bool IsPrivate(this IPAddress ip)
         {
             // Map back to IPv4 if mapped to IPv6, for example "::ffff:1.2.3.4" to "1.2.3.4".
             if (ip.IsIPv4MappedToIPv6)

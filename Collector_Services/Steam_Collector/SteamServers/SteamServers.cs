@@ -1,12 +1,12 @@
 ﻿using EFCore.BulkExtensions;
 using Microsoft.Extensions.Options;
-using Steam_Collector.Helpers.Maxmind;
-using Steam_Collector.Helpers.ScrapeJobStatus;
-using Steam_Collector.Models;
-using Steam_Collector.SteamServers.WebAPI;
+using UncoreMetrics.Steam_Collector.SteamServers.WebAPI;
 using UncoreMetrics.Data;
+using UncoreMetrics.Steam_Collector.Helpers.Maxmind;
+using UncoreMetrics.Steam_Collector.Helpers.ScrapeJobStatus;
+using UncoreMetrics.Steam_Collector.Models;
 
-namespace Steam_Collector.SteamServers;
+namespace UncoreMetrics.Steam_Collector.SteamServers;
 
 public partial class SteamServers : ISteamServers
 {

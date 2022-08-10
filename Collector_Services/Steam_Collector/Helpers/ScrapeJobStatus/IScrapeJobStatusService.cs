@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Steam_Collector.Helpers.ScrapeJobStatus
+namespace UncoreMetrics.Steam_Collector.Helpers.ScrapeJobStatus
 {
     public interface IScrapeJobStatusService
     {

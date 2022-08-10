@@ -1,6 +1,6 @@
 ﻿using UncoreMetrics.Data.Configuration;
 
-namespace API.Models;
+namespace UncoreMetrics.API.Models;
 
 public class APIConfiguration : BaseConfiguration
 {

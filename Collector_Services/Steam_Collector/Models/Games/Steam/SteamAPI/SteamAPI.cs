@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace Steam_Collector.Models.Games.Steam.SteamAPI;
+namespace UncoreMetrics.Steam_Collector.Models.Games.Steam.SteamAPI;
 
 public class ServerListQueryResult
 {

@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 
-namespace API.Models.PagedResults;
+namespace UncoreMetrics.API.Models.PagedResults;
 
 public class PagedResult<T>
 {

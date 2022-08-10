@@ -1,6 +1,6 @@
 ﻿using UncoreMetrics.Data;
 
-namespace Steam_Collector.SteamServers;
+namespace UncoreMetrics.Steam_Collector.SteamServers;
 
 public partial interface ISteamServers
 {

@@ -1,9 +1,9 @@
 ﻿using System.Net;
-using API.Models.Responses.API;
 using Sentry;
 using Serilog;
+using UncoreMetrics.API.Models.Responses.API;
 
-namespace API.Middleware;
+namespace UncoreMetrics.API.Middleware;
 
 public class JSONErrorMiddleware : IMiddleware
 {

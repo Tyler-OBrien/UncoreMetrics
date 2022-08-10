@@ -1,7 +1,7 @@
 ﻿using Okolni.Source.Query.Responses;
 using UncoreMetrics.Data;
 
-namespace Steam_Collector.Models.Games.Steam.SteamAPI;
+namespace UncoreMetrics.Steam_Collector.Models.Games.Steam.SteamAPI;
 
 public interface IGenericServerInfo
 {

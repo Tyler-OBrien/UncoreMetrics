@@ -5,15 +5,15 @@ using Okolni.Source.Query.Source;
 using Sentry;
 using Serilog.Context;
 using Serilog.Data;
-using Steam_Collector.Helpers;
-using Steam_Collector.Helpers.IPAddressExtensions;
-using Steam_Collector.Helpers.Maxmind;
-using Steam_Collector.Models.Games.Steam.SteamAPI;
-using Steam_Collector.SteamServers.ServerQuery;
-using Steam_Collector.SteamServers.WebAPI;
 using UncoreMetrics.Data;
+using UncoreMetrics.Steam_Collector.Helpers;
+using UncoreMetrics.Steam_Collector.Helpers.IPAddressExtensions;
+using UncoreMetrics.Steam_Collector.Helpers.Maxmind;
+using UncoreMetrics.Steam_Collector.Models.Games.Steam.SteamAPI;
+using UncoreMetrics.Steam_Collector.SteamServers.ServerQuery;
+using UncoreMetrics.Steam_Collector.SteamServers.WebAPI;
 
-namespace Steam_Collector.SteamServers;
+namespace UncoreMetrics.Steam_Collector.SteamServers;
 
 public class DiscoverySolver : IGenericAsyncSolver<QueryPoolItem<SteamListServer>, DiscoveredServerInfo>
 {

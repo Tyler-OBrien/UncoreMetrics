@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Options;
-using Steam_Collector.Models;
+using UncoreMetrics.Steam_Collector.Models;
 
-namespace Steam_Collector.SteamServers.WebAPI;
+namespace UncoreMetrics.Steam_Collector.SteamServers.WebAPI;
 
 public partial class SteamAPI : ISteamAPI
 {

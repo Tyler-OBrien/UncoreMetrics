@@ -1,11 +1,11 @@
 ﻿using System.Net;
 using Okolni.Source.Common;
 using Okolni.Source.Query.Responses;
-using Steam_Collector.Helpers;
-using Steam_Collector.Models.Tools.Maxmind;
 using UncoreMetrics.Data;
+using UncoreMetrics.Steam_Collector.Helpers;
+using UncoreMetrics.Steam_Collector.Models.Tools.Maxmind;
 
-namespace Steam_Collector.Models.Games.Steam.SteamAPI;
+namespace UncoreMetrics.Steam_Collector.Models.Games.Steam.SteamAPI;
 
 public class DiscoveredServerInfo : IGenericServerInfo
 {
@@ -14,7 +14,7 @@ public class DiscoveredServerInfo : IGenericServerInfo
     {
         Address = address;
         Port = port;
-        this.Server = server;
+        Server = server;
         ServerInfo = serverInfo;
         ServerPlayers = serverPlayers;
         ServerRules = serverRules;

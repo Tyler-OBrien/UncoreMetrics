@@ -1,4 +1,4 @@
-﻿namespace Steam_Collector.Models.Tools.Maxmind;
+﻿namespace UncoreMetrics.Steam_Collector.Models.Tools.Maxmind;
 
 public class IPInformation
 {

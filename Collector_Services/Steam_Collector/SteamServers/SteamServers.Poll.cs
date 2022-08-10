@@ -5,12 +5,12 @@ using Microsoft.EntityFrameworkCore;
 using Okolni.Source.Query.Source;
 using Sentry;
 using Serilog.Context;
-using Steam_Collector.Helpers;
-using Steam_Collector.Models.Games.Steam.SteamAPI;
-using Steam_Collector.SteamServers.ServerQuery;
 using UncoreMetrics.Data;
+using UncoreMetrics.Steam_Collector.Helpers;
+using UncoreMetrics.Steam_Collector.Models.Games.Steam.SteamAPI;
+using UncoreMetrics.Steam_Collector.SteamServers.ServerQuery;
 
-namespace Steam_Collector.SteamServers;
+namespace UncoreMetrics.Steam_Collector.SteamServers;
 
 public class PollSolver : IGenericAsyncSolver<QueryPoolItem<Server>, PollServerInfo>
 {

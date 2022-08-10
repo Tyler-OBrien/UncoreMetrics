@@ -1,14 +1,14 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using Steam_Collector.Helpers;
-using Steam_Collector.Models;
-using Steam_Collector.Models.Games.Steam.SteamAPI;
-using Steam_Collector.SteamServers;
+using UncoreMetrics.Steam_Collector.SteamServers;
 using UncoreMetrics.Data;
 using UncoreMetrics.Data.ClickHouse;
 using UncoreMetrics.Data.GameData._7DaysToDie;
+using UncoreMetrics.Steam_Collector.Helpers;
+using UncoreMetrics.Steam_Collector.Models;
+using UncoreMetrics.Steam_Collector.Models.Games.Steam.SteamAPI;
 
-namespace Steam_Collector.Game_Collectors;
+namespace UncoreMetrics.Steam_Collector.Game_Collectors;
 
 public class SevenDaysToDieResolver : BaseResolver
 {

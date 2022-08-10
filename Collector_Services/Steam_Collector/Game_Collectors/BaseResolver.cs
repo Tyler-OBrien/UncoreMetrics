@@ -3,16 +3,16 @@ using EFCore.BulkExtensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.Extensions.Options;
-using Steam_Collector.Models;
-using Steam_Collector.Models.Games.Steam.SteamAPI;
-using Steam_Collector.SteamServers;
-using Steam_Collector.SteamServers.WebAPI;
+using UncoreMetrics.Steam_Collector.SteamServers;
 using UncoreMetrics.Data;
 using UncoreMetrics.Data.ClickHouse;
 using UncoreMetrics.Data.ClickHouse.Data;
 using UncoreMetrics.Data.ClickHouse.Models;
+using UncoreMetrics.Steam_Collector.Models;
+using UncoreMetrics.Steam_Collector.Models.Games.Steam.SteamAPI;
+using UncoreMetrics.Steam_Collector.SteamServers.WebAPI;
 
-namespace Steam_Collector.Game_Collectors;
+namespace UncoreMetrics.Steam_Collector.Game_Collectors;
 
 /// <summary>
 /// Base Resolver for all of the various Server Resolvers.

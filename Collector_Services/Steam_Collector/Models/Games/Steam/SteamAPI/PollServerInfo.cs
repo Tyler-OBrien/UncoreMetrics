@@ -1,17 +1,17 @@
 ﻿using Okolni.Source.Common;
 using Okolni.Source.Query.Responses;
-using Steam_Collector.Helpers;
 using UncoreMetrics.Data;
 using UncoreMetrics.Data.ClickHouse.Models;
+using UncoreMetrics.Steam_Collector.Helpers;
 
-namespace Steam_Collector.Models.Games.Steam.SteamAPI;
+namespace UncoreMetrics.Steam_Collector.Models.Games.Steam.SteamAPI;
 
 public class PollServerInfo : IGenericServerInfo
 {
     public PollServerInfo(Server existingServer, InfoResponse? serverInfo,
         PlayerResponse? serverPlayers, RuleResponse? serverRules)
     {
-        this.ExistingServer = existingServer;
+        ExistingServer = existingServer;
         ServerInfo = serverInfo;
         ServerPlayers = serverPlayers;
         ServerRules = serverRules;

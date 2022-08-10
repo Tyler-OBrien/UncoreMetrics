@@ -3,7 +3,7 @@ using Okolni.Source.Common;
 using Okolni.Source.Query.Responses;
 using Okolni.Source.Query.Source;
 
-namespace Steam_Collector.SteamServers.ServerQuery;
+namespace UncoreMetrics.Steam_Collector.SteamServers.ServerQuery;
 
 public static class SteamServerQuery
 {

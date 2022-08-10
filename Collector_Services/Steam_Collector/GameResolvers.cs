@@ -1,6 +1,6 @@
-﻿using Steam_Collector.Game_Collectors;
+﻿using UncoreMetrics.Steam_Collector.Game_Collectors;
 
-namespace Steam_Collector;
+namespace UncoreMetrics.Steam_Collector;
 
 public class GameResolvers
 {

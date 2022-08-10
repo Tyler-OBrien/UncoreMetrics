@@ -1,15 +1,15 @@
 using System.Net;
 using Microsoft.Extensions.Options;
-using Steam_Collector.Game_Collectors;
-using Steam_Collector.Models;
-using Steam_Collector.Models.Games.Steam.SteamAPI;
-using Steam_Collector.SteamServers;
+using UncoreMetrics.Steam_Collector.Models.Games.Steam.SteamAPI;
+using UncoreMetrics.Steam_Collector.SteamServers;
 using UncoreMetrics.Data;
 using UncoreMetrics.Data.ClickHouse;
 using UncoreMetrics.Data.ClickHouse.Models;
 using UncoreMetrics.Data.GameData.VRising;
+using UncoreMetrics.Steam_Collector.Game_Collectors;
+using UncoreMetrics.Steam_Collector.Models;
 
-namespace Steam_Collector;
+namespace UncoreMetrics.Steam_Collector;
 
 public class Worker : BackgroundService
 {

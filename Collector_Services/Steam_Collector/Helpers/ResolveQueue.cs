@@ -1,6 +1,6 @@
 ﻿using System.Collections.Concurrent;
 
-namespace Steam_Collector.Helpers;
+namespace UncoreMetrics.Steam_Collector.Helpers;
 
 public class ResolveQueue<TIn, TOut> : IDisposable
 {

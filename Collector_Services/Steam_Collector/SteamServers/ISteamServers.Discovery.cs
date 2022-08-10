@@ -1,8 +1,8 @@
-﻿using Steam_Collector.Models.Games.Steam.SteamAPI;
-using Steam_Collector.SteamServers.WebAPI;
-using UncoreMetrics.Data;
+﻿using UncoreMetrics.Data;
+using UncoreMetrics.Steam_Collector.Models.Games.Steam.SteamAPI;
+using UncoreMetrics.Steam_Collector.SteamServers.WebAPI;
 
-namespace Steam_Collector.SteamServers;
+namespace UncoreMetrics.Steam_Collector.SteamServers;
 
 public partial interface ISteamServers
 {

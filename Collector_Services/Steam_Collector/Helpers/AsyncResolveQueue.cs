@@ -1,6 +1,6 @@
 ﻿using System.Collections.Concurrent;
 
-namespace Steam_Collector.Helpers;
+namespace UncoreMetrics.Steam_Collector.Helpers;
 
 public class AsyncResolveQueue<TIn, TOut> : IDisposable
 {
@@ -78,7 +78,7 @@ public class AsyncResolveQueue<TIn, TOut> : IDisposable
                     }
                     if (outItem.item != null)
                         Outgoing.Add(outItem.item);
-                    
+
                 }
                 finally
                 {
