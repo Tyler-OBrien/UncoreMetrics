@@ -70,7 +70,7 @@ function MyApp({ Component, pageProps }: AppProps) {
               <Link
                 variant="button"
                 color="text.primary"
-                href="jobs"
+                href="/jobs"
                 sx={{ my: 1, mx: 1.5 }}
               >
                 Scrape Jobs
