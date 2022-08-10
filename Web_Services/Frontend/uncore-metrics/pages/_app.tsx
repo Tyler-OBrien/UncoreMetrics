@@ -6,6 +6,7 @@ import Box from "@mui/material/Box";
 import AppBar from "@mui/material/AppBar";
 import InputBase from "@mui/material/InputBase";
 import SearchIcon from "@mui/icons-material/Search";
+import { useRouter } from "next/router";
 
 const Search = styled("div")(({ theme }) => ({
   position: "relative",
@@ -50,6 +51,7 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 }));
 
 function MyApp({ Component, pageProps }: AppProps) {
+  const router = useRouter()
   return (
     <div>
       <Box sx={{ flexGrow: 1 }}>
@@ -84,8 +86,17 @@ function MyApp({ Component, pageProps }: AppProps) {
                 onChange={(e) => {
                   // @ts-ignore - Really messy, should use something like Redux in the future, or higher order components
                   if (globalThis.onSearchChange)
+                  {
                     // @ts-ignore
                     globalThis.onSearchChange(e.target.value);
+                  }
+                  else {
+                    router.push({
+                      pathname: '/',
+                      query: { search: e.target.value }
+                    }, 
+                    )
+                  }
                 }}
               />
             </Search>
