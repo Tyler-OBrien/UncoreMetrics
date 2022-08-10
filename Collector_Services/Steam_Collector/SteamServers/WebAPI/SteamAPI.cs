@@ -5,9 +5,9 @@ namespace UncoreMetrics.Steam_Collector.SteamServers.WebAPI;
 
 public partial class SteamAPI : ISteamAPI
 {
-    private readonly SteamCollectorConfiguration _steamCollectorConfiguration;
     private readonly HttpClient _httpClient;
     private readonly string? _STEAM_API_KEY;
+    private readonly SteamCollectorConfiguration _steamCollectorConfiguration;
 
 
     public SteamAPI(IOptions<SteamCollectorConfiguration> baseConfigurationOptions)

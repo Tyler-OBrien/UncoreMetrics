@@ -1,13 +1,9 @@
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Sentry;
-using Sentry.Extensibility;
 using Sentry.Extensions.Logging;
 using Serilog;
 using Serilog.Context;
 using Serilog.Events;
-using UncoreMetrics.Steam_Collector.SteamServers;
-using UncoreMetrics.Steam_Collector.SteamServers.WebAPI;
 using UncoreMetrics.Data;
 using UncoreMetrics.Data.ClickHouse;
 using UncoreMetrics.Data.Configuration;
@@ -15,6 +11,8 @@ using UncoreMetrics.Steam_Collector.Game_Collectors;
 using UncoreMetrics.Steam_Collector.Helpers.Maxmind;
 using UncoreMetrics.Steam_Collector.Helpers.ScrapeJobStatus;
 using UncoreMetrics.Steam_Collector.Models;
+using UncoreMetrics.Steam_Collector.SteamServers;
+using UncoreMetrics.Steam_Collector.SteamServers.WebAPI;
 
 namespace UncoreMetrics.Steam_Collector;
 
@@ -25,7 +23,7 @@ public class Program
 
     public static int Main(string[] args)
     {
-        string extraLogName = "";
+        var extraLogName = "";
         // If env, we assume this is being run as a single program being targetted by mutiple unit files with their own env, so we need custom log names
         var env = Environment.GetEnvironmentVariable("UNCORE_COLLECTOR_GAMETYPE");
         if (env != null)
@@ -38,7 +36,8 @@ public class Program
             .WriteTo.Async(config =>
             {
                 config.File($"Logs/{extraLogName}Log.log", outputTemplate: outputFormat,
-                    restrictedToMinimumLevel: LogEventLevel.Information, retainedFileCountLimit: 10, rollingInterval: RollingInterval.Day);
+                    restrictedToMinimumLevel: LogEventLevel.Information, retainedFileCountLimit: 10,
+                    rollingInterval: RollingInterval.Day);
                 config.Console(outputTemplate: outputFormat, restrictedToMinimumLevel: LogEventLevel.Information);
             }).Enrich.FromLogContext().CreateLogger();
         Log.Logger.Information("Loaded SeriLog Logger");
@@ -61,11 +60,11 @@ public class Program
         }
     }
 
-    public static IHost BuildHost(string[] args) =>
-        Host.CreateDefaultBuilder(args)
+    public static IHost BuildHost(string[] args)
+    {
+        return Host.CreateDefaultBuilder(args)
             .ConfigureServices((hostContext, services) =>
             {
-
                 IConfiguration configuration = hostContext.Configuration.GetSection("Base");
                 var baseConfiguration = configuration.Get<SteamCollectorConfiguration>();
                 services.Configure<SteamCollectorConfiguration>(configuration);
@@ -102,7 +101,6 @@ public class Program
                 Log.Logger.Warning("Starting up with Resolver: {gameType}", gameType);
 
 
-
                 services.AddSingleton<ISteamAPI, SteamAPI>();
                 services.AddDbContext<ServersContext>(options =>
                 {
@@ -115,16 +113,17 @@ public class Program
                 services.AddScoped<IScrapeJobStatusService, ScrapeJobStatusService>();
 
                 services.AddHostedService<Worker>();
-
             })
             .UseSerilog() // <- Add this line
             .Build();
+    }
 
 
     private static void TaskSchedulerOnUnobservedTaskException(object? sender, UnobservedTaskExceptionEventArgs e)
     {
-        Log.Logger.Error(e.Exception, "[ERROR] Unobserved Error: {UnobservedTaskExceptionEventArgs} - {UnobservedTaskExceptionEventArgsException} - {senderObj}", e, e.Exception, sender);
+        Log.Logger.Error(e.Exception,
+            "[ERROR] Unobserved Error: {UnobservedTaskExceptionEventArgs} - {UnobservedTaskExceptionEventArgsException} - {senderObj}",
+            e, e.Exception, sender);
         throw e.Exception;
     }
-
 }

@@ -5,7 +5,6 @@ namespace UncoreMetrics.Steam_Collector.Models.Games.Steam.SteamAPI;
 
 public interface IGenericServerInfo
 {
-
     public Server? ExistingServer { get; set; }
 
     public InfoResponse? ServerInfo { get; set; }

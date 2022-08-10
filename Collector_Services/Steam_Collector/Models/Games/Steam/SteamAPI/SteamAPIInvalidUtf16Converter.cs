@@ -5,7 +5,8 @@ using System.Text.Json.Serialization;
 namespace UncoreMetrics.Steam_Collector.Models.Games.Steam.SteamAPI;
 
 /// <summary>
-/// This is a hack to get around the Steam API returning Invalid Utf16 chars for some foreign servers, we should be able to safely ignore those characters...
+///     This is a hack to get around the Steam API returning Invalid Utf16 chars for some foreign servers, we should be
+///     able to safely ignore those characters...
 /// </summary>
 public class SteamAPIInvalidUtf16Converter : JsonConverter<string>
 {

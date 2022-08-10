@@ -1,5 +1,4 @@
 ﻿using System.Net;
-using UncoreMetrics.API.Models.Responses.API;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using UncoreMetrics.API.Models.PagedResults;
@@ -38,14 +37,18 @@ public class GenericServerController : ControllerBase
             return BadRequest(new ErrorResponse(HttpStatusCode.BadRequest, "Minimum Page is 0",
                 "page_out_of_range"));
         if (includeDead == false)
-            return Ok(new DataResponse<PagedResult<Server>>(await _genericServersContext.Servers.OrderByDescending(server => server.Players)
+            return Ok(new DataResponse<PagedResult<Server>>(await _genericServersContext.Servers
+                .OrderByDescending(server => server.Players)
                 .Where(server => server.ServerDead == includeDead).GetPaged(page, pageSize)));
-        return Ok(new DataResponse<PagedResult<Server>>(await _genericServersContext.Servers.OrderByDescending(server => server.Players).GetPaged(page, pageSize)));
+        return Ok(new DataResponse<PagedResult<Server>>(await _genericServersContext.Servers
+            .OrderByDescending(server => server.Players).GetPaged(page, pageSize)));
     }
+
     [HttpGet("{id}")]
     public async Task<ActionResult<IResponse>> GetServer(Guid id)
     {
-        return Ok(new DataResponse<Server?>(await _genericServersContext.Servers.Where(server => server.ServerID == id).FirstOrDefaultAsync()));
+        return Ok(new DataResponse<Server?>(await _genericServersContext.Servers.Where(server => server.ServerID == id)
+            .FirstOrDefaultAsync()));
     }
 
 
@@ -60,9 +63,12 @@ public class GenericServerController : ControllerBase
             return BadRequest(new ErrorResponse(HttpStatusCode.BadRequest, "Minimum Page is 0",
                 "page_out_of_range"));
         if (includeDead == false)
-            return Ok(new DataResponse<PagedResult<Server>>(await _genericServersContext.Servers.Where(server => server.SearchVector.Matches(search))
-                .Where(server => server.ServerDead == includeDead).OrderByDescending(server => server.Players).GetPaged(page, pageSize)));
-        return Ok(new DataResponse<PagedResult<Server>>(await _genericServersContext.Servers.Where(server => server.SearchVector.Matches(search) || server.IpAddress == search).OrderByDescending(server => server.Players).GetPaged(page, pageSize)));
+            return Ok(new DataResponse<PagedResult<Server>>(await _genericServersContext.Servers
+                .Where(server => server.SearchVector.Matches(search))
+                .Where(server => server.ServerDead == includeDead).OrderByDescending(server => server.Players)
+                .GetPaged(page, pageSize)));
+        return Ok(new DataResponse<PagedResult<Server>>(await _genericServersContext.Servers
+            .Where(server => server.SearchVector.Matches(search) || server.IpAddress == search)
+            .OrderByDescending(server => server.Players).GetPaged(page, pageSize)));
     }
-
 }

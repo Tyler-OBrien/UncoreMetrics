@@ -4,8 +4,6 @@ using System.Runtime.InteropServices;
 using Okolni.Source.Query.Source;
 using Sentry;
 using Serilog.Context;
-using Serilog.Data;
-using UncoreMetrics.Data;
 using UncoreMetrics.Steam_Collector.Helpers;
 using UncoreMetrics.Steam_Collector.Helpers.IPAddressExtensions;
 using UncoreMetrics.Steam_Collector.Helpers.Maxmind;
@@ -39,11 +37,11 @@ public class DiscoverySolver : IGenericAsyncSolver<QueryPoolItem<SteamListServer
             var players = await pool.GetPlayersSafeAsync(endPoint);
             var geoIpInformation = await _geoIpService.GetIpInformation(Host.ToString());
             if (info != null && rules != null && players != null)
-            {
-                return (new DiscoveredServerInfo(Host, Port, server, info, players, rules, geoIpInformation), success: true);
-            }
+                return (new DiscoveredServerInfo(Host, Port, server, info, players, rules, geoIpInformation),
+                    success: true);
 #if DEBUG
-            _logger.LogDebug("Failed to get {Address} - {Name} - {SteamID}", server.Address, server.Name, server.SteamID);
+            _logger.LogDebug("Failed to get {Address} - {Name} - {SteamID}", server.Address, server.Name,
+                server.SteamID);
 #endif
             return (null, success: false);
         }
@@ -52,7 +50,8 @@ public class DiscoverySolver : IGenericAsyncSolver<QueryPoolItem<SteamListServer
             _logger.LogError(ex, "Unexpected error");
             SentrySdk.CaptureException(ex);
 #if DEBUG
-            _logger.LogDebug("Failed to get {Address} - {Name} - {SteamID}", server.Address, server.Name, server.SteamID);
+            _logger.LogDebug("Failed to get {Address} - {Name} - {SteamID}", server.Address, server.Name,
+                server.SteamID);
 #endif
         }
 
@@ -68,7 +67,8 @@ public partial class SteamServers : ISteamServers
     /// </summary>
     /// <param name="appID"></param>
     /// <returns>Returns a list of full Server info to be actioned on with stats for that specific Server type</returns>
-    public async Task<List<DiscoveredServerInfo>> GenericServerDiscovery(SteamServerListQueryBuilder queryListQueryBuilder)
+    public async Task<List<DiscoveredServerInfo>> GenericServerDiscovery(
+        SteamServerListQueryBuilder queryListQueryBuilder)
     {
         if (_steamApi == null) throw new NullReferenceException("Steam API cannot be null to use HandleGeneric");
 
@@ -83,15 +83,14 @@ public partial class SteamServers : ISteamServers
         foreach (var server in serverList.ToList())
         {
             var (Host, Port) = SteamServerQuery.ParseIPAndPort(server.Address);
-            if (Host.IsPrivate())
-            {
-                serverList.Remove(server);
-            }
+            if (Host.IsPrivate()) serverList.Remove(server);
         }
-        _logger.LogDebug("Removed {removedPrivateIPServers} Servers containing Private IP Addresses (Valve Servers use Relays and don't expose, among others)", serverListCount - serverList.Count);
+
+        _logger.LogDebug(
+            "Removed {removedPrivateIPServers} Servers containing Private IP Addresses (Valve Servers use Relays and don't expose, among others)",
+            serverListCount - serverList.Count);
 
         var servers = await GetAllServersDiscovery(serverList);
-
 
 
         return servers;
@@ -125,7 +124,8 @@ public partial class SteamServers : ISteamServers
         pool.Setup();
 
         using var queue = new AsyncResolveQueue<QueryPoolItem<SteamListServer>, DiscoveredServerInfo>(_logger,
-            servers.Select(server => new QueryPoolItem<SteamListServer>(pool, server)), maxConcurrency, newSolver, cancellationTokenSource.Token);
+            servers.Select(server => new QueryPoolItem<SteamListServer>(pool, server)), maxConcurrency, newSolver,
+            cancellationTokenSource.Token);
 
         // Wait a max of 60 seconds...
         var delayCount = 0;
@@ -140,18 +140,23 @@ public partial class SteamServers : ISteamServers
             await Task.WhenAll(Task.Delay(1000, cancellationTokenSource.Token), scrapeJobUpdate);
             delayCount++;
         }
+
         cancellationTokenSource.Cancel();
         if (delayCount >= 60)
-            _logger.LogWarning("[Warning] Operation timed out, reached {delayMax} Seconds, so we terminated. ", delayCount);
+            _logger.LogWarning("[Warning] Operation timed out, reached {delayMax} Seconds, so we terminated. ",
+                delayCount);
         var serverInfos = queue.Outgoing.ToList();
 
         stopwatch.Stop();
-        _logger.LogInformation("Took {ElapsedMilliseconds}ms to get {ServersCount} Server infos from list", stopwatch.ElapsedMilliseconds, servers.Count);
+        _logger.LogInformation("Took {ElapsedMilliseconds}ms to get {ServersCount} Server infos from list",
+            stopwatch.ElapsedMilliseconds, servers.Count);
         _logger.LogInformation("-----------------------------------------");
         _logger.LogInformation(
-            "We were able to connect to {serverInfosCount} out of {serversCount} {successPercentage}%", serverInfos.Count, servers.Count, (int)Math.Round(serverInfos.Count / (double)servers.Count * 100));
+            "We were able to connect to {serverInfosCount} out of {serversCount} {successPercentage}%",
+            serverInfos.Count, servers.Count, (int)Math.Round(serverInfos.Count / (double)servers.Count * 100));
         _logger.LogInformation(
-            "Total Players: {playersCount}, Total Servers: {serverInfosCount}", serverInfos.Sum(info => info.ServerInfo?.Players), serverInfos.Count);
+            "Total Players: {playersCount}, Total Servers: {serverInfosCount}",
+            serverInfos.Sum(info => info.ServerInfo?.Players), serverInfos.Count);
         await _scrapeJobStatusService.EndRun(runType);
 
         return serverInfos;
@@ -163,21 +168,27 @@ public partial class SteamServers : ISteamServers
         _logger.LogInformation("Status Update: ");
         ThreadPool.GetAvailableThreads(out var workerThreads, out var completionPortThreads);
         _logger.LogInformation(
-            "Threads: {ThreadCount} Threads, Available Workers: {workerThreads}, Available Completion: {completionPortThreads}", ThreadPool.ThreadCount, workerThreads, completionPortThreads);
+            "Threads: {ThreadCount} Threads, Available Workers: {workerThreads}, Available Completion: {completionPortThreads}",
+            ThreadPool.ThreadCount, workerThreads, completionPortThreads);
         _logger.LogInformation(
-            "Connection Pool Running Queries: {poolRunning}, Pool Waiting Queries: {poolWaitingForResponse}", pool.Running, pool.WaitingForResponse);
+            "Connection Pool Running Queries: {poolRunning}, Pool Waiting Queries: {poolWaitingForResponse}",
+            pool.Running, pool.WaitingForResponse);
         if (tasksCount != 0)
         {
             _logger.LogInformation(
-                "Finished {totalCompleted}/{tasksCount} ({percentCompleted}%)", totalCompleted, tasksCount, (int)Math.Round(totalCompleted / (double)tasksCount * 100));
+                "Finished {totalCompleted}/{tasksCount} ({percentCompleted}%)", totalCompleted, tasksCount,
+                (int)Math.Round(totalCompleted / (double)tasksCount * 100));
             if (totalQueued != 0)
                 _logger.LogInformation(
-                    "Queued: {totalQueued}/{concurrencyLimit} ({percentQueuedOfLimit}%)", totalQueued, concurrencyLimit, (int)Math.Round(totalQueued / (double)concurrencyLimit * 100));
+                    "Queued: {totalQueued}/{concurrencyLimit} ({percentQueuedOfLimit}%)", totalQueued, concurrencyLimit,
+                    (int)Math.Round(totalQueued / (double)concurrencyLimit * 100));
         }
 
         if (failed != 0)
-            _logger.LogInformation("Failed: {failed}, Successful {successfullyCompleted} ({percentSuccessful}%)", failed, successfullyCompleted, (int)Math.Round(successfullyCompleted / (double)totalCompleted * 100));
+            _logger.LogInformation("Failed: {failed}, Successful {successfullyCompleted} ({percentSuccessful}%)",
+                failed, successfullyCompleted, (int)Math.Round(successfullyCompleted / (double)totalCompleted * 100));
         else
-            _logger.LogInformation("Failed: {failed}, Successful {successfullyCompleted} ({percentSuccessful}%)", failed, successfullyCompleted, 100);
+            _logger.LogInformation("Failed: {failed}, Successful {successfullyCompleted} ({percentSuccessful}%)",
+                failed, successfullyCompleted, 100);
     }
 }

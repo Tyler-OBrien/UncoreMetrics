@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 using UncoreMetrics.Data.GameData._7DaysToDie;
 using UncoreMetrics.Data.GameData.ARK;
@@ -92,12 +91,10 @@ public class ServersContext : DbContext
         modelBuilder.Entity<SevenDaysToDieServer>().HasIndex(server => server.Version);
 
 
-
         modelBuilder.Entity<ArkServer>().ToTable("Ark_Servers");
         modelBuilder.Entity<ArkServer>().HasIndex(server => server.Battleye);
         modelBuilder.Entity<ArkServer>().HasIndex(server => server.PVE);
         modelBuilder.Entity<ArkServer>().HasIndex(server => server.PasswordRequired);
-
 
 
         modelBuilder.Entity<Arma3Server>().ToTable("Arma3_Servers");
@@ -112,7 +109,6 @@ public class ServersContext : DbContext
         modelBuilder.Entity<HellLetLooseServer>().HasIndex(server => server.Visible);
 
 
-
         modelBuilder.Entity<PostScriptumServer>().ToTable("PostScriptum_Servers");
         modelBuilder.Entity<PostScriptumServer>().HasIndex(server => server.CurrentModLoadedCount);
         modelBuilder.Entity<PostScriptumServer>().HasIndex(server => server.GameMode);
@@ -124,7 +120,6 @@ public class ServersContext : DbContext
         modelBuilder.Entity<RustServer>().ToTable("Rust_Servers");
         modelBuilder.Entity<RustServer>().HasIndex(server => server.PvE);
         modelBuilder.Entity<RustServer>().HasIndex(server => server.EntityCount);
-
 
 
         modelBuilder.Entity<UnturnedServer>().ToTable("Unturned_Servers");

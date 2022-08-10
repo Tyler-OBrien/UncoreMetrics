@@ -2,8 +2,7 @@
 
 public class SevenDaysToDieServer : Server
 {
-    [ServerRulesProperty("AirDropMarker")]
-    public bool? AirDropMarker { get; set; }
+    [ServerRulesProperty("AirDropMarker")] public bool? AirDropMarker { get; set; }
 
 
     [ServerRulesProperty("BedrollExpiryTime")]
@@ -75,8 +74,7 @@ public class SevenDaysToDieServer : Server
     [ServerRulesProperty("LevelName")] public string? LevelName { get; set; }
 
 
-    [ServerRulesProperty("LootAbundance")]
-    public int? LootAbundance { get; set; }
+    [ServerRulesProperty("LootAbundance")] public int? LootAbundance { get; set; }
 
 
     [ServerRulesProperty("LootRespawnDays")]
@@ -91,8 +89,7 @@ public class SevenDaysToDieServer : Server
     public int? MaxSpawnedZombies { get; set; }
 
 
-    [ServerRulesProperty("ModdedConfig")]
-    public bool? ModdedConfig { get; set; }
+    [ServerRulesProperty("ModdedConfig")] public bool? ModdedConfig { get; set; }
 
 
     [ServerRulesProperty("PlayerKillingMode")]
@@ -123,8 +120,7 @@ public class SevenDaysToDieServer : Server
     [ServerRulesProperty("StockFiles")] public bool? StockFiles { get; set; }
 
 
-    [ServerRulesProperty("StockSettings")]
-    public bool? StockSettings { get; set; }
+    [ServerRulesProperty("StockSettings")] public bool? StockSettings { get; set; }
 
 
     [ServerRulesProperty("Version")] public string? Version { get; set; }
@@ -132,12 +128,10 @@ public class SevenDaysToDieServer : Server
     [ServerRulesProperty("WorldSize")] public int? WorldSize { get; set; }
 
 
-    [ServerRulesProperty("XPMultiplier")]
-    public int? XPMultiplier { get; set; }
+    [ServerRulesProperty("XPMultiplier")] public int? XPMultiplier { get; set; }
 
 
-    [ServerRulesProperty("ZombieBMMove")]
-    public int? ZombieBMMove { get; set; }
+    [ServerRulesProperty("ZombieBMMove")] public int? ZombieBMMove { get; set; }
 
 
     [ServerRulesProperty("ZombieFeralMove")]

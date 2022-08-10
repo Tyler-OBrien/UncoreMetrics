@@ -4,10 +4,10 @@ namespace UncoreMetrics.Steam_Collector.Helpers;
 
 public class ResolveQueue<TIn, TOut> : IDisposable
 {
+    private readonly BlockingCollection<TIn> _incoming = new();
     private readonly IGenericSolver<TIn, TOut> _solvingMethod;
     private int _completed;
     private int _failed;
-    private readonly BlockingCollection<TIn> _incoming = new();
     private int _incomingItems;
     private int _running;
     private int _successful;

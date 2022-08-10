@@ -21,8 +21,6 @@ public class DiscoveredServerInfo : IGenericServerInfo
         IpInformation = ipInformation;
     }
 
-    public Server? ExistingServer { get; set; }
-
     public SteamListServer Server { get; set; }
 
     public IPInformation IpInformation { get; set; }
@@ -30,6 +28,8 @@ public class DiscoveredServerInfo : IGenericServerInfo
     public IPAddress Address { get; set; }
 
     public int Port { get; set; }
+
+    public Server? ExistingServer { get; set; }
 
     public InfoResponse ServerInfo { get; set; }
 

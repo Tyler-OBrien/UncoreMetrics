@@ -15,7 +15,7 @@ public enum Continent
     EU,
     NA,
     OC,
-    SA,
+    SA
 }
 
 public class Server
@@ -42,7 +42,10 @@ public class Server
     public byte[] IpAddressBytes { get; set; }
 
 
-    [Column(TypeName = "inet")] [Required] [JsonIgnore] public IPAddress Address { get; set; }
+    [Column(TypeName = "inet")]
+    [Required]
+    [JsonIgnore]
+    public IPAddress Address { get; set; }
 
     // IPAddress isn't seralizable...
     [NotMapped] public string IpAddress => Address.ToString();
@@ -58,13 +61,13 @@ public class Server
     public bool? Visibility { get; set; }
 
     /// <summary>
-    /// Retries used to get information. Used only for ClickHouse.
+    ///     Retries used to get information. Used only for ClickHouse.
     /// </summary>
-    [NotMapped] public ushort RetriesUsed { get; set; }
+    [NotMapped]
+    public ushort RetriesUsed { get; set; }
 
 
     public char? Environment { get; set; }
-
 
 
     public bool? VAC { get; set; }
