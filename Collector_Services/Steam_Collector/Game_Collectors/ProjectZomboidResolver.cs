@@ -32,6 +32,9 @@ public class ProjectZomboidResolver : BaseResolver
             .Where(server => server.NextCheck < DateTime.UtcNow && server.AppID == AppId).AsNoTracking()
             .OrderBy(server => server.NextCheck).Take(50000)
             .ToListAsync();
+        // Abort run if less then 10 servers to poll, and no server is over 5 minutes overdue
+        if (servers.Count < 10 && servers.Any(server => server.NextCheck > DateTime.UtcNow.AddMinutes(5)) == false)
+            return new List<Server>();
         return servers.ToList<Server>();
     }
 

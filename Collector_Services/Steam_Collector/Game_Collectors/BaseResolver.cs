@@ -99,6 +99,9 @@ public abstract class BaseResolver
     public virtual async Task<int> Poll()
     {
         var servers = await _steamServers.GenericServerPoll(await GetServers());
+        // Abort run if no servers are returned..
+        if (servers.Count == 0)
+            return 0;
         await PollResult(servers);
         return servers.Count;
     }
