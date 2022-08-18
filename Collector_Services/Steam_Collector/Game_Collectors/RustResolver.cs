@@ -51,6 +51,7 @@ public class RustResolver : BaseResolver
         customServer.Game = Name;
 
         if (server.ServerRules != null) customServer.ResolveGameDataPropertiesFromRules(server.ServerRules);
+        if (server.ServerPlayers != null) customServer.Players = (uint)server.ServerPlayers.Players.Count;
 
         return customServer;
     }

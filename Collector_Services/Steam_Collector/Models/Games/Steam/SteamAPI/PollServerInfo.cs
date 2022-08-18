@@ -56,7 +56,7 @@ public class PollServerInfo : IGenericServerInfo
         {
             ExistingServer.NextCheck = DateTime.UtcNow.AddSeconds(nextCheckSeconds);
             ExistingServer.FailedChecks = 0;
-            ExistingServer.Players = ServerPlayers != null ? (uint)ServerPlayers.Players.Count : ServerInfo.Players;
+            ExistingServer.Players = ServerInfo.Players;
             ExistingServer.MaxPlayers = ServerInfo.MaxPlayers;
             ExistingServer.AppID = ServerInfo.GameID ?? ExistingServer.AppID;
             ExistingServer.IsOnline = true;

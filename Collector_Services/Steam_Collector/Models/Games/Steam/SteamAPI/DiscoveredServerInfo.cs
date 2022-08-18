@@ -66,7 +66,7 @@ public class DiscoveredServerInfo : IGenericServerInfo
         ExistingServer.LastCheck = DateTime.UtcNow;
         ExistingServer.MaxPlayers = ServerInfo.MaxPlayers;
         ExistingServer.Port = ServerInfo.Port ?? Port;
-        ExistingServer.Players = (uint)ServerPlayers.Players.Count;
+        ExistingServer.Players = ServerInfo.Players;
         ExistingServer.FoundAt = DateTime.UtcNow;
         ExistingServer.Name = Server.Name;
         ExistingServer.ServerID = Guid.Empty;
