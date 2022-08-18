@@ -70,7 +70,7 @@ public class DiscoveredServerInfo : IGenericServerInfo
         ExistingServer.FoundAt = DateTime.UtcNow;
         ExistingServer.Name = Server.Name;
         ExistingServer.ServerID = Guid.Empty;
-        ExistingServer.NextCheck = DateTime.UtcNow.AddSeconds(Random.Shared.Next(30, 90));
+        ExistingServer.NextCheck = DateTime.UtcNow.AddSeconds(nextCheckSeconds);
         ExistingServer.FailedChecks = 0;
     }
 }
