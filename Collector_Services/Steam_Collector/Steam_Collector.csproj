@@ -12,6 +12,11 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <None Include="..\..\.editorconfig" Link=".editorconfig" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="ClrHeapAllocationAnalyzer" Version="3.0.0" />
 		<PackageReference Include="EFCore.BulkExtensions" Version="6.5.5" />
 		<PackageReference Include="MaxMind.GeoIP2" Version="5.1.0" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="6.0.7">

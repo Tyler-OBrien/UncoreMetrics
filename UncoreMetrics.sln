@@ -15,7 +15,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Data_Services", "Data_Servi
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UncoreMetrics.Data", "Data_Services\UncoreMetrics.Data\UncoreMetrics.Data.csproj", "{6F98F9BC-DA17-4F10-AFC2-92263ECB53AC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "API", "Web_Services\API\API.csproj", "{E2B360F6-F5EC-4E82-852D-7C9E578B87B8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "API", "Web_Services\API\API.csproj", "{E2B360F6-F5EC-4E82-852D-7C9E578B87B8}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{66E9389C-7D8A-41F8-8870-B7D76A190F2E}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
