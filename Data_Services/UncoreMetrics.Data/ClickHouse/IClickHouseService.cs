@@ -4,10 +4,10 @@ namespace UncoreMetrics.Data.ClickHouse;
 
 public interface IClickHouseService
 {
-    public Task Insert(IEnumerable<ClickHouseGenericServer> servers);
+    public Task Insert(IEnumerable<ClickHouseGenericServer> servers, CancellationToken token = default);
 
 
-    public Task<float> GetServerUptime(string serverId, int lastHours = 0);
+    public Task<double> GetServerUptime(string serverId, int lastHours = 0, CancellationToken token = default);
 
     public Task<List<ClickHousePlayerData>> GetPlayerCountPer30Minutes(string serverId, int lastHours,
         CancellationToken token = default);

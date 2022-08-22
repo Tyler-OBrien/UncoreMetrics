@@ -19,15 +19,15 @@ public class ClickHouseService : IClickHouseService
     }
 
 
-    public Task Insert(IEnumerable<ClickHouseGenericServer> servers)
+    public Task Insert(IEnumerable<ClickHouseGenericServer> servers, CancellationToken token = default)
     {
-        return _server.Insert(servers);
+        return _server.Insert(servers, token);
     }
 
 
-    public Task<float> GetServerUptime(string serverId, int lastHours = 0)
+    public Task<double> GetServerUptime(string serverId, int lastHours = 0, CancellationToken token = default)
     {
-        return _server.GetServerUptime(serverId, lastHours);
+        return _server.GetServerUptime(serverId, lastHours, token);
     }
 
     public Task<List<ClickHousePlayerData>> GetPlayerCountPer30Minutes(string serverId, int lastHours,

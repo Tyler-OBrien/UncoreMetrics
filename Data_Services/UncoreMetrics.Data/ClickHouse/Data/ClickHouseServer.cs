@@ -24,7 +24,7 @@ public class ClickHouseServer
     }
 
 
-    public async Task Insert(IEnumerable<ClickHouseGenericServer> servers)
+    public async Task Insert(IEnumerable<ClickHouseGenericServer> servers, CancellationToken token = default)
     {
         using var connection = CreateConnection();
         using var bulkCopyInterface = new ClickHouseBulkCopy(connection)
@@ -34,10 +34,10 @@ public class ClickHouseServer
         };
 
         // Example data to insert
-        await bulkCopyInterface.WriteToServerAsync(ClickHouseGenericServer.ToDatabase(servers));
+        await bulkCopyInterface.WriteToServerAsync(ClickHouseGenericServer.ToDatabase(servers), token);
     }
 
-    public async Task<float> GetServerUptime(string serverId, int lastHours = 0)
+    public async Task<double> GetServerUptime(string serverId, int lastHours = 0, CancellationToken token = default)
     {
         using var connection = CreateConnection();
 
@@ -52,9 +52,9 @@ public class ClickHouseServer
         }
 
         command.CommandText += ";";
-        var result = (await command.ExecuteScalarAsync())?.ToString();
+        var result = (await command.ExecuteScalarAsync(token))?.ToString();
         if (result != null)
-            if (float.TryParse(result, out var uptime))
+            if (double.TryParse(result, out var uptime))
                 return uptime;
 
         return -1;
