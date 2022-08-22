@@ -79,8 +79,18 @@ public class GenericServerController : ControllerBase
     {
         if (hours.HasValue == false)
             hours = 24;
+
         if (groupby.HasValue == false)
-            return Ok(new DataResponse<List<ClickHousePlayerData>>(await _clickHouseService.GetPlayerCountPer30Minutes(id.ToString(), hours.Value, token)));
+        {
+            if (hours / 0.5 > 500)
+                return BadRequest(new ErrorResponse(HttpStatusCode.BadRequest, $"Max Results Generated can be 500. Your Query would have returned {hours / 0.5}",
+                    "too_many_results"));
+            return Ok(new DataResponse<List<ClickHousePlayerData>>(
+                await _clickHouseService.GetPlayerCountPer30Minutes(id.ToString(), hours.Value, token)));
+        }
+        if (hours / groupby > 500)
+            return BadRequest(new ErrorResponse(HttpStatusCode.BadRequest, $"Max Results Generated can be 500. Your Query would have returned {hours / groupby}",
+                "too_many_results"));
 
         return Ok(new DataResponse<List<ClickHousePlayerData>>(await _clickHouseService.GetPlayerCount(id.ToString(), hours.Value, groupby.Value, token)));
     }
