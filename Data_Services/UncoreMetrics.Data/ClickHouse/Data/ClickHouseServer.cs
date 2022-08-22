@@ -59,6 +59,26 @@ public class ClickHouseServer
 
         return -1;
     }
+    public async Task<List<ClickHouseUptimeData>> GetUptimeData(string serverID, int lastHours, int hoursGroupBy, CancellationToken token = default)
+    {
+        using var connection = CreateConnection();
+
+        using var command = connection.CreateCommand();
+        command.AddParameter("serverId", "UUID", serverID);
+        command.AddParameter("lastHours", "Int32", lastHours);
+        command.AddParameter("hoursGroupBy", "Int32", hoursGroupBy);
+
+        command.CommandText =
+            "Select server_id, appid, countMerge(online_count) / countMerge(ping_count) * 100 as uptime, average_time from generic_server_stats_uptime_mv where server_id = {serverId:UUID} and average_time > DATE_SUB(NOW(), INTERVAL {lastHours:Int32} HOUR) GROUP BY server_id, appid, toStartOfInterval(average_time, INTERVAL {hoursGroupBy:Int32} HOUR) as average_time Order by average_time desc LIMIT 500;";
+        var result = await command.ExecuteReaderAsync(token);
+        List<ClickHouseUptimeData> data = new List<ClickHouseUptimeData>(lastHours * 2);
+        while (await result.ReadAsync(token))
+        {
+            data.Add(UptimeDataFromReader(result));
+        }
+
+        return data;
+    }
 
     public async Task<List<ClickHousePlayerData>> GetPlayerCountPer30Minutes(string serverID, int lastHours, CancellationToken token = default)
     {
@@ -109,6 +129,16 @@ public class ClickHouseServer
             PlayerAvg = reader.GetDouble("players_avg"),
             PlayersMin = (uint)reader.GetValue("players_min"),
             PlayersMax = (uint)reader.GetValue("players_max"),
+            AverageTime = reader.GetDateTime("average_time")
+        };
+    }
+    private ClickHouseUptimeData UptimeDataFromReader(DbDataReader reader)
+    {
+        return new ClickHouseUptimeData()
+        {
+            ServerId = reader.GetGuid("server_id"),
+            AppId = (ulong)reader.GetValue("appid"),
+            Uptime = reader.GetDouble("uptime"),
             AverageTime = reader.GetDateTime("average_time")
         };
     }
