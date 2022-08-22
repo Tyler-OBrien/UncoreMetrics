@@ -25,16 +25,16 @@ public class ScrapeJobController : ControllerBase
 
     // GET: api/<ScrapeJobController>
     [HttpGet]
-    public async Task<ActionResult<IResponse>> Get()
+    public async Task<ActionResult<IResponse>> Get(CancellationToken token)
     {
-        return Ok(new DataResponse<List<ScrapeJob>>(await _genericServersContext.ScrapeJobs.ToListAsync()));
+        return Ok(new DataResponse<List<ScrapeJob>>(await _genericServersContext.ScrapeJobs.ToListAsync(token)));
     }
 
     // GET api/<ScrapeJobController>/5
     [HttpGet("{id}")]
-    public async Task<ActionResult<IResponse>> Get(string id)
+    public async Task<ActionResult<IResponse>> Get(string id, CancellationToken token)
     {
         return Ok(new DataResponse<ScrapeJob?>(await _genericServersContext.ScrapeJobs
-            .Where(job => job.InternalId == id).FirstOrDefaultAsync()));
+            .Where(job => job.InternalId == id).FirstOrDefaultAsync(token)));
     }
 }

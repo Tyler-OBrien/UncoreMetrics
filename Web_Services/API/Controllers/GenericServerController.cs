@@ -28,7 +28,7 @@ public class GenericServerController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<IResponse>> GetServers([FromQuery] bool? includeDead = false,
+    public async Task<ActionResult<IResponse>> GetServers(CancellationToken token, [FromQuery] bool? includeDead = false,
         [FromQuery] int page = 1, [FromQuery] int pageSize = 25)
     {
         if (pageSize > 100)
@@ -40,21 +40,21 @@ public class GenericServerController : ControllerBase
         if (includeDead == false)
             return Ok(new DataResponse<PagedResult<Server>>(await _genericServersContext.Servers
                 .OrderByDescending(server => server.Players)
-                .Where(server => server.ServerDead == includeDead).GetPaged(page, pageSize)));
+                .Where(server => server.ServerDead == includeDead).GetPaged(page, pageSize, token)));
         return Ok(new DataResponse<PagedResult<Server>>(await _genericServersContext.Servers
-            .OrderByDescending(server => server.Players).GetPaged(page, pageSize)));
+            .OrderByDescending(server => server.Players).GetPaged(page, pageSize, token)));
     }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult<IResponse>> GetServer(Guid id)
+    public async Task<ActionResult<IResponse>> GetServer(Guid id, CancellationToken token)
     {
         return Ok(new DataResponse<Server?>(await _genericServersContext.Servers.Where(server => server.ServerID == id)
-            .FirstOrDefaultAsync()));
+            .FirstOrDefaultAsync(token)));
     }
     [HttpGet("uptime/{id}")]
-    public async Task<ActionResult<IResponse>> GetServer(Guid id, [FromQuery] int hours)
+    public async Task<ActionResult<IResponse>> GetServer(Guid id, [FromQuery] int hours, CancellationToken token)
     {
-        return Ok(new DataResponse<double?>(await _clickHouseService.GetServerUptime(id.ToString(), hours)));
+        return Ok(new DataResponse<double?>(await _clickHouseService.GetServerUptime(id.ToString(), hours, token)));
     }
 
 
@@ -71,7 +71,7 @@ public class GenericServerController : ControllerBase
 
 
     [HttpGet("search/{search}")]
-    public async Task<ActionResult<IResponse>> GetServers(string search, [FromQuery] bool? includeDead = false,
+    public async Task<ActionResult<IResponse>> GetServers(string search, CancellationToken token, [FromQuery] bool? includeDead = false,
         [FromQuery] int page = 1, [FromQuery] int pageSize = 25)
     {
         if (pageSize > 100)
@@ -84,9 +84,9 @@ public class GenericServerController : ControllerBase
             return Ok(new DataResponse<PagedResult<Server>>(await _genericServersContext.Servers
                 .Where(server => server.SearchVector.Matches(search))
                 .Where(server => server.ServerDead == includeDead).OrderByDescending(server => server.Players)
-                .GetPaged(page, pageSize)));
+                .GetPaged(page, pageSize, token)));
         return Ok(new DataResponse<PagedResult<Server>>(await _genericServersContext.Servers
             .Where(server => server.SearchVector.Matches(search) || server.IpAddress == search)
-            .OrderByDescending(server => server.Players).GetPaged(page, pageSize)));
+            .OrderByDescending(server => server.Players).GetPaged(page, pageSize, token)));
     }
 }

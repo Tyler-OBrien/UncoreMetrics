@@ -28,6 +28,7 @@ public class JSONErrorMiddleware : IMiddleware
                 await context.Response.WriteAsJsonAsync(errorResponse);
             }
         }
+        catch (OperationCanceledException) { /* Nom If Client cancels requests... */ }
         catch (Exception ex)
         {
             Log.Error(ex, "Unexpected error");

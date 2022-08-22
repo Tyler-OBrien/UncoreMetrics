@@ -14,19 +14,19 @@ public class PagedResult<T>
 public static class PageResultExtensions
 {
     public static async Task<PagedResult<T>> GetPaged<T>(this IQueryable<T> query,
-        int page, int pageSize) where T : class
+        int page, int pageSize, CancellationToken token) where T : class
     {
         var result = new PagedResult<T>();
         result.CurrentPage = page;
         result.PageSize = pageSize;
-        result.RowCount = await query.AsNoTracking().CountAsync();
+        result.RowCount = await query.AsNoTracking().CountAsync(token);
 
 
         var pageCount = (double)result.RowCount / pageSize;
         result.PageCount = (int)Math.Ceiling(pageCount);
 
         var skip = (page - 1) * pageSize;
-        result.Results = await query.AsNoTracking().Skip(skip).Take(pageSize).ToListAsync();
+        result.Results = await query.AsNoTracking().Skip(skip).Take(pageSize).ToListAsync(token);
 
         return result;
     }
