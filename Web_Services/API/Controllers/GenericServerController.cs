@@ -54,7 +54,7 @@ public class GenericServerController : ControllerBase
     [HttpGet("uptime/{id}")]
     public async Task<ActionResult<IResponse>> GetServer(Guid id, [FromQuery] int hours)
     {
-        return Ok(new DataResponse<float?>(await _clickHouseService.GetServerUptime(id.ToString(), hours)));
+        return Ok(new DataResponse<double?>(await _clickHouseService.GetServerUptime(id.ToString(), hours)));
     }
 
 
