@@ -52,9 +52,11 @@ public class GenericServerController : ControllerBase
             .FirstOrDefaultAsync(token)));
     }
     [HttpGet("uptime/{id}")]
-    public async Task<ActionResult<IResponse>> GetServer(Guid id, [FromQuery] int hours, CancellationToken token)
+    public async Task<ActionResult<IResponse>> GetServer(Guid id, [FromQuery] int? hours, CancellationToken token)
     {
-        return Ok(new DataResponse<double?>(await _clickHouseService.GetServerUptime(id.ToString(), hours, token)));
+        if (hours.HasValue == false)
+            hours = 24;
+        return Ok(new DataResponse<double?>(await _clickHouseService.GetServerUptime(id.ToString(), hours.Value, token)));
     }
 
 
