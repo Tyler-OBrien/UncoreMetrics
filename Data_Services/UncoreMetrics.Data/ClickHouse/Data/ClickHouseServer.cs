@@ -1,4 +1,6 @@
-﻿using ClickHouse.Client.ADO;
+﻿using System.Data;
+using System.Data.Common;
+using ClickHouse.Client.ADO;
 using ClickHouse.Client.Copy;
 using ClickHouse.Client.Utility;
 using UncoreMetrics.Data.ClickHouse.Models;
@@ -56,5 +58,58 @@ public class ClickHouseServer
                 return uptime;
 
         return -1;
+    }
+
+    public async Task<List<ClickHousePlayerData>> GetPlayerCountPer30Minutes(string serverID, int lastHours, CancellationToken token = default)
+    {
+        using var connection = CreateConnection();
+
+        using var command = connection.CreateCommand();
+        command.AddParameter("serverId", "UUID", serverID);
+        command.AddParameter("lastHours", "Int32", lastHours);
+
+        command.CommandText =
+            "Select server_id, appid, avgMerge(players_avg) as players_avg, minMerge(players_min) as players_min, maxMerge(players_max) as players_max, average_time from generic_server_stats_players_mv where server_id = {serverId:UUID} and average_time > DATE_SUB(NOW(), INTERVAL {lastHours:Int32} HOUR) GROUP BY server_id, appid, average_time Order by average_time desc LIMIT 500;";
+        var result = await command.ExecuteReaderAsync(token);
+        List<ClickHousePlayerData> data = new List<ClickHousePlayerData>(lastHours * 2);
+        while (await result.ReadAsync(token))
+        {
+            data.Add(PlayerDataFromReader(result));
+        }
+
+        return data;
+    }
+    public async Task<List<ClickHousePlayerData>> GetPlayerCount(string serverID, int lastHours, int hoursGroupBy, CancellationToken token = default)
+    {
+        using var connection = CreateConnection();
+
+        using var command = connection.CreateCommand();
+        command.AddParameter("serverId", "UUID", serverID);
+        command.AddParameter("lastHours", "Int32", lastHours);
+        command.AddParameter("hoursGroupBy", "Int32", hoursGroupBy);
+
+        command.CommandText =
+            "Select server_id, appid, avgMerge(players_avg) as players_avg, minMerge(players_min) as players_min, maxMerge(players_max) as players_max, average_time from generic_server_stats_players_mv where server_id = {serverId:UUID} and average_time > DATE_SUB(NOW(), INTERVAL {lastHours:Int32} HOUR) GROUP BY server_id, appid, toStartOfInterval(average_time, INTERVAL {hoursGroupBy:Int32} HOUR) as average_time Order by average_time desc LIMIT 500;";
+        var result = await command.ExecuteReaderAsync(token);
+        List<ClickHousePlayerData> data = new List<ClickHousePlayerData>(lastHours * 2);
+        while (await result.ReadAsync(token))
+        {
+            data.Add(PlayerDataFromReader(result));
+        }
+
+        return data;
+    }
+
+    private ClickHousePlayerData PlayerDataFromReader(DbDataReader reader)
+    {
+        return new ClickHousePlayerData()
+        {
+            ServerId = reader.GetGuid("server_id"),
+            AppId = (ulong)reader.GetValue("appid"),
+            PlayerAvg = reader.GetDouble("players_avg"),
+            PlayersMin = (uint)reader.GetValue("players_min"),
+            PlayersMax = (uint)reader.GetValue("players_max"),
+            AverageTime = reader.GetDateTime("average_time")
+        };
     }
 }
