@@ -54,6 +54,8 @@ public class AsyncResolveQueue<TIn, TOut> : IDisposable
     public void Dispose()
     {
         _beingDisposed = true;
+        _incoming.Clear();
+        Outgoing.Clear();
     }
 
 
@@ -73,7 +75,7 @@ public class AsyncResolveQueue<TIn, TOut> : IDisposable
                         Interlocked.Increment(ref _failed);
                     else
                         Interlocked.Increment(ref _successful);
-                    if (outItem.item != null)
+                    if (outItem.item != null && !_beingDisposed)
                         Outgoing.Add(outItem.item);
                 }
                 finally
