@@ -2,6 +2,7 @@ using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Prometheus;
+using Sentry.Extensibility;
 using Serilog;
 using Serilog.Events;
 using UncoreMetrics.API.Middleware;
