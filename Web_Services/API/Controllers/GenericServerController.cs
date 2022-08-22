@@ -74,8 +74,8 @@ public class GenericServerController : ControllerBase
     }
 
 
-    [HttpGet("players/{id}")]
-    public async Task<ActionResult<IResponse>> GetPlayersCountGroupBy(Guid id, [FromQuery] int? hours, [FromQuery] int? groupby, CancellationToken token)
+    [HttpGet("playerdata/{id}")]
+    public async Task<ActionResult<IResponse>> GetPlayersData(Guid id, [FromQuery] int? hours, [FromQuery] int? groupby, CancellationToken token)
     {
         if (hours.HasValue == false)
             hours = 24;
@@ -86,13 +86,13 @@ public class GenericServerController : ControllerBase
                 return BadRequest(new ErrorResponse(HttpStatusCode.BadRequest, $"Max Results Generated can be 500. Your Query would have returned {hours / 0.5}",
                     "too_many_results"));
             return Ok(new DataResponse<List<ClickHousePlayerData>>(
-                await _clickHouseService.GetPlayerCountPer30Minutes(id.ToString(), hours.Value, token)));
+                await _clickHouseService.GetPlayerDataPer30Minutes(id.ToString(), hours.Value, token)));
         }
         if (hours / groupby > 500)
             return BadRequest(new ErrorResponse(HttpStatusCode.BadRequest, $"Max Results Generated can be 500. Your Query would have returned {hours / groupby}",
                 "too_many_results"));
 
-        return Ok(new DataResponse<List<ClickHousePlayerData>>(await _clickHouseService.GetPlayerCount(id.ToString(), hours.Value, groupby.Value, token)));
+        return Ok(new DataResponse<List<ClickHousePlayerData>>(await _clickHouseService.GetPlayerData(id.ToString(), hours.Value, groupby.Value, token)));
     }
 
 
