@@ -13,8 +13,8 @@ public interface IClickHouseService
     public  Task<List<ClickHouseUptimeData>> GetUptimeData(string serverID, int lastHours, int hoursGroupBy,
         CancellationToken token = default);
 
-    public Task<List<ClickHousePlayerData>> GetPlayerCountPer30Minutes(string serverId, int lastHours,
+    public Task<List<ClickHousePlayerData>> GetPlayerDataPer30Minutes(string serverId, int lastHours,
         CancellationToken token = default);
 
-    public Task<List<ClickHousePlayerData>> GetPlayerCount(string serverId, int lastHours, int hoursGroupBy, CancellationToken token = default);
+    public Task<List<ClickHousePlayerData>> GetPlayerData(string serverId, int lastHours, int hoursGroupBy, CancellationToken token = default);
 }

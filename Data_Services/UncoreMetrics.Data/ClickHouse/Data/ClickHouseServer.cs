@@ -80,7 +80,7 @@ public class ClickHouseServer
         return data;
     }
 
-    public async Task<List<ClickHousePlayerData>> GetPlayerCountPer30Minutes(string serverID, int lastHours, CancellationToken token = default)
+    public async Task<List<ClickHousePlayerData>> GetPlayerDataPer30Minutes(string serverID, int lastHours, CancellationToken token = default)
     {
         using var connection = CreateConnection();
 
@@ -99,7 +99,7 @@ public class ClickHouseServer
 
         return data;
     }
-    public async Task<List<ClickHousePlayerData>> GetPlayerCount(string serverID, int lastHours, int hoursGroupBy, CancellationToken token = default)
+    public async Task<List<ClickHousePlayerData>> GetPlayerData(string serverID, int lastHours, int hoursGroupBy, CancellationToken token = default)
     {
         using var connection = CreateConnection();
 

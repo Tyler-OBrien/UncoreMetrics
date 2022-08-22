@@ -34,9 +34,9 @@ public class ClickHouseService : IClickHouseService
         CancellationToken token = default) => _server.GetUptimeData(serverID, lastHours, hoursGroupBy, token);
 
 
-    public Task<List<ClickHousePlayerData>> GetPlayerCountPer30Minutes(string serverId, int lastHours,
-        CancellationToken token = default) => _server.GetPlayerCountPer30Minutes(serverId, lastHours, token);
+    public Task<List<ClickHousePlayerData>> GetPlayerDataPer30Minutes(string serverId, int lastHours,
+        CancellationToken token = default) => _server.GetPlayerDataPer30Minutes(serverId, lastHours, token);
 
-    public  Task<List<ClickHousePlayerData>> GetPlayerCount(string serverId, int lastHours, int hoursGroupBy, CancellationToken token = default) => _server.GetPlayerCount(serverId, lastHours, hoursGroupBy, token);
+    public  Task<List<ClickHousePlayerData>> GetPlayerData(string serverId, int lastHours, int hoursGroupBy, CancellationToken token = default) => _server.GetPlayerData(serverId, lastHours, hoursGroupBy, token);
 
 }
