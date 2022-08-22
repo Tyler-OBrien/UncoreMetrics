@@ -54,7 +54,7 @@ public class ClickHouseServer
         command.CommandText += ";";
         var result = (await command.ExecuteScalarAsync(token))?.ToString();
         if (result != null)
-            if (double.TryParse(result, out var uptime))
+            if (double.TryParse(result, out var uptime) && double.IsNormal(uptime))
                 return uptime;
 
         return -1;
