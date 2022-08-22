@@ -5,6 +5,7 @@ using UncoreMetrics.API.Models.PagedResults;
 using UncoreMetrics.API.Models.Responses.API;
 using UncoreMetrics.Data;
 using UncoreMetrics.Data.ClickHouse;
+using UncoreMetrics.Data.ClickHouse.Models;
 
 namespace UncoreMetrics.API.Controllers;
 
@@ -49,6 +50,23 @@ public class GenericServerController : ControllerBase
     {
         return Ok(new DataResponse<Server?>(await _genericServersContext.Servers.Where(server => server.ServerID == id)
             .FirstOrDefaultAsync()));
+    }
+    [HttpGet("uptime/{id}")]
+    public async Task<ActionResult<IResponse>> GetServer(Guid id, [FromQuery] int hours)
+    {
+        return Ok(new DataResponse<float?>(await _clickHouseService.GetServerUptime(id.ToString(), hours)));
+    }
+
+
+    [HttpGet("players/{id}")]
+    public async Task<ActionResult<IResponse>> GetPlayersCountGroupBy(Guid id, [FromQuery] int? hours, [FromQuery] int? groupby, CancellationToken token)
+    {
+        if (hours.HasValue == false)
+            hours = 24;
+        if (groupby.HasValue == false)
+            return Ok(new DataResponse<List<ClickHousePlayerData>>(await _clickHouseService.GetPlayerCountPer30Minutes(id.ToString(), hours.Value, token)));
+
+        return Ok(new DataResponse<List<ClickHousePlayerData>>(await _clickHouseService.GetPlayerCount(id.ToString(), hours.Value, groupby.Value, token)));
     }
 
 
