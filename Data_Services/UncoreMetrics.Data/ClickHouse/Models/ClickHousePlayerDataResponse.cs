@@ -22,10 +22,6 @@ namespace UncoreMetrics.Data.ClickHouse.Models
             PlayersMax = playersMax;
             AverageTime = averageTime;
         }
-        public ClickHousePlayerData(DbDataReader reader)
-        {
-       
-        }
 
         public Guid ServerId { get; set; }
 
