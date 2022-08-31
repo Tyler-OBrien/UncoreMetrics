@@ -74,10 +74,20 @@ public partial class SteamServers : ISteamServers
 
 
         // Worth noting, this will only get us 20k Servers max. Querying the Master Server Query List directly leads to too many timeouts though, 20k is more then enough servers if we include only ones with players.
-        var serverList =
-            await _steamApi.GetServerList(
-                queryListQueryBuilder,
-                int.MaxValue);
+        List<SteamListServer> serverList;
+        try
+        {
+            serverList =
+                await _steamApi.GetServerList(
+                    queryListQueryBuilder,
+                    int.MaxValue);
+        }
+        catch (HttpRequestException requestException)
+        {
+            // Abort for HTTP Errors by Steam API
+            _logger.LogCritical(requestException, "Error getting server information from steam, will assume Steam is down. Aborting Discovery.");
+            return new List<DiscoveredServerInfo>();
+        }
 
         var serverListCount = serverList.Count;
         foreach (var server in serverList.ToList())
