@@ -1,4 +1,6 @@
 using Microsoft.EntityFrameworkCore;
+using Polly;
+using Polly.Extensions.Http;
 using Sentry;
 using Sentry.Extensions.Logging;
 using Serilog;
@@ -101,7 +103,10 @@ public class Program
                 Log.Logger.Warning("Starting up with Resolver: {gameType}", gameType);
 
 
-                services.AddSingleton<ISteamAPI, SteamAPI>();
+                services.AddScoped<ISteamAPI, SteamAPI>();
+                services.AddHttpClient<ISteamAPI, SteamAPI>()
+                    .SetHandlerLifetime(TimeSpan.FromMinutes(5))
+                    .AddPolicyHandler(GetRetryPolicy());
                 services.AddDbContext<ServersContext>(options =>
                 {
                     options.UseNpgsql(baseConfiguration.PostgresConnectionString);
@@ -118,6 +123,12 @@ public class Program
             .Build();
     }
 
+    static IAsyncPolicy<HttpResponseMessage> GetRetryPolicy()
+    {
+        return HttpPolicyExtensions
+            .HandleTransientHttpError()
+            .WaitAndRetryAsync(6, retryAttempt => TimeSpan.FromMilliseconds(Math.Max(50, retryAttempt * 50)));
+    }
 
     private static void TaskSchedulerOnUnobservedTaskException(object? sender, UnobservedTaskExceptionEventArgs e)
     {

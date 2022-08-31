@@ -10,9 +10,9 @@ public partial class SteamAPI : ISteamAPI
     private readonly SteamCollectorConfiguration _steamCollectorConfiguration;
 
 
-    public SteamAPI(IOptions<SteamCollectorConfiguration> baseConfigurationOptions)
+    public SteamAPI(HttpClient client, IOptions<SteamCollectorConfiguration> baseConfigurationOptions)
     {
-        _httpClient = new HttpClient();
+        _httpClient = client;
         _steamCollectorConfiguration = baseConfigurationOptions.Value;
         _httpClient.BaseAddress = new Uri("https://api.steampowered.com/");
         _STEAM_API_KEY = _steamCollectorConfiguration.SteamAPIKey;
