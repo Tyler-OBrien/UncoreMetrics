@@ -24,5 +24,5 @@ public partial interface ISteamAPI
     /// <param name="filterBuilder"></param>
     /// <param name="limit"></param>
     /// <returns></returns>
-    public Task<List<SteamListServer>> GetServerList(SteamServerListQueryBuilder filterBuilder, int imit);
+    public Task<List<SteamListServer>> GetServerList(SteamServerListQueryBuilder filterBuilder, int limit);
 }
