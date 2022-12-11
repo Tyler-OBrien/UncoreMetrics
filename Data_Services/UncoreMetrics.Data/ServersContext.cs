@@ -69,6 +69,8 @@ public class ServersContext : DbContext
         modelBuilder.Entity<Server>().HasIndex(server => server.NextCheck);
         modelBuilder.Entity<Server>().HasIndex(server => server.ServerDead);
         modelBuilder.Entity<Server>().HasIndex(server => server.IsOnline);
+        modelBuilder.Entity<Server>().HasIndex(server => server.Players);
+        modelBuilder.Entity<Server>().HasIndex(server => server.Address);
         modelBuilder.Entity<Server>()
             .HasGeneratedTsVectorColumn(
                 p => p.SearchVector,

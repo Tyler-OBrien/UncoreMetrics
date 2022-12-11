@@ -100,7 +100,12 @@ public class GenericServerController : ControllerBase
     public async Task<ActionResult<IResponse>> GetServers(string search, CancellationToken token, [FromQuery] bool? includeDead = false,
         [FromQuery] int page = 1, [FromQuery] int pageSize = 25)
     {
-        if (pageSize > 100)
+        IPAddress searchAddress;
+        IPAddress.TryParse(search, out searchAddress);
+        if (searchAddress == null)
+            searchAddress = IPAddress.None;
+
+            if (pageSize > 100)
             return BadRequest(new ErrorResponse(HttpStatusCode.BadRequest, "Max Page Size is 100",
                 "page_size_out_of_range"));
         if (page <= 0)
@@ -108,11 +113,11 @@ public class GenericServerController : ControllerBase
                 "page_out_of_range"));
         if (includeDead == false)
             return Ok(new DataResponse<PagedResult<Server>>(await _genericServersContext.Servers
-                .Where(server => server.SearchVector.Matches(search))
+                .Where(server => server.SearchVector.Matches(search) || server.Address == searchAddress)
                 .Where(server => server.ServerDead == includeDead).OrderByDescending(server => server.Players)
                 .GetPaged(page, pageSize, token)));
         return Ok(new DataResponse<PagedResult<Server>>(await _genericServersContext.Servers
-            .Where(server => server.SearchVector.Matches(search) || server.IpAddress == search)
+            .Where(server => server.SearchVector.Matches(search) || server.Address == searchAddress)
             .OrderByDescending(server => server.Players).GetPaged(page, pageSize, token)));
     }
 }
