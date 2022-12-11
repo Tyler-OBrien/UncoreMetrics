@@ -196,7 +196,7 @@ export default function ServerDisplay() {
       response = await fetch(
         `https://api.uncore.app/v1/servers/search/${encodeURIComponent(
           search
-        )}?page=${page + 1}&pageSize=${rowsPerPage}`
+        )}?page=${page + 1}&pageSize=${rowsPerPage}&includeDead=true`
       );
     } else {
       response = await fetch(
