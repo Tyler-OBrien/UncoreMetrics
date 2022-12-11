@@ -12,11 +12,12 @@ namespace UncoreMetrics.Data.ClickHouse.Models
         {
 
         }
-        public ClickHouseUptimeData(Guid serverID, ulong appID, double uptime, DateTime averageTime)
+        public ClickHouseUptimeData(Guid serverID, ulong appID, ulong pingCount, ulong onlineCount, DateTime averageTime)
         {
             ServerId = serverID;
             AppId = appID;
-            Uptime = uptime;
+            PingCount = pingCount;
+            OnlineCount = onlineCount;
             AverageTime = averageTime;
         }
 
@@ -24,7 +25,15 @@ namespace UncoreMetrics.Data.ClickHouse.Models
 
         public ulong AppId { get; set; }
 
-        public double Uptime { get; set; }
+        public double Uptime
+        {
+            get => (OnlineCount / PingCount) * 100;
+        }
+
+        public ulong PingCount { get; set; }
+
+        public ulong OnlineCount { get; set; }
+
         public DateTime AverageTime { get; set; }
     }
 }

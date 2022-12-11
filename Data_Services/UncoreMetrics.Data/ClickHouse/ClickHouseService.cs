@@ -30,13 +30,37 @@ public class ClickHouseService : IClickHouseService
         return _server.GetServerUptime(serverId, lastHours, token);
     }
 
+    public Task<List<ClickHouseUptimeData>> GetUptimeData(string serverID, int lastHours, CancellationToken token = default) => _server.GetUptimeData(serverID, lastHours, token);
+
     public Task<List<ClickHouseUptimeData>> GetUptimeData(string serverID, int lastHours, int hoursGroupBy,
         CancellationToken token = default) => _server.GetUptimeData(serverID, lastHours, hoursGroupBy, token);
 
+    public  Task<List<ClickHouseUptimeData>> GetUptimeDataOverall(ulong? appId, int lastHours, CancellationToken token = default) =>_server.GetUptimeDataOverall(appId, lastHours, token);
+    
 
-    public Task<List<ClickHousePlayerData>> GetPlayerDataPer30Minutes(string serverId, int lastHours,
-        CancellationToken token = default) => _server.GetPlayerDataPer30Minutes(serverId, lastHours, token);
+    public Task<List<ClickHouseUptimeData>> GetUptimeDataOverall(ulong? appId, int lastHours, int hoursGroupBy, CancellationToken token = default) => _server.GetUptimeDataOverall(appId, lastHours, hoursGroupBy, token);
+
+
+    public Task<List<ClickHouseUptimeData>> GetUptimeData1d(string serverId, int lastDays,
+        CancellationToken token = default) => _server.GetUptimeData1d(serverId, lastDays, token);
+
+    public Task<List<ClickHouseUptimeData>> GetUptimeData1d(string serverId, int lastDays, int daysGroupBy,
+        CancellationToken token = default) => _server.GetUptimeData1d(serverId, lastDays, daysGroupBy, token);
+
+
+    public Task<List<ClickHousePlayerData>> GetPlayerData(string serverId, int lastHours,
+        CancellationToken token = default) => _server.GetPlayerData(serverId, lastHours, token);
 
     public  Task<List<ClickHousePlayerData>> GetPlayerData(string serverId, int lastHours, int hoursGroupBy, CancellationToken token = default) => _server.GetPlayerData(serverId, lastHours, hoursGroupBy, token);
 
+    public Task<List<ClickHousePlayerData>> GetPlayerDataOverall(ulong? appId, int lastHours,
+        CancellationToken token = default) => _server.GetPlayerDataOverall(appId, lastHours, token);
+
+    public Task<List<ClickHousePlayerData>> GetPlayerDataOverall(ulong? appId, int lastHours, int hoursGroupBy, CancellationToken token = default) => _server.GetPlayerDataOverall(appId, lastHours, hoursGroupBy, token);
+
+    public Task<List<ClickHousePlayerData>> GetPlayerData1d(string serverId, int lastDays,
+        CancellationToken token = default) => _server.GetPlayerData1d(serverId, lastDays, token);
+
+    public Task<List<ClickHousePlayerData>> GetPlayerData1d(string serverId, int lastDays, int daysGroupBy,
+        CancellationToken token = default) => _server.GetPlayerData1d(serverId, lastDays, daysGroupBy, token);
 }
