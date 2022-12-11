@@ -27,7 +27,7 @@ namespace UncoreMetrics.Data.ClickHouse.Models
 
         public double Uptime
         {
-            get => (OnlineCount / PingCount) * 100;
+            get => ((double)OnlineCount / (double)PingCount) * (double)100;
         }
 
         public ulong PingCount { get; set; }
