@@ -45,6 +45,32 @@ public class GenericServerController : ControllerBase
             .OrderByDescending(server => server.Players).GetPaged(page, pageSize, token)));
     }
 
+    [HttpGet("scheduled")]
+    public async Task<ActionResult<IResponse>> GetScheduled(CancellationToken token)
+    {
+        return Ok(new DataResponse<int?>(await _genericServersContext.Servers.Where(server => server.ServerDead == false)
+            .CountAsync(token)));
+    }
+
+    [HttpGet("overdue")]
+    public async Task<ActionResult<IResponse>> GetOverdue(CancellationToken token)
+    {
+        return Ok(new DataResponse<int?>(await _genericServersContext.Servers.Where(server => server.NextCheck > DateTime.UtcNow && server.ServerDead == false)
+            .CountAsync(token)));
+    }
+    [HttpGet("mostoverdue")]
+    public async Task<ActionResult<IResponse>> OldestServerInQueue(CancellationToken token)
+    {
+        return Ok(new DataResponse<DateTime?>((await _genericServersContext.Servers.Where(server => server.ServerDead == false).OrderBy(server => server.NextCheck)
+            .FirstOrDefaultAsync(token))?.NextCheck));
+    }
+    [HttpGet("mostoverdue/{appid}")]
+    public async Task<ActionResult<IResponse>> OldestServerInQueue(ulong appid, CancellationToken token)
+    {
+        return Ok(new DataResponse<DateTime?>((await _genericServersContext.Servers.Where(server => server.ServerDead == false && server.AppID == appid).OrderBy(server => server.NextCheck)
+            .FirstOrDefaultAsync(token))?.NextCheck));
+    }
+
     [HttpGet("{id}")]
     public async Task<ActionResult<IResponse>> GetServer(Guid id, CancellationToken token)
     {
@@ -64,18 +90,36 @@ public class GenericServerController : ControllerBase
     {
         if (hours.HasValue == false)
             hours = 24;
+        if (hours > 336)
+        {
+            return BadRequest(new ErrorResponse(HttpStatusCode.BadRequest,
+                $"Please use uptimedata1d to query for data older then 14 days. Note that the granularity/min groupby of that data is 1 day. ", "too_old_data"));
+        }
+
         if (groupby.HasValue == false)
-            groupby = 1;
+        {
+            if (hours / 0.5 > 500)
+                return BadRequest(new ErrorResponse(HttpStatusCode.BadRequest, $"Max Results Generated can be 500. Your Query would have returned {hours / 0.5}",
+                    "too_many_results"));
+            return Ok(new DataResponse<List<ClickHouseUptimeData>>(await _clickHouseService.GetUptimeData(id.ToString(), hours.Value, token)));
+
+        }
+
         if (hours / groupby > 500)
-            return BadRequest(new ErrorResponse(HttpStatusCode.BadRequest, $"Max Results Generated can be 500. Your Query would have returned {hours / groupby}",
+            return BadRequest(new ErrorResponse(HttpStatusCode.BadRequest,
+                $"Max Results Generated can be 500. Your Query would have returned {hours / groupby}",
                 "too_many_results"));
 
         return Ok(new DataResponse<List<ClickHouseUptimeData>>(await _clickHouseService.GetUptimeData(id.ToString(), hours.Value, groupby.Value, token)));
     }
 
 
-    [HttpGet("playerdata/{id}")]
-    public async Task<ActionResult<IResponse>> GetPlayersData(Guid id, [FromQuery] int? hours, [FromQuery] int? groupby, CancellationToken token)
+    [HttpGet("uptimedataoverall")]
+    public Task<ActionResult<IResponse>> GetUptimeDataOverallAppId([FromQuery] int? hours, [FromQuery] int? groupby,
+        CancellationToken token) => GetUptimeDataOverallAppId(null, hours, groupby, token);
+
+    [HttpGet("uptimedataoverall/{appid?}")]
+    public async Task<ActionResult<IResponse>> GetUptimeDataOverallAppId(ulong? appid, [FromQuery] int? hours, [FromQuery] int? groupby, CancellationToken token)
     {
         if (hours.HasValue == false)
             hours = 24;
@@ -85,14 +129,113 @@ public class GenericServerController : ControllerBase
             if (hours / 0.5 > 500)
                 return BadRequest(new ErrorResponse(HttpStatusCode.BadRequest, $"Max Results Generated can be 500. Your Query would have returned {hours / 0.5}",
                     "too_many_results"));
+            return Ok(new DataResponse<List<ClickHouseUptimeData>>(await _clickHouseService.GetUptimeDataOverall(appid, hours.Value, token)));
+
+        }
+
+        if (hours / groupby > 500)
+            return BadRequest(new ErrorResponse(HttpStatusCode.BadRequest,
+                $"Max Results Generated can be 500. Your Query would have returned {hours / groupby}",
+                "too_many_results"));
+
+        return Ok(new DataResponse<List<ClickHouseUptimeData>>(await _clickHouseService.GetUptimeDataOverall(appid, hours.Value, groupby.Value, token)));
+    }
+
+    [HttpGet("uptimedata1d/{id}")]
+    public async Task<ActionResult<IResponse>> GetUptimeData1d(Guid id, [FromQuery] int? days, [FromQuery] int? groupby, CancellationToken token)
+    {
+        if (days.HasValue == false)
+            days = 30;
+
+        if (groupby.HasValue == false)
+        {
+            if (days / 1 > 500)
+                return BadRequest(new ErrorResponse(HttpStatusCode.BadRequest, $"Max Results Generated can be 500. Your Query would have returned {days / 0.5}",
+                    "too_many_results"));
+            return Ok(new DataResponse<List<ClickHouseUptimeData>>(await _clickHouseService.GetUptimeData1d(id.ToString(), days.Value, token)));
+
+        }
+
+        if (days / groupby > 500)
+            return BadRequest(new ErrorResponse(HttpStatusCode.BadRequest,
+                $"Max Results Generated can be 500. Your Query would have returned {days / groupby}",
+                "too_many_results"));
+
+        return Ok(new DataResponse<List<ClickHouseUptimeData>>(await _clickHouseService.GetUptimeData1d(id.ToString(), days.Value, groupby.Value, token)));
+    }
+
+
+    [HttpGet("playerdata/{id}")]
+    public async Task<ActionResult<IResponse>> GetPlayersData(Guid id, [FromQuery] int? hours, [FromQuery] int? groupby, CancellationToken token)
+    {
+        if (hours.HasValue == false)
+            hours = 24;
+        if (hours > 336)
+        {
+            return BadRequest(new ErrorResponse(HttpStatusCode.BadRequest,
+                $"Please use playerdata1d to query for data older then 14 days. Note that the granularity/min groupby of that data is 1 day. ", "too_old_data"));
+        }
+
+        if (groupby.HasValue == false)
+        {
+            if (hours / 0.5 > 500)
+                return BadRequest(new ErrorResponse(HttpStatusCode.BadRequest, $"Max Results Generated can be 500. Your Query would have returned {hours / 0.5}",
+                    "too_many_results"));
             return Ok(new DataResponse<List<ClickHousePlayerData>>(
-                await _clickHouseService.GetPlayerDataPer30Minutes(id.ToString(), hours.Value, token)));
+                await _clickHouseService.GetPlayerData(id.ToString(), hours.Value, token)));
         }
         if (hours / groupby > 500)
             return BadRequest(new ErrorResponse(HttpStatusCode.BadRequest, $"Max Results Generated can be 500. Your Query would have returned {hours / groupby}",
                 "too_many_results"));
 
         return Ok(new DataResponse<List<ClickHousePlayerData>>(await _clickHouseService.GetPlayerData(id.ToString(), hours.Value, groupby.Value, token)));
+    }
+
+    [HttpGet("playerdataoverall")]
+    public Task<ActionResult<IResponse>> GetPlayersDataOverall([FromQuery] int? hours, [FromQuery] int? groupby, CancellationToken token) => GetPlayersDataOveralAppId(null, hours, groupby, token);
+
+    [HttpGet("playerdataoverall/{appid?}")]
+    public async Task<ActionResult<IResponse>> GetPlayersDataOveralAppId(ulong? appid, [FromQuery] int? hours, [FromQuery] int? groupby, CancellationToken token)
+    {
+        if (hours.HasValue == false)
+            hours = 24;
+    
+
+        if (groupby.HasValue == false)
+        {
+            if (hours / 1 > 500)
+                return BadRequest(new ErrorResponse(HttpStatusCode.BadRequest, $"Max Results Generated can be 500. Your Query would have returned {hours / 0.5}",
+                    "too_many_results"));
+            return Ok(new DataResponse<List<ClickHousePlayerData>>(
+                await _clickHouseService.GetPlayerDataOverall(appid, hours.Value, token)));
+        }
+        if (hours / groupby > 500)
+            return BadRequest(new ErrorResponse(HttpStatusCode.BadRequest, $"Max Results Generated can be 500. Your Query would have returned {hours / groupby}",
+                "too_many_results"));
+
+        return Ok(new DataResponse<List<ClickHousePlayerData>>(await _clickHouseService.GetPlayerDataOverall(appid, hours.Value, groupby.Value, token)));
+    }
+
+    [HttpGet("playerdata1d/{id}")]
+    public async Task<ActionResult<IResponse>> GetPlayersData1d(Guid id, [FromQuery] int? days, [FromQuery] int? groupby, CancellationToken token)
+    {
+        if (days.HasValue == false)
+            days = 30;
+  
+
+        if (groupby.HasValue == false)
+        {
+            if (days / 0.5 > 500)
+                return BadRequest(new ErrorResponse(HttpStatusCode.BadRequest, $"Max Results Generated can be 500. Your Query would have returned {days / 0.5}",
+                    "too_many_results"));
+            return Ok(new DataResponse<List<ClickHousePlayerData>>(
+                await _clickHouseService.GetPlayerData1d(id.ToString(), days.Value, token)));
+        }
+        if (days / groupby > 500)
+            return BadRequest(new ErrorResponse(HttpStatusCode.BadRequest, $"Max Results Generated can be 500. Your Query would have returned {days / groupby}",
+                "too_many_results"));
+
+        return Ok(new DataResponse<List<ClickHousePlayerData>>(await _clickHouseService.GetPlayerData1d(id.ToString(), days.Value, groupby.Value, token)));
     }
 
 
