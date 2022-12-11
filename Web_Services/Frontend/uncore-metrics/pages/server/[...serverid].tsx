@@ -1,7 +1,6 @@
 import { useRouter } from "next/router";
 import * as React from "react";
 import { styled } from "@mui/material/styles";
-import Box from "@mui/material/Box";
 import Paper from "@mui/material/Paper";
 import Grid from "@mui/material/Unstable_Grid2";
 import { useEffect } from "react";
@@ -20,7 +19,6 @@ import {
   VictoryTheme,
   VictoryTooltip,
   VictoryVoronoiContainer,
-  VictoryZoomContainer,
 } from "victory";
 import FormControl from "@mui/material/FormControl";
 import InputLabel from "@mui/material/InputLabel";
@@ -35,17 +33,6 @@ const Item = styled(Paper)(({ theme }) => ({
   color: theme.palette.text.secondary,
 }));
 
-const CustomTooltip = (props: any) => {
-  const { x, y } = props;
-  return (
-    <VictoryTooltip
-      {...props}
-      renderInPortal={false}
-      constrainToVisibleArea={false}
-    ></VictoryTooltip>
-  );
-};
-CustomTooltip.defaultEvents = VictoryTooltip.defaultEvents;
 
 const Server = () => {
   const router = useRouter();
@@ -81,7 +68,8 @@ const Server = () => {
 
   // https://stackoverflow.com/questions/11832914/how-to-round-to-at-most-2-decimal-places-if-necessary
   function SimpleRound(num: number, decimalPlaces = 0) {
-    num = Math.round(num + "e" + decimalPlaces); // @ts-ignore
+    // @ts-ignore
+    num = Math.round(num + "e" + decimalPlaces);
     return Number(num + "e" + -decimalPlaces);
   }
   const updateData = async (serverid: string) => {
@@ -183,7 +171,7 @@ const Server = () => {
       </Grid>
       <Grid container spacing={3} padding={3}></Grid>
       <Grid container spacing={3} sx={{ flexGrow: 1 }}>
-        <Grid xs md={6} mdOffset={0} padding={3} sx={{ className:"info-box"}}  >
+        <Grid xs md={6} mdOffset={0} padding={3}>
           <Item className={styles.serverPropertyList}>
             <dl>
               <dt>Server Address: </dt>
