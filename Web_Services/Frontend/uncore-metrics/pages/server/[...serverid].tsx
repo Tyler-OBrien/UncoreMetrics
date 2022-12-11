@@ -5,10 +5,27 @@ import Box from "@mui/material/Box";
 import Paper from "@mui/material/Paper";
 import Grid from "@mui/material/Unstable_Grid2";
 import { useEffect } from "react";
-import { ClickhousePlayerData, ClickHouseUptimeData, ServerPlayerDataResponse, ServerUptimeDataResponse, SingleServerResponse } from "../../interfaces/server";
+import {
+  ClickhousePlayerData,
+  ClickHouseUptimeData,
+  ServerPlayerDataResponse,
+  ServerUptimeDataResponse,
+  SingleServerResponse,
+} from "../../interfaces/server";
 import { Server } from "../../interfaces/server";
 import styles from "./[serverid].module.css";
-import { VictoryChart, VictoryLine, VictoryZoomContainer } from "victory";
+import {
+  VictoryChart,
+  VictoryLine,
+  VictoryTheme,
+  VictoryTooltip,
+  VictoryVoronoiContainer,
+  VictoryZoomContainer,
+} from "victory";
+import FormControl from "@mui/material/FormControl";
+import InputLabel from "@mui/material/InputLabel";
+import Select, { SelectChangeEvent } from "@mui/material/Select";
+import MenuItem from "@mui/material/MenuItem";
 
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: theme.palette.mode === "dark" ? "#1A2027" : "#fff",
@@ -18,9 +35,22 @@ const Item = styled(Paper)(({ theme }) => ({
   color: theme.palette.text.secondary,
 }));
 
+const CustomTooltip = (props: any) => {
+  const { x, y } = props;
+  return (
+    <VictoryTooltip
+      {...props}
+      renderInPortal={false}
+      constrainToVisibleArea={false}
+    ></VictoryTooltip>
+  );
+};
+CustomTooltip.defaultEvents = VictoryTooltip.defaultEvents;
+
 const Server = () => {
   const router = useRouter();
   const { serverid } = router.query;
+
   // Store in state so we can refresh every 10s
   const [ServerID, setServerID] = React.useState<string>(serverid as string);
   if (serverid && !ServerID) {
@@ -29,10 +59,18 @@ const Server = () => {
 
   // @ts-ignore
   const [data, setData] = React.useState<Server>(undefined); // @ts-ignore
-  const [uptimeData, setUptimeData] = React.useState<ServerUptimeDataResponse>(undefined); // @ts-ignore
-  const [playerData, setPlayerData] = React.useState<ServerPlayerDataResponse>(undefined); // @ts-ignore
+  const [uptimeData, setUptimeData] = React.useState<ServerUptimeDataResponse>({
+    data: [],
+  }); // @ts-ignore
+  const [playerData, setPlayerData] = React.useState<ServerPlayerDataResponse>({
+    data: [],
+  }); // @ts-ignore
   const [loading, setLoading] = React.useState<boolean>(true);
   const [error, setError] = React.useState<string>("");
+  const [playerDataTimeRange, setPlayerDataTimeRange] =
+    React.useState<number>(3);
+  const [uptimeDataTimeRange, setUptimeDataTimeRange] =
+    React.useState<number>(3);
 
   useEffect(() => {
     const interval = setInterval(() => updateData(ServerID), 10000);
@@ -41,19 +79,19 @@ const Server = () => {
     };
   }, [ServerID]);
 
+  // https://stackoverflow.com/questions/11832914/how-to-round-to-at-most-2-decimal-places-if-necessary
+  function SimpleRound(num: number, decimalPlaces = 0) {
+    num = Math.round(num + "e" + decimalPlaces); // @ts-ignore
+    return Number(num + "e" + -decimalPlaces);
+  }
   const updateData = async (serverid: string) => {
-
-
-
     const serverFetchRequest = fetch(
       `https://api.uncore.app/v1/servers/${serverid}`
     );
-    const serverUptimeDataRequest = fetch(`https://api.uncore.app/v1/servers/uptimedata/${serverid}?hours=96&groupby=1`);
-    
-    const serverPlayerDataRequest = fetch(`https://api.uncore.app/v1/servers/playerdata/${serverid}?hours=96&groupby=1`);
 
     const serverDataResponse = await serverFetchRequest;
-    const serverResponse: SingleServerResponse = await serverDataResponse.json();
+    const serverResponse: SingleServerResponse =
+      await serverDataResponse.json();
     if (serverResponse.error) {
       setError(serverResponse.error.Message);
     }
@@ -61,17 +99,62 @@ const Server = () => {
       setData(serverResponse?.data);
     }
     setLoading(false);
-    const uptimeDataResponse: ServerUptimeDataResponse = await (await serverUptimeDataRequest).json();
-    if (uptimeDataResponse.data) {
-      setUptimeData(uptimeDataResponse);
+  };
+  const handlePlayerDataTimeRangeChange = async (event: SelectChangeEvent) => {
+    let days = Number.parseInt(event.target.value);
+    setPlayerDataTimeRange(days);
+    loadPlayerData(days);
+  };
+  const loadPlayerData = async (days: number) => {
+    setPlayerData({ data: [] });
+    const hours = days * 24;
+    let groupby: number = 0.5;
+    if (hours > 96) {
+      groupby = 24;
     }
-    const playerDataResponse: ServerPlayerDataResponse = await (await serverPlayerDataRequest).json();
-    if (uptimeDataResponse.data) {
+    const serverPlayerDataRequest = await fetch(
+      `https://api.uncore.app/v1/servers/playerdata/${serverid}?hours=${hours}${
+        groupby >= 1 ? "&groupby=" + groupby : ""
+      }`
+    );
+    const playerDataResponse: ServerPlayerDataResponse =
+      await serverPlayerDataRequest.json();
+    if (playerDataResponse.data) {
       setPlayerData(playerDataResponse);
     }
   };
+  const handleUptimeDataTimeRangeChange = async (event: SelectChangeEvent) => {
+    let days = Number.parseInt(event.target.value);
+    setUptimeDataTimeRange(days);
+    loadUptimeData(days);
+  };
+  const loadUptimeData = async (days: number) => {
+    setUptimeData({ data: [] });
+    const hours = days * 24;
+    let groupby: number = 0.5;
+    if (hours > 96) {
+      groupby = 24;
+    }
+    const serverUptimeDataRequest = await fetch(
+      `https://api.uncore.app/v1/servers/uptimedata/${serverid}?hours=${hours}${
+        groupby >= 1 ? "&groupby=" + groupby : ""
+      }`
+    );
+    const uptimeDataResponse: ServerUptimeDataResponse =
+      await serverUptimeDataRequest.json();
+    if (uptimeDataResponse.data) {
+      setUptimeData(uptimeDataResponse);
+    }
+  };
+  const initialLoad = async () => {
+    await updateData(serverid as string);
+    var initLoadPlayerDataPromise = loadPlayerData(playerDataTimeRange);
+    var initLoadUptimeDataPromise = loadUptimeData(uptimeDataTimeRange);
+    await Promise.all([initLoadPlayerDataPromise, initLoadUptimeDataPromise]);
+  };
+
   if (loading && !error && !data && serverid) {
-    updateData(serverid as string);
+    initialLoad();
   }
   if (loading) {
     return <div>Loading...</div>;
@@ -79,7 +162,6 @@ const Server = () => {
   if (error) {
     return <div>Error: {error}</div>;
   }
-
   return (
     <div>
       <Grid container spacing={3} padding={3}>
@@ -101,7 +183,7 @@ const Server = () => {
       </Grid>
       <Grid container spacing={3} padding={3}></Grid>
       <Grid container spacing={3} sx={{ flexGrow: 1 }}>
-        <Grid xs md={6} mdOffset={0} padding={3}>
+        <Grid xs md={6} mdOffset={0} padding={3} sx={{ className:"info-box"}}  >
           <Item className={styles.serverPropertyList}>
             <dl>
               <dt>Server Address: </dt>
@@ -128,45 +210,140 @@ const Server = () => {
               <dd>{new Date(data.lastCheck).toLocaleString()}</dd>
               <dt>Found At: </dt>
               <dd>{new Date(data.foundAt).toLocaleString()}</dd>
+              <dt>Next Check </dt>
+              <dd>{new Date(data.nextCheck).toLocaleString()}</dd>
               <dt>ISP: </dt>
               <dd>{data.isp}</dd>
               <dt>ASN: </dt>
               <dd>{data.asn}</dd>
+              <dt>Server Is Dead (not responding for 24 hours):</dt>
+              <dd>{data.isOnline ? "Alive" : "Dead"}</dd>
+              <dt>Unsuccessful Retries (failed to respond x checks in a row):</dt>
+              <dd>{data.retriesUsed}</dd>
             </dl>
           </Item>
         </Grid>
         <Grid xs={4} mdOffset="auto">
           <Item>
-            <h2>Player Data</h2>
-          <VictoryChart domainPadding={{ y: 10 }}
-            containerComponent={
-              <VictoryZoomContainer/>
-            }
-          >
-            <VictoryLine
-                  style={{
-
-                  }}
-                  data={playerData?.data?.map((d: ClickhousePlayerData) => { return { x: new Date(d.averageTime), y: d.playerAvg } }) }
-            />
-          </VictoryChart>
+            <h2 style={{ float: "left", fontSize: "200%" }}>
+              Players over time
+            </h2>
+            <FormControl size="medium" style={{ width: "50%", float: "right" }}>
+              <InputLabel id="player-data-period-select-label">
+                Time period
+              </InputLabel>
+              <Select
+                labelId="player-data-period-select-label"
+                id="player-data-period-select"
+                label="Time Period"
+                onChange={handlePlayerDataTimeRangeChange}
+                value={playerDataTimeRange.toString()}
+              >
+                <MenuItem value={3}>3 Days</MenuItem>
+                <MenuItem value={30}>1 Month</MenuItem>
+                <MenuItem value={365}>1 Year</MenuItem>
+                <MenuItem value={Infinity}>Max</MenuItem>
+              </Select>
+            </FormControl>
+            <VictoryChart
+              containerComponent={
+                <VictoryVoronoiContainer
+                  labels={({ datum }) =>
+                    `${new Date(datum.x).toLocaleString()}\n${datum.y} players`
+                  }
+                  labelComponent={
+                    <VictoryTooltip
+                      cornerRadius={0}
+                      flyoutStyle={{
+                        fill: "black",
+                        stroke: "black",
+                        opacity: "0.10",
+                      }}
+                    />
+                  }
+                  theme={VictoryTheme.material}
+                />
+              }
+            >
+              <VictoryLine
+                interpolation="natural"
+                style={{ labels: {}, data: { stroke: "skyblue" } }}
+                theme={VictoryTheme.material}
+                data={playerData?.data?.map((d: ClickhousePlayerData) => {
+                  return {
+                    x: new Date(d.averageTime),
+                    y: SimpleRound(d.playerAvg),
+                  };
+                })}
+              />
+            </VictoryChart>
+          </Item>
+        </Grid>
+        <Grid xs md={6} mdOffset={0} padding={3}>
+          <Item className={styles.serverPropertyList}>
+            <dl>
+              <dt>Ping from popular locations: </dt>
+              <dd>
+                Coming Soon
+              </dd>
+            </dl>
           </Item>
         </Grid>
         <Grid xs={4} mdOffset="auto">
           <Item>
-          <h2>Uptime Data</h2>
-          <VictoryChart domainPadding={{ y: 10 }}
-            containerComponent={
-              <VictoryZoomContainer/>
-            }
-          >
-            <VictoryLine
-                  style={{
-
-                  }}
-                  data={uptimeData?.data?.map((d: ClickHouseUptimeData) => { return { x: new Date(d.averageTime), y: d.uptime } }) }
-            />
-          </VictoryChart>
+            <h2 style={{ float: "left", fontSize: "200%" }}>Uptime Data</h2>
+            <FormControl size="medium" style={{ width: "50%", float: "right" }}>
+              <InputLabel id="player-data-period-select-label">
+                Time period
+              </InputLabel>
+              <Select
+                labelId="player-data-period-select-label"
+                id="player-data-period-select"
+                label="Time Period"
+                onChange={handleUptimeDataTimeRangeChange}
+                value={uptimeDataTimeRange.toString()}
+              >
+                <MenuItem value={3}>3 Days</MenuItem>
+                <MenuItem value={30}>1 Month</MenuItem>
+                <MenuItem value={365}>1 Year</MenuItem>
+                <MenuItem value={Infinity}>Max</MenuItem>
+              </Select>
+            </FormControl>
+            <VictoryChart
+              containerComponent={
+                <VictoryVoronoiContainer
+                  labels={({ datum }) =>
+                    `${new Date(datum.x).toLocaleString()}\n${
+                      datum.y
+                    }% successful checks`
+                  }
+                  labelComponent={
+                    <VictoryTooltip
+                      cornerRadius={0}
+                      flyoutStyle={{
+                        fill: "black",
+                        stroke: "black",
+                        opacity: "0.10",
+                      }}
+                    />
+                  }
+                  theme={VictoryTheme.material}
+                />
+              }
+            >
+              <VictoryLine
+                interpolation="natural"
+                theme={VictoryTheme.material}
+                style={{ labels: {}, data: { stroke: "skyblue" } }}
+                data={uptimeData?.data?.map((d: ClickHouseUptimeData) => {
+                  return {
+                    x: new Date(d.averageTime),
+                    y: SimpleRound(d.uptime, 2),
+                  };
+                })}
+                domain={{ y: [0, 100] }}
+              />
+            </VictoryChart>
           </Item>
         </Grid>
       </Grid>
