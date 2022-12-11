@@ -19,11 +19,3 @@
     flex-wrap: wrap;
     overflow: visible;
 }
-
-.media {
-@media screen and (max-width: 100px) {
-    .MuiGrid2-root {
-        flex-direction: column;
-    }
-}
-}    
