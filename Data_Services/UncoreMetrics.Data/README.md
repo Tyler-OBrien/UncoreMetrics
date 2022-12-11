@@ -1,10 +1,10 @@
 ﻿Generate new migrations:
 
->  dotnet ef migrations add AddScrapeJobs  --context ServersContext --output-dir "Migrations\ServerContext" --startup-project ..\..\Web_Services\API
+>  dotnet ef migrations add AddScrapeJobs  --context ServersContext --output-dir "Migrations\ServerContext" --startup-project ..\\..\\Web_Services\API
 
 Apply Migrations to get started:
 
-> dotnet ef migrations script --startup-project  ..\..\Web_Services\API or  dotnet ef database update --startup-project   ..\..\Web_Services\API
+> dotnet ef migrations script --startup-project  ..\\..\\Web_Services\API or  dotnet ef database update --startup-project   ..\\..\\Web_Services\API
 
 Clickhouse:
 
