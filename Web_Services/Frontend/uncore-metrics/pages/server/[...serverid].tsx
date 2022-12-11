@@ -99,7 +99,7 @@ const Server = () => {
     let groupby: number = 0.5;
     let playerDataEndpoint = "playerdata";
     if (days == -1) {
-      days = 3652;
+      days = 500;
       hours = days * 24;
     }
     if (hours > 96) {
@@ -130,7 +130,7 @@ const Server = () => {
     let groupby: number = 0.5;
     let uptimeDataEndpoint = "uptimedata";
     if (days == -1) {
-      days = 3652;
+      days = 500;
       hours = days * 24;
     }
     if (hours > 96) {
