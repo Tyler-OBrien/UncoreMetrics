@@ -95,13 +95,21 @@ const Server = () => {
   };
   const loadPlayerData = async (days: number) => {
     setPlayerData({ data: [] });
-    const hours = days * 24;
+    let hours = days * 24;
     let groupby: number = 0.5;
-    if (hours > 96) {
-      groupby = 24;
+    let playerDataEndpoint = "playerdata";
+    if (days == -1) {
+      days = 3652;
+      hours = days * 24;
     }
+    if (hours > 96) {
+      groupby = 1;
+      hours = days;
+      playerDataEndpoint = "playerdata1d";
+    }
+
     const serverPlayerDataRequest = await fetch(
-      `https://api.uncore.app/v1/servers/playerdata/${serverid}?hours=${hours}${
+      `https://api.uncore.app/v1/servers/${playerDataEndpoint}/${serverid}?hours=${hours}${
         groupby >= 1 ? "&groupby=" + groupby : ""
       }`
     );
@@ -118,13 +126,21 @@ const Server = () => {
   };
   const loadUptimeData = async (days: number) => {
     setUptimeData({ data: [] });
-    const hours = days * 24;
+    let hours = days * 24;
     let groupby: number = 0.5;
-    if (hours > 96) {
-      groupby = 24;
+    let uptimeDataEndpoint = "uptimedata";
+    if (days == -1) {
+      days = 3652;
+      hours = days * 24;
     }
+    if (hours > 96) {
+      groupby = 1;
+      hours = days;
+      uptimeDataEndpoint = "uptimedata1d";
+    }
+
     const serverUptimeDataRequest = await fetch(
-      `https://api.uncore.app/v1/servers/uptimedata/${serverid}?hours=${hours}${
+      `https://api.uncore.app/v1/servers/${uptimeDataEndpoint}/${serverid}?hours=${hours}${
         groupby >= 1 ? "&groupby=" + groupby : ""
       }`
     );
@@ -230,7 +246,7 @@ const Server = () => {
                 <MenuItem value={3}>3 Days</MenuItem>
                 <MenuItem value={30}>1 Month</MenuItem>
                 <MenuItem value={365}>1 Year</MenuItem>
-                <MenuItem value={Infinity}>Max</MenuItem>
+                <MenuItem value={-1}>Max</MenuItem>
               </Select>
             </FormControl>
             <VictoryChart
@@ -294,16 +310,16 @@ const Server = () => {
                 <MenuItem value={3}>3 Days</MenuItem>
                 <MenuItem value={30}>1 Month</MenuItem>
                 <MenuItem value={365}>1 Year</MenuItem>
-                <MenuItem value={Infinity}>Max</MenuItem>
+                <MenuItem value={-1}>Max</MenuItem>
               </Select>
             </FormControl>
-            <VictoryChart
+            <VictoryChart domainPadding={{ y: 10 }}
               containerComponent={
                 <VictoryVoronoiContainer
                   labels={({ datum }) =>
                     `${new Date(datum.x).toLocaleString()}\n${
                       datum.y
-                    }% successful checks`
+                    }% successful checks\n ${datum.online}/${datum.ping}`
                   }
                   labelComponent={
                     <VictoryTooltip
@@ -327,6 +343,8 @@ const Server = () => {
                   return {
                     x: new Date(d.averageTime),
                     y: SimpleRound(d.uptime, 2),
+                    ping: d.pingCount,
+                    online: d.onlineCount
                   };
                 })}
                 domain={{ y: [0, 100] }}
