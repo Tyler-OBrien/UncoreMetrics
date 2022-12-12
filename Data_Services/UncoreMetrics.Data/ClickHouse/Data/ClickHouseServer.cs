@@ -291,22 +291,29 @@ public class ClickHouseServer
         command.AddParameter("lastHours", "Int32", lastHours);
         bool hasAppid = false;
         if (appId == null || appId == 0)
+            // TODO: THESE QUERIES SHOULD BE REDONE AT SOME POINT
         {
+           // command.CommandText =
+           //     "Select avgMerge(players_avg) as players_avg, minMerge(players_min) as players_min, maxMerge(players_max) as players_max, average_time from generic_server_stats_players_mv where average_time > DATE_SUB(NOW(), INTERVAL {lastHours:Int32} HOUR) GROUP BY average_time Order by average_time desc LIMIT 500;";
+
             command.CommandText =
-                "Select avgMerge(players_avg) as players_avg, minMerge(players_min) as players_min, maxMerge(players_max) as players_max, average_time from generic_server_stats_players_mv where average_time > DATE_SUB(NOW(), INTERVAL {lastHours:Int32} HOUR) GROUP BY average_time Order by average_time desc LIMIT 500;";
+                "Select sum(temp.players_max) as players_max, temp.average_time as average_time from (select (maxMerge(players_max)) as players_max, average_time from generic_server_stats_players_mv_overall where average_time > DATE_SUB(NOW(), INTERVAL {lastHours:Int32} HOUR) group by average_time, server_id order by average_time desc) temp group by temp.average_time order by average_time desc";
+
         }
         else
         {
             hasAppid = true;
             command.AddParameter("appId", "UInt64", appId);
-            command.CommandText =
-                "Select appid, avgMerge(players_avg) as players_avg, minMerge(players_min) as players_min, maxMerge(players_max) as players_max, average_time from generic_server_stats_players_mv where appid = {appId:UInt64} and average_time > DATE_SUB(NOW(), INTERVAL {lastHours:Int32} HOUR) GROUP BY appid, average_time Order by average_time desc LIMIT 500;";
+           // command.CommandText =
+           //     "Select appid, avgMerge(players_avg) as players_avg, minMerge(players_min) as players_min, maxMerge(players_max) as players_max, average_time from generic_server_stats_players_mv where appid = {appId:UInt64} and average_time > DATE_SUB(NOW(), INTERVAL {lastHours:Int32} HOUR) GROUP BY appid, average_time Order by average_time desc LIMIT 500;";
+           command.CommandText =
+               "Select sum(temp.players_max) as players_max, temp.appid as appid, temp.average_time as average_time from (select appid, (maxMerge(players_max)) as players_max, average_time from generic_server_stats_players_mv_overall where average_time > DATE_SUB(NOW(), INTERVAL {lastHours:Int32} HOUR) and appid = {appId:UInt64} group by appid, average_time, server_id order by average_time desc) temp group by temp.appid, temp.average_time order by average_time desc";
         }
         var result = await command.ExecuteReaderAsync(token);
         List<ClickHousePlayerData> data = new List<ClickHousePlayerData>(lastHours * 2);
         while (await result.ReadAsync(token))
         {
-            data.Add(PlayerDataFromReader(result, false, hasAppid));
+            data.Add(OverallPlayerDataFromReader(result, hasAppid));
         }
 
         return data;
@@ -320,37 +327,54 @@ public class ClickHouseServer
         command.AddParameter("hoursGroupBy", "Int32", hoursGroupBy);
         bool hasAppid = false;
         if (appId == null || appId == 0)
+        // TODO: THESE QUERIES SHOULD BE REDONE AT SOME POINT
         {
+            // command.CommandText =
+            //     "Select avgMerge(players_avg) as players_avg, minMerge(players_min) as players_min, maxMerge(players_max) as players_max, average_time from generic_server_stats_players_mv where average_time > DATE_SUB(NOW(), INTERVAL {lastHours:Int32} HOUR) GROUP BY average_time Order by average_time desc LIMIT 500;";
+
             command.CommandText =
-                "Select avgMerge(players_avg) as players_avg, minMerge(players_min) as players_min, maxMerge(players_max) as players_max, average_time from generic_server_stats_players_mv where average_time > DATE_SUB(NOW(), INTERVAL {lastHours:Int32} HOUR) GROUP BY toStartOfInterval(average_time, INTERVAL {hoursGroupBy:Int32} HOUR) as average_time Order by average_time desc LIMIT 500;";
+                "Select sum(temp.players_max) as players_max, temp.average_time as average_time from (select (maxMerge(players_max)) as players_max, average_time from generic_server_stats_players_mv_overall where average_time > DATE_SUB(NOW(), INTERVAL {lastHours:Int32} HOUR) group by  toStartOfInterval(average_time, INTERVAL {hoursGroupBy:Int32} HOUR) as average_time, server_id order by average_time desc) temp group by temp.average_time order by average_time desc";
         }
         else
         {
             hasAppid = true;
             command.AddParameter("appId", "UInt64", appId);
+            // command.CommandText =
+            //     "Select appid, avgMerge(players_avg) as players_avg, minMerge(players_min) as players_min, maxMerge(players_max) as players_max, average_time from generic_server_stats_players_mv where appid = {appId:UInt64} and average_time > DATE_SUB(NOW(), INTERVAL {lastHours:Int32} HOUR) GROUP BY appid, average_time Order by average_time desc LIMIT 500;";
             command.CommandText =
-                "Select appid, avgMerge(players_avg) as players_avg, minMerge(players_min) as players_min, maxMerge(players_max) as players_max, average_time from generic_server_stats_players_mv where appid = {appId:UInt64} and average_time > DATE_SUB(NOW(), INTERVAL {lastHours:Int32} HOUR) GROUP BY appid, toStartOfInterval(average_time, INTERVAL {hoursGroupBy:Int32} HOUR) as average_time Order by average_time desc LIMIT 500;";
+                "Select sum(temp.players_max) as players_max, temp.appid as appid, temp.average_time as average_time from (select appid, (maxMerge(players_max)) as players_max, average_time from generic_server_stats_players_mv_overall where average_time > DATE_SUB(NOW(), INTERVAL {lastHours:Int32} HOUR) and appid = {appId:UInt64} group by appid,  toStartOfInterval(average_time, INTERVAL {hoursGroupBy:Int32} HOUR) as average_time, server_id order by average_time desc) temp group by temp.appid, temp.average_time order by average_time desc";
         }
         var result = await command.ExecuteReaderAsync(token);
         List<ClickHousePlayerData> data = new List<ClickHousePlayerData>(lastHours / hoursGroupBy);
         while (await result.ReadAsync(token))
         {
-            data.Add(PlayerDataFromReader(result, false, hasAppid));
+            data.Add(OverallPlayerDataFromReader(result, hasAppid));
         }
 
         return data;
     }
 
-    private ClickHousePlayerData PlayerDataFromReader(DbDataReader reader, bool hasServerID = true, bool hasAppID = true)
+
+    private ClickHousePlayerData OverallPlayerDataFromReader(DbDataReader reader,  bool hasAppId)
     {
         return new ClickHousePlayerData()
         {
-            ServerId = hasServerID ? reader.GetGuid("server_id") : Guid.Empty,
-            AppId = hasAppID ? (ulong)reader.GetValue("appid") : 0,
-            PlayerAvg = reader.GetDouble("players_avg"),
-            PlayersMin = (uint)reader.GetValue("players_min"),
-            PlayersMax = (uint)reader.GetValue("players_max"),
-            AverageTime = reader.GetDateTime("average_time")
+            AppId = hasAppId ? (ulong)reader.GetValue("appid") : 0,
+            PlayersMax = (uint)(ulong)reader.GetValue("players_max"),
+            AverageTime = reader.GetDateTime("average_time"),
+        };
+    }
+
+    private ClickHousePlayerData PlayerDataFromReader(DbDataReader reader)
+    {
+        return new ClickHousePlayerData()
+        {
+            ServerId =  reader.GetGuid("server_id"),
+            AppId =  (ulong)reader.GetValue("appid"),
+            PlayerAvg =  reader.GetDouble("players_avg"),
+            PlayersMin =  (uint)reader.GetValue("players_min"),
+            PlayersMax =  (uint)reader.GetValue("players_max"),
+            AverageTime = reader.GetDateTime("average_time"),
         };
     }
     private ClickHouseUptimeData UptimeDataFromReader(DbDataReader reader, bool hasServerID = true, bool hasAppID = true)
