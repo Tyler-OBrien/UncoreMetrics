@@ -33,6 +33,7 @@ const Item = styled(Paper)(({ theme }) => ({
   color: theme.palette.text.secondary,
 }));
 
+const MAGIC_NUMBER_MAX_RESULTS = 250;
 
 const Server = () => {
   const router = useRouter();
@@ -96,23 +97,29 @@ const Server = () => {
   const loadPlayerData = async (days: number) => {
     setPlayerData({ data: [] });
     let hours = days * 24;
-    let groupby: number = 0.5;
-    let playerDataEndpoint = "playerdata";
+    let maxHoursGroupBy: number = Math.ceil(hours / MAGIC_NUMBER_MAX_RESULTS); 
+    let serverPlayerDataRequest;
     if (days == -1) {
-      days = 500;
+      days = MAGIC_NUMBER_MAX_RESULTS - 1;
       hours = days * 24;
+      maxHoursGroupBy = 24;
     }
-    if (hours > 96) {
-      groupby = 1;
-      hours = days;
-      playerDataEndpoint = "playerdata1d";
+    if (maxHoursGroupBy >= 24) {
+      let groupby: number = Math.ceil(days / MAGIC_NUMBER_MAX_RESULTS); 
+      serverPlayerDataRequest = await fetch(
+        `https://api.uncore.app/v1/servers/playerdata1d/${serverid}?days=${days}${
+          groupby > 1 ? "&groupby=" + groupby : ""
+        }`
+      );
     }
-
-    const serverPlayerDataRequest = await fetch(
-      `https://api.uncore.app/v1/servers/${playerDataEndpoint}/${serverid}?hours=${hours}${
+    else {
+      let groupby: number = Math.ceil(hours / MAGIC_NUMBER_MAX_RESULTS); 
+    serverPlayerDataRequest = await fetch(
+      `https://api.uncore.app/v1/servers/playerdata/${serverid}?hours=${hours}${
         groupby >= 1 ? "&groupby=" + groupby : ""
       }`
     );
+    }
     const playerDataResponse: ServerPlayerDataResponse =
       await serverPlayerDataRequest.json();
     if (playerDataResponse.data) {
@@ -127,23 +134,29 @@ const Server = () => {
   const loadUptimeData = async (days: number) => {
     setUptimeData({ data: [] });
     let hours = days * 24;
-    let groupby: number = 0.5;
-    let uptimeDataEndpoint = "uptimedata";
+    let serverUptimeDataRequest;
+    let maxHoursGroupBy: number = Math.ceil(hours / MAGIC_NUMBER_MAX_RESULTS); 
     if (days == -1) {
-      days = 500;
+      days = MAGIC_NUMBER_MAX_RESULTS - 1;
       hours = days * 24;
+      maxHoursGroupBy = 24;
     }
-    if (hours > 96) {
-      groupby = 1;
-      hours = days;
-      uptimeDataEndpoint = "uptimedata1d";
+    if (maxHoursGroupBy >= 24) {
+      let groupby: number = Math.ceil(days / MAGIC_NUMBER_MAX_RESULTS); 
+      serverUptimeDataRequest = await fetch(
+        `https://api.uncore.app/v1/servers/uptimedata1d/${serverid}?days=${days}${
+          groupby > 1 ? "&groupby=" + groupby : ""
+        }`
+      );
     }
-
-    const serverUptimeDataRequest = await fetch(
-      `https://api.uncore.app/v1/servers/${uptimeDataEndpoint}/${serverid}?hours=${hours}${
+    else {
+    let groupby: number = Math.ceil(hours / MAGIC_NUMBER_MAX_RESULTS); 
+    serverUptimeDataRequest = await fetch(
+      `https://api.uncore.app/v1/servers/uptimedata/${serverid}?hours=${hours}${
         groupby >= 1 ? "&groupby=" + groupby : ""
       }`
     );
+    }
     const uptimeDataResponse: ServerUptimeDataResponse =
       await serverUptimeDataRequest.json();
     if (uptimeDataResponse.data) {
@@ -244,6 +257,7 @@ const Server = () => {
                 value={playerDataTimeRange.toString()}
               >
                 <MenuItem value={3}>3 Days</MenuItem>
+                <MenuItem value={14}>14 Days</MenuItem>
                 <MenuItem value={30}>1 Month</MenuItem>
                 <MenuItem value={365}>1 Year</MenuItem>
                 <MenuItem value={-1}>Max</MenuItem>
@@ -308,6 +322,7 @@ const Server = () => {
                 value={uptimeDataTimeRange.toString()}
               >
                 <MenuItem value={3}>3 Days</MenuItem>
+                <MenuItem value={14}>14 Days</MenuItem>
                 <MenuItem value={30}>1 Month</MenuItem>
                 <MenuItem value={365}>1 Year</MenuItem>
                 <MenuItem value={-1}>Max</MenuItem>
