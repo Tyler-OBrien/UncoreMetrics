@@ -97,7 +97,7 @@ const Server = () => {
   const loadPlayerData = async (days: number) => {
     setPlayerData({ data: [] });
     let hours = days * 24;
-    let maxHoursGroupBy: number = Math.ceil(hours / MAGIC_NUMBER_MAX_RESULTS); 
+    let maxHoursGroupBy: number = Math.ceil(hours / MAGIC_NUMBER_MAX_RESULTS);
     let serverPlayerDataRequest;
     if (days == -1) {
       days = MAGIC_NUMBER_MAX_RESULTS - 1;
@@ -105,20 +105,19 @@ const Server = () => {
       maxHoursGroupBy = 24;
     }
     if (maxHoursGroupBy >= 24) {
-      let groupby: number = Math.ceil(days / MAGIC_NUMBER_MAX_RESULTS); 
+      let groupby: number = Math.ceil(days / MAGIC_NUMBER_MAX_RESULTS);
       serverPlayerDataRequest = await fetch(
         `https://api.uncore.app/v1/servers/playerdata1d/${serverid}?days=${days}${
           groupby > 1 ? "&groupby=" + groupby : ""
         }`
       );
-    }
-    else {
-      let groupby: number = Math.ceil(hours / MAGIC_NUMBER_MAX_RESULTS); 
-    serverPlayerDataRequest = await fetch(
-      `https://api.uncore.app/v1/servers/playerdata/${serverid}?hours=${hours}${
-        groupby >= 1 ? "&groupby=" + groupby : ""
-      }`
-    );
+    } else {
+      let groupby: number = Math.ceil(hours / MAGIC_NUMBER_MAX_RESULTS);
+      serverPlayerDataRequest = await fetch(
+        `https://api.uncore.app/v1/servers/playerdata/${serverid}?hours=${hours}${
+          groupby >= 1 ? "&groupby=" + groupby : ""
+        }`
+      );
     }
     const playerDataResponse: ServerPlayerDataResponse =
       await serverPlayerDataRequest.json();
@@ -135,27 +134,26 @@ const Server = () => {
     setUptimeData({ data: [] });
     let hours = days * 24;
     let serverUptimeDataRequest;
-    let maxHoursGroupBy: number = Math.ceil(hours / MAGIC_NUMBER_MAX_RESULTS); 
+    let maxHoursGroupBy: number = Math.ceil(hours / MAGIC_NUMBER_MAX_RESULTS);
     if (days == -1) {
       days = MAGIC_NUMBER_MAX_RESULTS - 1;
       hours = days * 24;
       maxHoursGroupBy = 24;
     }
     if (maxHoursGroupBy >= 24) {
-      let groupby: number = Math.ceil(days / MAGIC_NUMBER_MAX_RESULTS); 
+      let groupby: number = Math.ceil(days / MAGIC_NUMBER_MAX_RESULTS);
       serverUptimeDataRequest = await fetch(
         `https://api.uncore.app/v1/servers/uptimedata1d/${serverid}?days=${days}${
           groupby > 1 ? "&groupby=" + groupby : ""
         }`
       );
-    }
-    else {
-    let groupby: number = Math.ceil(hours / MAGIC_NUMBER_MAX_RESULTS); 
-    serverUptimeDataRequest = await fetch(
-      `https://api.uncore.app/v1/servers/uptimedata/${serverid}?hours=${hours}${
-        groupby >= 1 ? "&groupby=" + groupby : ""
-      }`
-    );
+    } else {
+      let groupby: number = Math.ceil(hours / MAGIC_NUMBER_MAX_RESULTS);
+      serverUptimeDataRequest = await fetch(
+        `https://api.uncore.app/v1/servers/uptimedata/${serverid}?hours=${hours}${
+          groupby >= 1 ? "&groupby=" + groupby : ""
+        }`
+      );
     }
     const uptimeDataResponse: ServerUptimeDataResponse =
       await serverUptimeDataRequest.json();
@@ -235,7 +233,9 @@ const Server = () => {
               <dd>{data.asn}</dd>
               <dt>Server Is Dead (not responding for 24 hours):</dt>
               <dd>{data.isOnline ? "Alive" : "Dead"}</dd>
-              <dt>Unsuccessful Retries (failed to respond x checks in a row):</dt>
+              <dt>
+                Unsuccessful Retries (failed to respond x checks in a row):
+              </dt>
               <dd>{data.retriesUsed}</dd>
             </dl>
           </Item>
@@ -259,11 +259,14 @@ const Server = () => {
                 <MenuItem value={3}>3 Days</MenuItem>
                 <MenuItem value={14}>14 Days</MenuItem>
                 <MenuItem value={30}>1 Month</MenuItem>
+                <MenuItem value={90}>3 Months</MenuItem>
+                <MenuItem value={180}>6 Months</MenuItem>
                 <MenuItem value={365}>1 Year</MenuItem>
                 <MenuItem value={-1}>Max</MenuItem>
               </Select>
             </FormControl>
             <VictoryChart
+              domainPadding={{ y: 10 }}
               containerComponent={
                 <VictoryVoronoiContainer
                   labels={({ datum }) =>
@@ -301,9 +304,7 @@ const Server = () => {
           <Item className={styles.serverPropertyList}>
             <dl>
               <dt>Ping from popular locations: </dt>
-              <dd>
-                Coming Soon
-              </dd>
+              <dd>Coming Soon</dd>
             </dl>
           </Item>
         </Grid>
@@ -324,11 +325,14 @@ const Server = () => {
                 <MenuItem value={3}>3 Days</MenuItem>
                 <MenuItem value={14}>14 Days</MenuItem>
                 <MenuItem value={30}>1 Month</MenuItem>
+                <MenuItem value={90}>3 Months</MenuItem>
+                <MenuItem value={180}>6 Months</MenuItem>
                 <MenuItem value={365}>1 Year</MenuItem>
                 <MenuItem value={-1}>Max</MenuItem>
               </Select>
             </FormControl>
-            <VictoryChart domainPadding={{ y: 10 }}
+            <VictoryChart
+              domainPadding={{ y: 10 }}
               containerComponent={
                 <VictoryVoronoiContainer
                   labels={({ datum }) =>
@@ -359,7 +363,7 @@ const Server = () => {
                     x: new Date(d.averageTime),
                     y: SimpleRound(d.uptime, 2),
                     ping: d.pingCount,
-                    online: d.onlineCount
+                    online: d.onlineCount,
                   };
                 })}
                 domain={{ y: [0, 100] }}

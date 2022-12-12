@@ -75,6 +75,14 @@ function MyApp({ Component, pageProps }: AppProps) {
               >
                 Scrape Jobs
               </Link>
+              <Link
+                variant="button"
+                color="text.primary"
+                href="/stats"
+                sx={{ my: 1, mx: 1.5 }}
+              >
+                Statistics
+              </Link>
             </nav>
             <Search>
               <SearchIconWrapper>
