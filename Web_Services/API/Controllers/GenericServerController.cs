@@ -90,10 +90,10 @@ public class GenericServerController : ControllerBase
     {
         if (hours.HasValue == false)
             hours = 24;
-        if (hours > 336)
+        if (groupby >= 24)
         {
             return BadRequest(new ErrorResponse(HttpStatusCode.BadRequest,
-                $"Please use uptimedata1d to query for data older then 14 days. Note that the granularity/min groupby of that data is 1 day. ", "too_old_data"));
+                $"Please use uptimedata1d to group data larger then 24 hours. Note that the granularity/min groupby of that data is 1 day. ", "too_old_data"));
         }
 
         if (groupby.HasValue == false)
@@ -149,14 +149,14 @@ public class GenericServerController : ControllerBase
 
         if (groupby.HasValue == false)
         {
-            if (days / 1 > 500)
+            if ((days / 1) > 500)
                 return BadRequest(new ErrorResponse(HttpStatusCode.BadRequest, $"Max Results Generated can be 500. Your Query would have returned {days / 0.5}",
                     "too_many_results"));
             return Ok(new DataResponse<List<ClickHouseUptimeData>>(await _clickHouseService.GetUptimeData1d(id.ToString(), days.Value, token)));
 
         }
 
-        if (days / groupby > 500)
+        if ((days / groupby) > 500)
             return BadRequest(new ErrorResponse(HttpStatusCode.BadRequest,
                 $"Max Results Generated can be 500. Your Query would have returned {days / groupby}",
                 "too_many_results"));
@@ -170,10 +170,10 @@ public class GenericServerController : ControllerBase
     {
         if (hours.HasValue == false)
             hours = 24;
-        if (hours > 336)
+        if (groupby >= 24)
         {
             return BadRequest(new ErrorResponse(HttpStatusCode.BadRequest,
-                $"Please use playerdata1d to query for data older then 14 days. Note that the granularity/min groupby of that data is 1 day. ", "too_old_data"));
+                $"Please use playerdata1d to group data larger then 24 hours. Note that the granularity/min groupby of that data is 1 day. ", "too_old_data"));
         }
 
         if (groupby.HasValue == false)
@@ -225,13 +225,13 @@ public class GenericServerController : ControllerBase
 
         if (groupby.HasValue == false)
         {
-            if (days / 0.5 > 500)
+            if ((days / 1) > 500)
                 return BadRequest(new ErrorResponse(HttpStatusCode.BadRequest, $"Max Results Generated can be 500. Your Query would have returned {days / 0.5}",
                     "too_many_results"));
             return Ok(new DataResponse<List<ClickHousePlayerData>>(
                 await _clickHouseService.GetPlayerData1d(id.ToString(), days.Value, token)));
         }
-        if (days / groupby > 500)
+        if ((days / groupby) > 500)
             return BadRequest(new ErrorResponse(HttpStatusCode.BadRequest, $"Max Results Generated can be 500. Your Query would have returned {days / groupby}",
                 "too_many_results"));
 
