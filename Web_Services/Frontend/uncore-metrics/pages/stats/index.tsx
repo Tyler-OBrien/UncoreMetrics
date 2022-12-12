@@ -230,7 +230,7 @@ const Server = () => {
                 data={playerData?.data?.map((d: ClickhousePlayerData) => {
                   return {
                     x: new Date(d.averageTime),
-                    y: SimpleRound(d.playerAvg),
+                    y: SimpleRound(d.playersMax),
                   };
                 })}
               />
