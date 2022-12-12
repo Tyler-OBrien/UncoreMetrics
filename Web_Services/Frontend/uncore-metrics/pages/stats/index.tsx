@@ -42,13 +42,10 @@ const Server = () => {
     gameStr = "0";
   }
 
-
   const [selectedGame, setSelectedGame] = React.useState<string>(gameStr);
   if (!selectedGame && gameStr) {
     setSelectedGame(gameStr);
   }
-  
-
 
   // @ts-ignore
   const [uptimeData, setUptimeData] = React.useState<ServerUptimeDataResponse>({
@@ -76,16 +73,21 @@ const Server = () => {
     loadPlayerData(selectedGame, days);
   };
   const loadPlayerData = async (game: string, days: number) => {
-    if (game == "0")
-    game = "";
+    if (game == "0") game = "";
     setPlayerData({ data: [] });
     let hours = days * 24;
+    if (days == 0) {
+      hours = 12;
+    }
     let serverPlayerDataRequest;
     if (days == -1) {
       days = MAGIC_NUMBER_MAX_RESULTS - 1;
       hours = days * 24;
     }
     let groupby: number = Math.ceil(hours / MAGIC_NUMBER_MAX_RESULTS);
+    if (hours <= 24) {
+      groupby = 0;
+    }
     serverPlayerDataRequest = await fetch(
       `https://api.uncore.app/v1/servers/playerdataoverall/${game}?hours=${hours}${
         groupby >= 1 ? "&groupby=" + groupby : ""
@@ -103,16 +105,21 @@ const Server = () => {
     loadUptimeData(selectedGame, days);
   };
   const loadUptimeData = async (game: string, days: number) => {
-    if (game == "0")
-      game = "";
+    if (game == "0") game = "";
     setUptimeData({ data: [] });
     let hours = days * 24;
+    if (days == 0) {
+      hours = 12;
+    }
     let serverUptimeDataRequest;
     if (days == -1) {
       days = MAGIC_NUMBER_MAX_RESULTS - 1;
       hours = days * 24;
     }
     let groupby: number = Math.ceil(hours / MAGIC_NUMBER_MAX_RESULTS);
+    if (hours <= 24) {
+      groupby = 0;
+    }
     serverUptimeDataRequest = await fetch(
       `https://api.uncore.app/v1/servers/uptimedataoverall/${game}?hours=${hours}${
         groupby >= 1 ? "&groupby=" + groupby : ""
@@ -193,6 +200,8 @@ const Server = () => {
                 onChange={handlePlayerDataTimeRangeChange}
                 value={playerDataTimeRange.toString()}
               >
+                <MenuItem value={0}>12 hours</MenuItem>
+                <MenuItem value={1}>1 Day</MenuItem>
                 <MenuItem value={3}>3 Days</MenuItem>
                 <MenuItem value={14}>14 Days</MenuItem>
                 <MenuItem value={30}>1 Month</MenuItem>
@@ -251,6 +260,8 @@ const Server = () => {
                 onChange={handleUptimeDataTimeRangeChange}
                 value={uptimeDataTimeRange.toString()}
               >
+                <MenuItem value={0}>12 hours</MenuItem>
+                <MenuItem value={1}>1 Day</MenuItem>
                 <MenuItem value={3}>3 Days</MenuItem>
                 <MenuItem value={14}>14 Days</MenuItem>
                 <MenuItem value={30}>1 Month</MenuItem>

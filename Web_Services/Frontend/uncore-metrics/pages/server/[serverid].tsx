@@ -97,7 +97,11 @@ const Server = () => {
   const loadPlayerData = async (days: number) => {
     setPlayerData({ data: [] });
     let hours = days * 24;
+    if (days == 0) {
+      hours = 12;
+    }
     let maxHoursGroupBy: number = Math.ceil(hours / MAGIC_NUMBER_MAX_RESULTS);
+
     let serverPlayerDataRequest;
     if (days == -1) {
       days = MAGIC_NUMBER_MAX_RESULTS - 1;
@@ -113,6 +117,9 @@ const Server = () => {
       );
     } else {
       let groupby: number = Math.ceil(hours / MAGIC_NUMBER_MAX_RESULTS);
+      if (hours <= 24) {
+        groupby = 0;
+      }
       serverPlayerDataRequest = await fetch(
         `https://api.uncore.app/v1/servers/playerdata/${serverid}?hours=${hours}${
           groupby >= 1 ? "&groupby=" + groupby : ""
@@ -133,8 +140,10 @@ const Server = () => {
   const loadUptimeData = async (days: number) => {
     setUptimeData({ data: [] });
     let hours = days * 24;
+    if (days == 0) hours = 12;
     let serverUptimeDataRequest;
     let maxHoursGroupBy: number = Math.ceil(hours / MAGIC_NUMBER_MAX_RESULTS);
+
     if (days == -1) {
       days = MAGIC_NUMBER_MAX_RESULTS - 1;
       hours = days * 24;
@@ -149,6 +158,9 @@ const Server = () => {
       );
     } else {
       let groupby: number = Math.ceil(hours / MAGIC_NUMBER_MAX_RESULTS);
+      if (hours <= 24) {
+        groupby = 0;
+      }
       serverUptimeDataRequest = await fetch(
         `https://api.uncore.app/v1/servers/uptimedata/${serverid}?hours=${hours}${
           groupby >= 1 ? "&groupby=" + groupby : ""
@@ -256,6 +268,8 @@ const Server = () => {
                 onChange={handlePlayerDataTimeRangeChange}
                 value={playerDataTimeRange.toString()}
               >
+                <MenuItem value={0}>12 hours</MenuItem>
+                <MenuItem value={1}>1 Day</MenuItem>
                 <MenuItem value={3}>3 Days</MenuItem>
                 <MenuItem value={14}>14 Days</MenuItem>
                 <MenuItem value={30}>1 Month</MenuItem>
@@ -322,6 +336,8 @@ const Server = () => {
                 onChange={handleUptimeDataTimeRangeChange}
                 value={uptimeDataTimeRange.toString()}
               >
+                <MenuItem value={0}>12 hours</MenuItem>
+                <MenuItem value={1}>1 Day</MenuItem>
                 <MenuItem value={3}>3 Days</MenuItem>
                 <MenuItem value={14}>14 Days</MenuItem>
                 <MenuItem value={30}>1 Month</MenuItem>
