@@ -212,7 +212,7 @@ const Server = () => {
               </Select>
             </FormControl>
             <VictoryChart
-              domainPadding={{ y: 10 }}
+              domainPadding={{ y: 20, x: 5 }}
               containerComponent={
                 <VictoryVoronoiContainer
                   labels={({ datum }) =>
@@ -272,7 +272,7 @@ const Server = () => {
               </Select>
             </FormControl>
             <VictoryChart
-              domainPadding={{ y: 10 }}
+              domainPadding={{ y: 20, x: 5 }}
               containerComponent={
                 <VictoryVoronoiContainer
                   labels={({ datum }) =>
