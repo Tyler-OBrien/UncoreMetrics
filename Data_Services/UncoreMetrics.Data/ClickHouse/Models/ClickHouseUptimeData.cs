@@ -36,4 +36,24 @@ namespace UncoreMetrics.Data.ClickHouse.Models
 
         public DateTime AverageTime { get; set; }
     }
+    public class ClickHouseRawUptimeData
+    {
+        public ClickHouseRawUptimeData(Guid serverId, bool isOnline, DateTime checkTime)
+        {
+            ServerId = serverId;
+            IsOnline = isOnline;
+            CheckTime = checkTime;
+        }
+
+        public ClickHouseRawUptimeData()
+        {
+
+        }
+
+        public Guid ServerId { get; set; }
+
+        public bool IsOnline { get; set; }
+
+        public DateTime CheckTime { get; set; }
+    }
 }

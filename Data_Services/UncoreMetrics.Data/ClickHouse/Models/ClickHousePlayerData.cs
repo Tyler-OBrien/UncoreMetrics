@@ -33,4 +33,25 @@ namespace UncoreMetrics.Data.ClickHouse.Models
         public uint PlayersMax { get; set; }
         public DateTime AverageTime { get; set; }
     }
+
+    public class ClickHouseRawPlayerData
+    {
+        public ClickHouseRawPlayerData()
+        {
+
+        }
+        public ClickHouseRawPlayerData(Guid serverID, uint players, DateTime checkTime)
+        {
+            ServerId = serverID;
+            Players = players;
+            CheckTime = checkTime;
+        }
+
+        public Guid ServerId { get; set; }
+
+
+        public uint Players { get; set; }
+
+        public DateTime CheckTime { get; set; }
+    }
 }

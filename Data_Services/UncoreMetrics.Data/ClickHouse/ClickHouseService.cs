@@ -30,6 +30,10 @@ public class ClickHouseService : IClickHouseService
         return _server.GetServerUptime(serverId, lastHours, token);
     }
 
+
+    public Task<List<ClickHouseRawUptimeData>> GetUptimeDataRaw(string serverId, int lastHours, CancellationToken token = default) => _server.GetUptimeDataRaw(serverId, lastHours, token);
+
+
     public Task<List<ClickHouseUptimeData>> GetUptimeData(string serverID, int lastHours, CancellationToken token = default) => _server.GetUptimeData(serverID, lastHours, token);
 
     public Task<List<ClickHouseUptimeData>> GetUptimeData(string serverID, int lastHours, int hoursGroupBy,
@@ -47,6 +51,9 @@ public class ClickHouseService : IClickHouseService
     public Task<List<ClickHouseUptimeData>> GetUptimeData1d(string serverId, int lastDays, int daysGroupBy,
         CancellationToken token = default) => _server.GetUptimeData1d(serverId, lastDays, daysGroupBy, token);
 
+
+    public Task<List<ClickHouseRawPlayerData>> GetPlayerDataRaw(string serverId, int lastHours,
+        CancellationToken token = default) => _server.GetPlayerDataRaw(serverId, lastHours, token);
 
     public Task<List<ClickHousePlayerData>> GetPlayerData(string serverId, int lastHours,
         CancellationToken token = default) => _server.GetPlayerData(serverId, lastHours, token);

@@ -60,6 +60,26 @@ public class ClickHouseServer
         return -1;
     }
 
+    public async Task<List<ClickHouseRawUptimeData>> GetUptimeDataRaw(string serverID, int lastHours, CancellationToken token = default)
+    {
+        using var connection = CreateConnection();
+
+        using var command = connection.CreateCommand();
+        command.AddParameter("serverId", "UUID", serverID);
+        command.AddParameter("lastHours", "Int32", lastHours);
+
+        command.CommandText =
+            "Select server_id, is_online, current_check_time from generic_server_stats where server_id = {serverId:UUID} and current_check_time > DATE_SUB(NOW(), INTERVAL {lastHours:Int32} HOUR) Order by current_check_time desc LIMIT 1000";
+        var result = await command.ExecuteReaderAsync(token);
+        List<ClickHouseRawUptimeData> data = new List<ClickHouseRawUptimeData>(lastHours * 2);
+        while (await result.ReadAsync(token))
+        {
+            data.Add(RawUptimeDataFromReader(result));
+        }
+
+        return data;
+    }
+
     public async Task<List<ClickHouseUptimeData>> GetUptimeData(string serverID, int lastHours, CancellationToken token = default)
     {
         using var connection = CreateConnection();
@@ -201,6 +221,28 @@ public class ClickHouseServer
         }
         return data;
     }
+
+    public async Task<List<ClickHouseRawPlayerData>> GetPlayerDataRaw(string serverID, int lastHours, CancellationToken token = default)
+    {
+        using var connection = CreateConnection();
+
+        using var command = connection.CreateCommand();
+        command.AddParameter("serverId", "UUID", serverID);
+        command.AddParameter("lastHours", "Int32", lastHours);
+
+        command.CommandText =
+            "Select server_id, players, current_check_time from generic_server_stats where server_id = {serverId:UUID} and current_check_time > DATE_SUB(NOW(), INTERVAL {lastHours:Int32} HOUR) Order by current_check_time desc LIMIT 1000";
+
+        var result = await command.ExecuteReaderAsync(token);
+        List<ClickHouseRawPlayerData> data = new List<ClickHouseRawPlayerData>(lastHours * 2);
+        while (await result.ReadAsync(token))
+        {
+            data.Add(RawPlayerDataFromReader(result));
+        }
+
+        return data;
+    }
+
 
     public async Task<List<ClickHousePlayerData>> GetPlayerData(string serverID, int lastHours, CancellationToken token = default)
     {
@@ -377,6 +419,15 @@ public class ClickHouseServer
             AverageTime = reader.GetDateTime("average_time"),
         };
     }
+    private ClickHouseRawPlayerData RawPlayerDataFromReader(DbDataReader reader)
+    {
+        return new ClickHouseRawPlayerData()
+        {
+            ServerId = reader.GetGuid("server_id"),
+            Players = (uint)reader.GetValue("players"),
+            CheckTime = reader.GetDateTime("current_check_time"),
+        };
+    }
     private ClickHouseUptimeData UptimeDataFromReader(DbDataReader reader, bool hasServerID = true, bool hasAppID = true)
     {
         return new ClickHouseUptimeData()
@@ -386,6 +437,15 @@ public class ClickHouseServer
             OnlineCount = (ulong)reader.GetValue("online_count"),
             PingCount = (ulong)reader.GetValue("ping_count"),
             AverageTime = reader.GetDateTime("average_time")
+        };
+    }
+    private ClickHouseRawUptimeData RawUptimeDataFromReader(DbDataReader reader)
+    {
+        return new ClickHouseRawUptimeData()
+        {
+            ServerId = reader.GetGuid("server_id"),
+            IsOnline = reader.GetBoolean("is_online"),
+            CheckTime = reader.GetDateTime("current_check_time"),
         };
     }
 }

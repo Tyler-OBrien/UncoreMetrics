@@ -61,14 +61,14 @@ public class GenericServerController : ControllerBase
     [HttpGet("mostoverdue")]
     public async Task<ActionResult<IResponse>> OldestServerInQueue(CancellationToken token)
     {
-        return Ok(new DataResponse<DateTime?>((await _genericServersContext.Servers.Where(server => server.ServerDead == false).OrderBy(server => server.NextCheck)
-            .FirstOrDefaultAsync(token))?.NextCheck));
+        return Ok(new DataResponse<Server?>((await _genericServersContext.Servers.Where(server => server.ServerDead == false).OrderBy(server => server.NextCheck)
+            .FirstOrDefaultAsync(token))));
     }
     [HttpGet("mostoverdue/{appid}")]
     public async Task<ActionResult<IResponse>> OldestServerInQueue(ulong appid, CancellationToken token)
     {
-        return Ok(new DataResponse<DateTime?>((await _genericServersContext.Servers.Where(server => server.ServerDead == false && server.AppID == appid).OrderBy(server => server.NextCheck)
-            .FirstOrDefaultAsync(token))?.NextCheck));
+        return Ok(new DataResponse<Server?>((await _genericServersContext.Servers.Where(server => server.ServerDead == false && server.AppID == appid).OrderBy(server => server.NextCheck)
+            .FirstOrDefaultAsync(token))));
     }
 
     [HttpGet("{id}")]
@@ -84,6 +84,23 @@ public class GenericServerController : ControllerBase
             hours = 24;
         return Ok(new DataResponse<double?>(await _clickHouseService.GetServerUptime(id.ToString(), hours.Value, token)));
     }
+
+    [HttpGet("uptimedataraw/{id}")]
+    public async Task<ActionResult<IResponse>> GetUptimeDataRaw(Guid id, [FromQuery] int? hours, CancellationToken token)
+    {
+        if (hours.HasValue == false)
+            hours = 6;
+
+        // Eventually there should be actual date range selectors
+        if ((hours * 60)  > 1000)
+            return BadRequest(new ErrorResponse(HttpStatusCode.BadRequest,
+                $"Max Results Generated can be 1000. Your Query would have returned {hours * 60}",
+                "too_many_results"));
+
+        return Ok(new DataResponse<List<ClickHouseRawUptimeData>>(await _clickHouseService.GetUptimeDataRaw(id.ToString(), hours.Value, token)));
+    }
+
+
 
     [HttpGet("uptimedata/{id}")]
     public async Task<ActionResult<IResponse>> GetUptimeData(Guid id, [FromQuery] int? hours, [FromQuery] int? groupby, CancellationToken token)
@@ -162,6 +179,20 @@ public class GenericServerController : ControllerBase
                 "too_many_results"));
 
         return Ok(new DataResponse<List<ClickHouseUptimeData>>(await _clickHouseService.GetUptimeData1d(id.ToString(), days.Value, groupby.Value, token)));
+    }
+
+
+    [HttpGet("playerdataraw/{id}")]
+    public async Task<ActionResult<IResponse>> GetPlayersDataRaw(Guid id, [FromQuery] int? hours, CancellationToken token)
+    {
+        if (hours.HasValue == false)
+            hours = 6;
+ 
+        if (hours * 60 > 1000)
+            return BadRequest(new ErrorResponse(HttpStatusCode.BadRequest, $"Max Results Generated can be 1000. Your Query would have returned {hours * 60}",
+                "too_many_results"));
+
+        return Ok(new DataResponse<List<ClickHouseRawPlayerData>>(await _clickHouseService.GetPlayerDataRaw(id.ToString(), hours.Value, token)));
     }
 
 
