@@ -77,3 +77,86 @@ GROUP BY
    toStartOfInterval(current_check_time, INTERVAL 30 minute) as average_time,
    current_check_time,
    appid
+
+
+NEW (STILL TESTING / OPTIMIZING EXACT TABLES, ESPESICALLY PLAYERS_OVERALL. EVENTUALLY SHOULD HAVE _OVERALLS for others too.):
+
+
+CREATE MATERIALIZED VIEW generic_server_stats_players_mv_day
+ENGINE = AggregatingMergeTree
+PARTITION BY toYYYYMM(average_time)
+ORDER BY (average_time, server_id)
+AS SELECT
+   server_id,
+   appid,
+   avgState(players) as players_avg,
+   minState(players) as players_min,
+   maxState(players) as players_max,
+   average_time
+FROM generic_server_stats
+GROUP BY
+   server_id,
+   toStartOfDay(current_check_time) as average_time,
+   current_check_time,
+   appid
+
+
+
+
+
+CREATE MATERIALIZED VIEW generic_server_stats_players_mv_overall
+ENGINE = SummingMergeTree
+PARTITION BY toYYYYMM(average_time)
+ORDER BY (average_time, appid)
+POPULATE
+AS SELECT
+   appid,
+   maxState(players) as players_max,
+   average_time,
+   server_id
+FROM generic_server_stats
+GROUP BY
+   toStartOfInterval(current_check_time, INTERVAL 30 minute) as average_time,
+   appid,
+   server_id
+
+
+
+
+CREATE MATERIALIZED VIEW generic_server_stats_uptime_mv_day
+ENGINE = AggregatingMergeTree
+PARTITION BY toYYYYMM(average_time)
+ORDER BY (average_time, server_id)
+AS SELECT
+   server_id,
+   appid,
+   countState(CASE WHEN is_online THEN 1 END) as online_count,
+   countState() as ping_count,
+   average_time
+FROM generic_server_stats
+GROUP BY
+   server_id,
+   toStartOfDay(current_check_time) as average_time,
+   current_check_time,
+   appid
+
+
+
+
+
+
+CREATE MATERIALIZED VIEW generic_server_stats_uptime_mv_overall
+ENGINE = AggregatingMergeTree
+PARTITION BY toYYYYMM(average_time)
+ORDER BY (average_time, appid)
+POPULATE
+AS SELECT
+   appid,
+   countState(CASE WHEN is_online THEN 1 END) as online_count,
+   countState() as ping_count,
+   average_time
+FROM generic_server_stats
+GROUP BY
+   toStartOfInterval(current_check_time, INTERVAL 30 minute) as average_time,
+   current_check_time,
+   appid
