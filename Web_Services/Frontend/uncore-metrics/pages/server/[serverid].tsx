@@ -5,9 +5,13 @@ import Paper from "@mui/material/Paper";
 import Grid from "@mui/material/Unstable_Grid2";
 import { useEffect } from "react";
 import {
-  ClickhousePlayerData,
+  ClickHousePlayerData,
+  ClickHouseRawPlayerData,
+  ClickHouseRawUptimeData,
   ClickHouseUptimeData,
   ServerPlayerDataResponse,
+  ServerRawPlayerDataResponse,
+  ServerRawUptimeDataResponse,
   ServerUptimeDataResponse,
   SingleServerResponse,
 } from "../../interfaces/server";
@@ -47,23 +51,38 @@ const Server = () => {
 
   // @ts-ignore
   const [data, setData] = React.useState<Server>(undefined); // @ts-ignore
-  const [uptimeData, setUptimeData] = React.useState<ServerUptimeDataResponse>({
+  const [uptimeData, setUptimeData] = React.useState<
+    ServerUptimeDataResponse | ServerRawUptimeDataResponse
+  >({
     data: [],
   }); // @ts-ignore
-  const [playerData, setPlayerData] = React.useState<ServerPlayerDataResponse>({
+  const [playerData, setPlayerData] = React.useState<
+    ServerPlayerDataResponse | ServerRawPlayerDataResponse
+  >({
     data: [],
   }); // @ts-ignore
   const [loading, setLoading] = React.useState<boolean>(true);
   const [error, setError] = React.useState<string>("");
   const [playerDataTimeRange, setPlayerDataTimeRange] =
-    React.useState<number>(3);
+    React.useState<number>(72);
   const [uptimeDataTimeRange, setUptimeDataTimeRange] =
-    React.useState<number>(3);
+    React.useState<number>(72);
 
   useEffect(() => {
-    const interval = setInterval(() => updateData(ServerID), 10000);
+    const interval = setInterval(async () => {
+      updateData(ServerID);
+    }, 10000);
+    const chartInterval = setInterval(async () => {
+      if (playerDataTimeRange <= 1) {
+        loadPlayerData(playerDataTimeRange, false);
+      }
+      if (uptimeDataTimeRange <= 1) {
+        loadUptimeData(uptimeDataTimeRange, false);
+      }
+    }, 30000);
     return () => {
       clearInterval(interval);
+      clearInterval(chartInterval);
     };
   }, [ServerID]);
 
@@ -90,19 +109,28 @@ const Server = () => {
     setLoading(false);
   };
   const handlePlayerDataTimeRangeChange = async (event: SelectChangeEvent) => {
-    let days = Number.parseInt(event.target.value);
-    setPlayerDataTimeRange(days);
-    loadPlayerData(days);
+    let hours = Number.parseInt(event.target.value);
+    setPlayerDataTimeRange(hours);
+    loadPlayerData(hours);
   };
-  const loadPlayerData = async (days: number) => {
-    setPlayerData({ data: [] });
-    let hours = days * 24;
-    if (days == 0) {
-      hours = 12;
+  const loadPlayerData = async (hours: number, clear: boolean = true) => {
+    if (clear) {
+      setPlayerData({ data: [] });
     }
+    let days = hours / 24;
     let maxHoursGroupBy: number = Math.ceil(hours / MAGIC_NUMBER_MAX_RESULTS);
-
     let serverPlayerDataRequest;
+    if (hours < 12) {
+      serverPlayerDataRequest = await fetch(
+        `https://api.uncore.app/v1/servers/playerdataraw/${serverid}?hours=${hours}`
+      );
+      const playerDataResponse: ServerRawPlayerDataResponse =
+        await serverPlayerDataRequest.json();
+      if (playerDataResponse.data) {
+        setPlayerData(playerDataResponse);
+      }
+      return;
+    }
     if (days == -1) {
       days = MAGIC_NUMBER_MAX_RESULTS - 1;
       hours = days * 24;
@@ -133,17 +161,28 @@ const Server = () => {
     }
   };
   const handleUptimeDataTimeRangeChange = async (event: SelectChangeEvent) => {
-    let days = Number.parseInt(event.target.value);
-    setUptimeDataTimeRange(days);
-    loadUptimeData(days);
+    let hours = Number.parseInt(event.target.value);
+    setUptimeDataTimeRange(hours);
+    loadUptimeData(hours);
   };
-  const loadUptimeData = async (days: number) => {
-    setUptimeData({ data: [] });
-    let hours = days * 24;
-    if (days == 0) hours = 12;
+  const loadUptimeData = async (hours: number, clear: boolean = true) => {
+    if (clear) {
+      setUptimeData({ data: [] });
+    }
+    let days = hours / 24;
     let serverUptimeDataRequest;
     let maxHoursGroupBy: number = Math.ceil(hours / MAGIC_NUMBER_MAX_RESULTS);
-
+    if (hours < 12) {
+      serverUptimeDataRequest = await fetch(
+        `https://api.uncore.app/v1/servers/uptimedataraw/${serverid}?hours=${hours}`
+      );
+      const uptimeDataResponse: ServerRawUptimeDataResponse =
+        await serverUptimeDataRequest.json();
+      if (uptimeDataResponse.data) {
+        setUptimeData(uptimeDataResponse);
+      }
+      return;
+    }
     if (days == -1) {
       days = MAGIC_NUMBER_MAX_RESULTS - 1;
       hours = days * 24;
@@ -268,14 +307,16 @@ const Server = () => {
                 onChange={handlePlayerDataTimeRangeChange}
                 value={playerDataTimeRange.toString()}
               >
-                <MenuItem value={0}>12 hours</MenuItem>
-                <MenuItem value={1}>1 Day</MenuItem>
-                <MenuItem value={3}>3 Days</MenuItem>
-                <MenuItem value={14}>14 Days</MenuItem>
-                <MenuItem value={30}>1 Month</MenuItem>
-                <MenuItem value={90}>3 Months</MenuItem>
-                <MenuItem value={180}>6 Months</MenuItem>
-                <MenuItem value={365}>1 Year</MenuItem>
+                <MenuItem value={1}>1 hour (Live)</MenuItem>
+                <MenuItem value={6}>6 hours</MenuItem>
+                <MenuItem value={12}>12 hours</MenuItem>
+                <MenuItem value={24}>1 Day</MenuItem>
+                <MenuItem value={72}>3 Days</MenuItem>
+                <MenuItem value={336}>14 Days</MenuItem>
+                <MenuItem value={730}>1 Month</MenuItem>
+                <MenuItem value={2190}>3 Months</MenuItem>
+                <MenuItem value={4380}>6 Months</MenuItem>
+                <MenuItem value={8760}>1 Year</MenuItem>
                 <MenuItem value={-1}>Max</MenuItem>
               </Select>
             </FormControl>
@@ -304,10 +345,10 @@ const Server = () => {
                 interpolation="natural"
                 style={{ labels: {}, data: { stroke: "skyblue" } }}
                 theme={VictoryTheme.material}
-                data={playerData?.data?.map((d: ClickhousePlayerData) => {
+                data={playerData?.data?.map((d: any) => {
                   return {
-                    x: new Date(d.averageTime),
-                    y: SimpleRound(d.playerAvg),
+                    x: new Date(d.checkTime ?? d.averageTime),
+                    y: SimpleRound(d.players ?? d.playerAvg),
                   };
                 })}
               />
@@ -336,14 +377,16 @@ const Server = () => {
                 onChange={handleUptimeDataTimeRangeChange}
                 value={uptimeDataTimeRange.toString()}
               >
-                <MenuItem value={0}>12 hours</MenuItem>
-                <MenuItem value={1}>1 Day</MenuItem>
-                <MenuItem value={3}>3 Days</MenuItem>
-                <MenuItem value={14}>14 Days</MenuItem>
-                <MenuItem value={30}>1 Month</MenuItem>
-                <MenuItem value={90}>3 Months</MenuItem>
-                <MenuItem value={180}>6 Months</MenuItem>
-                <MenuItem value={365}>1 Year</MenuItem>
+                <MenuItem value={1}>1 hour (Live)</MenuItem>
+                <MenuItem value={6}>6 hours</MenuItem>
+                <MenuItem value={12}>12 hours</MenuItem>
+                <MenuItem value={24}>1 Day</MenuItem>
+                <MenuItem value={72}>3 Days</MenuItem>
+                <MenuItem value={336}>14 Days</MenuItem>
+                <MenuItem value={730}>1 Month</MenuItem>
+                <MenuItem value={2190}>3 Months</MenuItem>
+                <MenuItem value={4380}>6 Months</MenuItem>
+                <MenuItem value={8760}>1 Year</MenuItem>
                 <MenuItem value={-1}>Max</MenuItem>
               </Select>
             </FormControl>
@@ -374,12 +417,16 @@ const Server = () => {
                 interpolation="natural"
                 theme={VictoryTheme.material}
                 style={{ labels: {}, data: { stroke: "skyblue" } }}
-                data={uptimeData?.data?.map((d: ClickHouseUptimeData) => {
+                data={uptimeData?.data?.map((d: any) => {
                   return {
-                    x: new Date(d.averageTime),
-                    y: SimpleRound(d.uptime, 2),
-                    ping: d.pingCount,
-                    online: d.onlineCount,
+                    x: new Date(d.averageTime ?? d.checkTime),
+                    y: d.uptime
+                      ? SimpleRound(d.uptime, 2)
+                      : (d.isOnline
+                      ? 100
+                      : 0),
+                    ping: d.pingCount ?? (d.isOnline ? 1 : 0),
+                    online: d.onlineCount ?? ( d.isOnline ? 1 : 0),
                   };
                 })}
                 domain={{ y: [0, 100] }}
