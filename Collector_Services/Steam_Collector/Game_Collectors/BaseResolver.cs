@@ -59,7 +59,7 @@ public abstract class BaseResolver
     /// <returns></returns>
     public virtual async Task PollResult(List<PollServerInfo> servers)
     {
-        servers.ForEach(server => server.UpdateServer(_configuration.SecondsBetweenChecks,
+        servers.ForEach(server => server.UpdateServer(AppId, _configuration.SecondsBetweenChecks,
             _configuration.SecondsBetweenFailedChecks, _configuration.DaysUntilServerMarkedDead));
         await HandleServersGeneric(servers.ToList<IGenericServerInfo>());
     }

@@ -31,7 +31,7 @@ public class PollServerInfo : IGenericServerInfo
     public RuleResponse? ServerRules { get; set; }
 
 
-    internal void UpdateServer(int nextCheckSeconds, List<int> nextCheckFailed, int daysUntilServerMarkedAsDead)
+    internal void UpdateServer(ulong appid, int nextCheckSeconds, List<int> nextCheckFailed, int daysUntilServerMarkedAsDead)
     {
         if (ServerInfo == null)
         {
@@ -69,6 +69,13 @@ public class PollServerInfo : IGenericServerInfo
             ExistingServer.Visibility = ServerInfo.Visibility == Enums.Visibility.Private ? true : false;
             ExistingServer.Environment = ServerInfo.Environment.ResolveEnvironment();
             ExistingServer.SteamID = ServerInfo.SteamID;
+        }
+        // This server has switched SERVER GAME TYPES!!!!
+        if (ExistingServer.AppID != 0 && ExistingServer.AppID != appid)
+        {
+            // Server is now dead to us.
+            ExistingServer.ServerDead = true;
+            ExistingServer.NextCheck = DateTime.MaxValue;
         }
     }
 }
