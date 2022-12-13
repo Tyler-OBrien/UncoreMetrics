@@ -5,10 +5,6 @@ import Paper from "@mui/material/Paper";
 import Grid from "@mui/material/Unstable_Grid2";
 import { useEffect } from "react";
 import {
-  ClickHousePlayerData,
-  ClickHouseRawPlayerData,
-  ClickHouseRawUptimeData,
-  ClickHouseUptimeData,
   ServerPlayerDataResponse,
   ServerRawPlayerDataResponse,
   ServerRawUptimeDataResponse,
@@ -39,6 +35,7 @@ const Item = styled(Paper)(({ theme }) => ({
 
 const MAGIC_NUMBER_MAX_RESULTS = 250;
 
+// TODO: Refactor using Next.js SSR
 const Server = () => {
   const router = useRouter();
   const { serverid } = router.query;
@@ -73,11 +70,13 @@ const Server = () => {
       updateData(ServerID);
     }, 10000);
     const chartInterval = setInterval(async () => {
-      if (playerDataTimeRange <= 1) {
-        loadPlayerData(playerDataTimeRange, false);
-      }
-      if (uptimeDataTimeRange <= 1) {
-        loadUptimeData(uptimeDataTimeRange, false);
+      if (ServerID) {
+        if (playerDataTimeRange <= 1) {
+          loadPlayerData(playerDataTimeRange, false);
+        }
+        if (uptimeDataTimeRange <= 1) {
+          loadUptimeData(uptimeDataTimeRange, false);
+        }
       }
     }, 30000);
     return () => {
@@ -422,11 +421,11 @@ const Server = () => {
                     x: new Date(d.averageTime ?? d.checkTime),
                     y: d.uptime
                       ? SimpleRound(d.uptime, 2)
-                      : (d.isOnline
+                      : d.isOnline
                       ? 100
-                      : 0),
+                      : 0,
                     ping: d.pingCount ?? (d.isOnline ? 1 : 0),
-                    online: d.onlineCount ?? ( d.isOnline ? 1 : 0),
+                    online: d.onlineCount ?? (d.isOnline ? 1 : 0),
                   };
                 })}
                 domain={{ y: [0, 100] }}

@@ -5,7 +5,7 @@ import Paper from "@mui/material/Paper";
 import Grid from "@mui/material/Unstable_Grid2";
 import { useEffect } from "react";
 import {
-  ClickhousePlayerData,
+  ClickHousePlayerData,
   ClickHouseUptimeData,
   ServerPlayerDataResponse,
   ServerUptimeDataResponse,
@@ -236,7 +236,7 @@ const Server = () => {
                 interpolation="natural"
                 style={{ labels: {}, data: { stroke: "skyblue" } }}
                 theme={VictoryTheme.material}
-                data={playerData?.data?.map((d: ClickhousePlayerData) => {
+                data={playerData?.data?.map((d: ClickHousePlayerData) => {
                   return {
                     x: new Date(d.averageTime),
                     y: SimpleRound(d.playersMax),
