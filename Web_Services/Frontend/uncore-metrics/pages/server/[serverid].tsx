@@ -119,7 +119,7 @@ const Server = () => {
     let days = hours / 24;
     let maxHoursGroupBy: number = Math.ceil(hours / MAGIC_NUMBER_MAX_RESULTS);
     let serverPlayerDataRequest;
-    if (hours < 12) {
+    if (hours < 12 && hours != -1) {
       serverPlayerDataRequest = await fetch(
         `https://api.uncore.app/v1/servers/playerdataraw/${serverid}?hours=${hours}`
       );
@@ -130,12 +130,12 @@ const Server = () => {
       }
       return;
     }
-    if (days == -1) {
+    if (hours == -1) {
       days = MAGIC_NUMBER_MAX_RESULTS - 1;
       hours = days * 24;
       maxHoursGroupBy = 24;
     }
-    if (maxHoursGroupBy >= 24) {
+    if (maxHoursGroupBy >= 12) {
       let groupby: number = Math.ceil(days / MAGIC_NUMBER_MAX_RESULTS);
       serverPlayerDataRequest = await fetch(
         `https://api.uncore.app/v1/servers/playerdata1d/${serverid}?days=${days}${
@@ -171,7 +171,7 @@ const Server = () => {
     let days = hours / 24;
     let serverUptimeDataRequest;
     let maxHoursGroupBy: number = Math.ceil(hours / MAGIC_NUMBER_MAX_RESULTS);
-    if (hours < 12) {
+    if (hours < 12 && hours != -1) {
       serverUptimeDataRequest = await fetch(
         `https://api.uncore.app/v1/servers/uptimedataraw/${serverid}?hours=${hours}`
       );
@@ -182,12 +182,12 @@ const Server = () => {
       }
       return;
     }
-    if (days == -1) {
+    if (hours == -1) {
       days = MAGIC_NUMBER_MAX_RESULTS - 1;
       hours = days * 24;
       maxHoursGroupBy = 24;
     }
-    if (maxHoursGroupBy >= 24) {
+    if (maxHoursGroupBy >= 12) {
       let groupby: number = Math.ceil(days / MAGIC_NUMBER_MAX_RESULTS);
       serverUptimeDataRequest = await fetch(
         `https://api.uncore.app/v1/servers/uptimedata1d/${serverid}?days=${days}${
@@ -312,9 +312,9 @@ const Server = () => {
                 <MenuItem value={24}>1 Day</MenuItem>
                 <MenuItem value={72}>3 Days</MenuItem>
                 <MenuItem value={336}>14 Days</MenuItem>
-                <MenuItem value={730}>1 Month</MenuItem>
-                <MenuItem value={2190}>3 Months</MenuItem>
-                <MenuItem value={4380}>6 Months</MenuItem>
+                <MenuItem value={720}>1 Month</MenuItem>
+                <MenuItem value={2160}>3 Months</MenuItem>
+                <MenuItem value={4320}>6 Months</MenuItem>
                 <MenuItem value={8760}>1 Year</MenuItem>
                 <MenuItem value={-1}>Max</MenuItem>
               </Select>
@@ -382,9 +382,9 @@ const Server = () => {
                 <MenuItem value={24}>1 Day</MenuItem>
                 <MenuItem value={72}>3 Days</MenuItem>
                 <MenuItem value={336}>14 Days</MenuItem>
-                <MenuItem value={730}>1 Month</MenuItem>
-                <MenuItem value={2190}>3 Months</MenuItem>
-                <MenuItem value={4380}>6 Months</MenuItem>
+                <MenuItem value={720}>1 Month</MenuItem>
+                <MenuItem value={2160}>3 Months</MenuItem>
+                <MenuItem value={4320}>6 Months</MenuItem>
                 <MenuItem value={8760}>1 Year</MenuItem>
                 <MenuItem value={-1}>Max</MenuItem>
               </Select>
