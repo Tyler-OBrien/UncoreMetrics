@@ -344,6 +344,7 @@ const Server = () => {
                 interpolation="natural"
                 style={{ labels: {}, data: { stroke: "skyblue" } }}
                 theme={VictoryTheme.material}
+                scale={{ x: 'time'}}
                 data={playerData?.data?.map((d: any) => {
                   return {
                     x: new Date(d.checkTime ?? d.averageTime),
@@ -415,6 +416,7 @@ const Server = () => {
               <VictoryLine
                 interpolation="natural"
                 theme={VictoryTheme.material}
+                scale={{ x: 'time'}}
                 style={{ labels: {}, data: { stroke: "skyblue" } }}
                 data={uptimeData?.data?.map((d: any) => {
                   return {
