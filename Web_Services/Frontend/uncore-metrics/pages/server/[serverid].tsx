@@ -130,12 +130,12 @@ const Server = () => {
       }
       return;
     }
-    if (days == -1) {
+    if (hours == -1) {
       days = MAGIC_NUMBER_MAX_RESULTS - 1;
       hours = days * 24;
       maxHoursGroupBy = 24;
     }
-    if (maxHoursGroupBy >= 24) {
+    if (maxHoursGroupBy >= 12) {
       let groupby: number = Math.ceil(days / MAGIC_NUMBER_MAX_RESULTS);
       serverPlayerDataRequest = await fetch(
         `https://api.uncore.app/v1/servers/playerdata1d/${serverid}?days=${days}${
@@ -182,12 +182,12 @@ const Server = () => {
       }
       return;
     }
-    if (days == -1) {
+    if (hours == -1) {
       days = MAGIC_NUMBER_MAX_RESULTS - 1;
       hours = days * 24;
       maxHoursGroupBy = 24;
     }
-    if (maxHoursGroupBy >= 24) {
+    if (maxHoursGroupBy >= 12) {
       let groupby: number = Math.ceil(days / MAGIC_NUMBER_MAX_RESULTS);
       serverUptimeDataRequest = await fetch(
         `https://api.uncore.app/v1/servers/uptimedata1d/${serverid}?days=${days}${
