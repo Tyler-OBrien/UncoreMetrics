@@ -251,6 +251,10 @@ const Server = () => {
         <Grid xs md={6} mdOffset={0} padding={3}>
           <Item className={styles.serverPropertyList}>
             <dl>
+            <dt>Server GUID: </dt>
+              <dd>
+                {data.serverID}
+              </dd>
               <dt>Server Address: </dt>
               <dd>
                 {data.ipAddress}:{data.port}
