@@ -4,6 +4,7 @@ using UncoreMetrics.Data;
 using UncoreMetrics.Data.ClickHouse;
 using UncoreMetrics.Data.GameData.Unturned;
 using UncoreMetrics.Steam_Collector.Helpers;
+using UncoreMetrics.Steam_Collector.Helpers.QueueHelper;
 using UncoreMetrics.Steam_Collector.Models;
 using UncoreMetrics.Steam_Collector.Models.Games.Steam.SteamAPI;
 using UncoreMetrics.Steam_Collector.SteamServers;
@@ -16,8 +17,8 @@ public class UnturnedResolver : BaseResolver
 
     public UnturnedResolver(
         IOptions<SteamCollectorConfiguration> baseConfiguration, ServersContext serversContext,
-        ISteamServers steamServers, IClickHouseService clickHouse, ILogger<UnturnedResolver> logger) :
-        base(baseConfiguration, serversContext, steamServers, clickHouse, logger)
+        ISteamServers steamServers, IClickHouseService clickHouse, ILogger<UnturnedResolver> logger, IServerUpdateQueue serverUpdateQueue) :
+        base(baseConfiguration, serversContext, steamServers, clickHouse, logger, serverUpdateQueue)
     {
         _genericServersContext = serversContext;
     }

@@ -11,6 +11,7 @@ using UncoreMetrics.Data.ClickHouse;
 using UncoreMetrics.Data.Configuration;
 using UncoreMetrics.Steam_Collector.Game_Collectors;
 using UncoreMetrics.Steam_Collector.Helpers.Maxmind;
+using UncoreMetrics.Steam_Collector.Helpers.QueueHelper;
 using UncoreMetrics.Steam_Collector.Helpers.ScrapeJobStatus;
 using UncoreMetrics.Steam_Collector.Models;
 using UncoreMetrics.Steam_Collector.SteamServers;
@@ -116,6 +117,7 @@ public class Program
                 services.AddScoped<ISteamServers, SteamServers.SteamServers>();
                 services.AddScoped<IClickHouseService, ClickHouseService>();
                 services.AddScoped<IScrapeJobStatusService, ScrapeJobStatusService>();
+                services.AddScoped<IServerUpdateQueue, ServerUpdateNATSQueue>();
 
                 services.AddHostedService<Worker>();
             })

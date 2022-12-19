@@ -4,6 +4,7 @@ using UncoreMetrics.Data;
 using UncoreMetrics.Data.ClickHouse;
 using UncoreMetrics.Data.GameData.PostScriptum;
 using UncoreMetrics.Steam_Collector.Helpers;
+using UncoreMetrics.Steam_Collector.Helpers.QueueHelper;
 using UncoreMetrics.Steam_Collector.Models;
 using UncoreMetrics.Steam_Collector.Models.Games.Steam.SteamAPI;
 using UncoreMetrics.Steam_Collector.SteamServers;
@@ -17,8 +18,8 @@ public class PostScriptumResolver : BaseResolver
 
     public PostScriptumResolver(
         IOptions<SteamCollectorConfiguration> baseConfiguration, ServersContext serversContext,
-        ISteamServers steamServers, IClickHouseService clickHouse, ILogger<PostScriptumResolver> logger) :
-        base(baseConfiguration, serversContext, steamServers, clickHouse, logger)
+        ISteamServers steamServers, IClickHouseService clickHouse, ILogger<PostScriptumResolver> logger, IServerUpdateQueue serverUpdateQueue) :
+        base(baseConfiguration, serversContext, steamServers, clickHouse, logger, serverUpdateQueue)
     {
         _genericServersContext = serversContext;
     }

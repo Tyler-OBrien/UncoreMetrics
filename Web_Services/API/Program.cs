@@ -10,6 +10,7 @@ using UncoreMetrics.API.Models;
 using UncoreMetrics.Data;
 using UncoreMetrics.Data.ClickHouse;
 using UncoreMetrics.Data.Configuration;
+using UncoreMetrics.Data.Discord;
 
 namespace UncoreMetrics.API;
 
@@ -94,6 +95,10 @@ public class Program
         builder.WebHost.UseKestrel(options => { options.AddServerHeader = false; });
 
         builder.Services.AddDbContext<ServersContext>(options =>
+        {
+            options.UseNpgsql(apiConfiguration.PostgresConnectionString);
+        });
+        builder.Services.AddDbContext<DiscordContext>(options =>
         {
             options.UseNpgsql(apiConfiguration.PostgresConnectionString);
         });

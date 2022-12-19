@@ -5,6 +5,8 @@ using Microsoft.Extensions.Options;
 using UncoreMetrics.Data;
 using UncoreMetrics.Data.ClickHouse;
 using UncoreMetrics.Data.ClickHouse.Models;
+using UncoreMetrics.Data.Discord;
+using UncoreMetrics.Steam_Collector.Helpers.QueueHelper;
 using UncoreMetrics.Steam_Collector.Models;
 using UncoreMetrics.Steam_Collector.Models.Games.Steam.SteamAPI;
 using UncoreMetrics.Steam_Collector.SteamServers;
@@ -22,17 +24,19 @@ public abstract class BaseResolver
     private readonly ServersContext _genericServersContext;
     private readonly ILogger _logger;
     private readonly ISteamServers _steamServers;
+    private readonly IServerUpdateQueue _serverUpdateQueue;
 
 
     public BaseResolver(
         IOptions<SteamCollectorConfiguration> baseConfiguration, ServersContext serversContext,
-        ISteamServers steamServers, IClickHouseService clickHouse, ILogger logger)
+        ISteamServers steamServers, IClickHouseService clickHouse, ILogger logger, IServerUpdateQueue serverUpdateQueue)
     {
         _genericServersContext = serversContext;
         _configuration = baseConfiguration.Value;
         _steamServers = steamServers;
         _clickHouseService = clickHouse;
         _logger = logger;
+        _serverUpdateQueue = serverUpdateQueue;
     }
 
     /// <summary>
@@ -52,29 +56,70 @@ public abstract class BaseResolver
     public virtual SteamServerListQueryBuilder? CustomQuery { get; }
 
     /// <summary>
-    ///     Can be overriden to handle the behavior of the result of Polls. By default, it updates each Server with the latest
+    ///     Can be overriden to handle the behavior of the result of Polls. By default, it calls HandleServersGenericStatusChange, updates each Server with the latest
     ///     information, and calls HandleServersGeneric
     /// </summary>
     /// <param name="servers"></param>
     /// <returns></returns>
     public virtual async Task PollResult(List<PollServerInfo> servers)
     {
+        await HandleServersGenericStatusChange(servers.ToList<IGenericServerInfo>());
         servers.ForEach(server => server.UpdateServer(AppId, _configuration.SecondsBetweenChecks,
             _configuration.SecondsBetweenFailedChecks, _configuration.DaysUntilServerMarkedDead));
         await HandleServersGeneric(servers.ToList<IGenericServerInfo>());
     }
 
     /// <summary>
-    ///     Can be overriden to handle the behavior of the result of Discovery. By default, it updates each Server with the
+    ///     Can be overriden to handle the behavior of the result of Discovery. By default, it calls HandleServersGenericStatusChange, updates each Server with the
     ///     latest information, and calls HandleServersGeneric
     /// </summary>
     /// <param name="servers"></param>
     /// <returns></returns>
     public virtual async Task DiscoveryResult(List<DiscoveredServerInfo> servers)
     {
+        await HandleServersGenericStatusChange(servers.ToList<IGenericServerInfo>());
         servers.ForEach(server => server.UpdateServer(_configuration.SecondsBetweenChecks));
         await HandleServersGeneric(servers.ToList<IGenericServerInfo>());
     }
+
+    /// <summary>
+    /// Can be overriden to have custom behavior for server status. Called by Discovery/Poll Result to handle status changes, forwarded to NATS.
+    /// </summary>
+    /// <param name="servers"></param>
+    /// <returns></returns>
+    public virtual async Task HandleServersGenericStatusChange(List<IGenericServerInfo> servers)
+    {
+        try
+        {
+            if (String.IsNullOrWhiteSpace(_configuration.NATSConnectionURL))
+            {
+                _logger.LogInformation("Not pushing updates to NATS Since Disabled in Config");
+                return;
+            }
+
+            List<Guid> newlyDownServers = new List<Guid>();
+            List<Guid> newlyUpServers = new List<Guid>();
+            foreach (var genericServerInfo in servers)
+            {
+                if (genericServerInfo.ExistingServer != null)
+                {
+                    if (genericServerInfo.ServerInfo == null && genericServerInfo.ExistingServer.IsOnline)
+                        newlyDownServers.Add(genericServerInfo.ExistingServer.ServerID);
+                    else if (genericServerInfo.ServerInfo != null && genericServerInfo.ExistingServer.IsOnline == false)
+                        newlyUpServers.Add(genericServerInfo.ExistingServer.ServerID);
+                }
+            }
+
+            await _serverUpdateQueue.ServerUpdate(new ServerUpdateNATs()
+                { ServersDown = newlyDownServers, ServersUp = newlyUpServers });
+            _logger.LogInformation($"Pushed {newlyDownServers.Count} Down Servers and {newlyUpServers.Count} Up server status to NATS.");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error in HandleServersGenericStatusChange, non-fatal, contuining.");
+        }
+    }
+
 
     /// <summary>
     ///     This method is implemented by Game Resolvers. It takes in a list with generic server details, and must handle any

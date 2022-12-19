@@ -30,6 +30,9 @@ public class PollServerInfo : IGenericServerInfo
 
     public RuleResponse? ServerRules { get; set; }
 
+    // If was down before, but up Now, or up but now down
+    public bool StatusChanged { get; set; }
+
 
     internal void UpdateServer(ulong appid, int nextCheckSeconds, List<int> nextCheckFailed, int daysUntilServerMarkedAsDead)
     {

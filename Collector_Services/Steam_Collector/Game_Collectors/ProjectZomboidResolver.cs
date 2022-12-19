@@ -4,6 +4,7 @@ using UncoreMetrics.Data;
 using UncoreMetrics.Data.ClickHouse;
 using UncoreMetrics.Data.GameData.ProjectZomboid;
 using UncoreMetrics.Steam_Collector.Helpers;
+using UncoreMetrics.Steam_Collector.Helpers.QueueHelper;
 using UncoreMetrics.Steam_Collector.Models;
 using UncoreMetrics.Steam_Collector.Models.Games.Steam.SteamAPI;
 using UncoreMetrics.Steam_Collector.SteamServers;
@@ -16,8 +17,8 @@ public class ProjectZomboidResolver : BaseResolver
 
     public ProjectZomboidResolver(
         IOptions<SteamCollectorConfiguration> baseConfiguration, ServersContext serversContext,
-        ISteamServers steamServers, IClickHouseService clickHouse, ILogger<ProjectZomboidResolver> logger) :
-        base(baseConfiguration, serversContext, steamServers, clickHouse, logger)
+        ISteamServers steamServers, IClickHouseService clickHouse, ILogger<ProjectZomboidResolver> logger, IServerUpdateQueue serverUpdateQueue) :
+        base(baseConfiguration, serversContext, steamServers, clickHouse, logger, serverUpdateQueue)
     {
         _genericServersContext = serversContext;
     }

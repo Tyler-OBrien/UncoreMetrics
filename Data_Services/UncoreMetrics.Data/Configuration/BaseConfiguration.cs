@@ -6,5 +6,7 @@ public class BaseConfiguration
 
     public string ClickhouseConnectionString { get; set; }
 
+    public string NATSConnectionURL { get; set; }
+
     public string SENTRY_DSN { get; set; }
 }
