@@ -162,6 +162,26 @@ public abstract class BaseResolver
         if (query == null) query = SteamServerListQueryBuilder.New().AppID(AppId.ToString()).Dedicated().NotEmpty();
 
         var servers = await _steamServers.GenericServerDiscovery(query);
+        var addresses = servers.Select(i => i.Address).ToList();
+        var ports = servers.Select(i => i.Port).ToList();
+
+        var entities = await _genericServersContext.Servers
+            .Where(a => addresses.Contains(a.Address) || ports.Contains(a.QueryPort)).AsNoTracking()
+            .Select(i => new { i.Address, i.QueryPort, i.ServerID, i.IsOnline }).ToListAsync(); // SQL IN
+
+        var hashMapDictionary = new Dictionary<IPEndPoint, Tuple<Guid, bool>>();
+        foreach (var server in entities)
+            hashMapDictionary.Add(new IPEndPoint(server.Address, server.QueryPort), new Tuple<Guid, bool>(server.ServerID, server.IsOnline));
+
+        servers.ForEach(server =>
+        {
+            if (hashMapDictionary.TryGetValue(new IPEndPoint(server.Address, server.Port), out var value))
+            {
+                if (server.ExistingServer == null) server.ExistingServer = new Server();
+                server.ExistingServer.ServerID = value.Item1;
+                server.ExistingServer.IsOnline = value.Item2;
+            }
+        });
         await DiscoveryResult(servers);
         return servers.Count;
     }
@@ -179,12 +199,14 @@ public abstract class BaseResolver
 
         if (servers.Any(server => server.ServerID == Guid.Empty))
         {
-            var addresses = servers.Select(i => i.Address).ToList();
-            var ports = servers.Select(i => i.QueryPort).ToList();
+            var unfoundServers = servers.Where(server => server.ServerID == Guid.Empty);
 
-            var entities = _genericServersContext.Servers
+            var addresses = unfoundServers.Select(i => i.Address).ToList();
+            var ports = unfoundServers.Select(i => i.QueryPort).ToList();
+
+            var entities = await _genericServersContext.Servers
                 .Where(a => addresses.Contains(a.Address) || ports.Contains(a.QueryPort)).AsNoTracking()
-                .Select(i => new { i.Address, i.QueryPort, i.ServerID }).ToList(); // SQL IN
+                .Select(i => new { i.Address, i.QueryPort, i.ServerID }).ToListAsync(); // SQL IN
 
             var hashMapDictionary = new Dictionary<IPEndPoint, Guid>();
             foreach (var server in entities)
