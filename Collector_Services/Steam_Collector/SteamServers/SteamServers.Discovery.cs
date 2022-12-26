@@ -116,8 +116,7 @@ public partial class SteamServers : ISteamServers
         await _scrapeJobStatusService.StartRun(servers.Count, runType, cancellationTokenSource.Token);
 
         // Might want to make this configurable eventually.. Right now Windows runs way worse then other platforms like Linux
-        var maxConcurrency = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? 512 : 1024;
-
+        var maxConcurrency = _configuration.MaxConcurrency;
 
         _logger.LogInformation("Queueing Tasks");
 
@@ -137,9 +136,8 @@ public partial class SteamServers : ISteamServers
             servers.Select(server => new QueryPoolItem<SteamListServer>(pool, server)), maxConcurrency, newSolver,
             cancellationTokenSource.Token);
 
-        // Wait a max of 60 seconds...
-        var delayCount = 0;
-        while (!queue.Done && delayCount <= 60)
+        var delayCount = 0; 
+        while (!queue.Done && delayCount <= _configuration.DiscoveryRunTimeout)
         {
             LogStatus(pool, servers.Count, queue.Completed, queue.Failed, queue.Successful, maxConcurrency,
                 queue.Running);
@@ -152,9 +150,9 @@ public partial class SteamServers : ISteamServers
         }
 
         cancellationTokenSource.Cancel();
-        if (delayCount >= 60)
+        if (delayCount >= _configuration.DiscoveryRunTimeout)
             _logger.LogWarning("[Warning] Operation timed out, reached {delayMax} Seconds, so we terminated. ",
-                delayCount);
+                _configuration.DiscoveryRunTimeout);
         var serverInfos = queue.Outgoing.ToList();
 
         stopwatch.Stop();

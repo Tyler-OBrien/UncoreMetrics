@@ -19,12 +19,12 @@ namespace UncoreMetrics.Steam_Collector.Game_Collectors;
 /// </summary>
 public abstract class BaseResolver
 {
-    private readonly IClickHouseService _clickHouseService;
-    private readonly SteamCollectorConfiguration _configuration;
-    private readonly ServersContext _genericServersContext;
-    private readonly ILogger _logger;
-    private readonly ISteamServers _steamServers;
-    private readonly IServerUpdateQueue _serverUpdateQueue;
+    internal readonly IClickHouseService _clickHouseService;
+    internal readonly SteamCollectorConfiguration _configuration;
+    internal readonly ServersContext _genericServersContext;
+    internal readonly ILogger _logger;
+    internal readonly ISteamServers _steamServers;
+    internal readonly IServerUpdateQueue _serverUpdateQueue;
 
 
     public BaseResolver(

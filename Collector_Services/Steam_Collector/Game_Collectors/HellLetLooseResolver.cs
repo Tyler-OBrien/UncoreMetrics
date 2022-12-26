@@ -13,14 +13,11 @@ namespace UncoreMetrics.Steam_Collector.Game_Collectors;
 
 public class HellLetLooseResolver : BaseResolver
 {
-    private readonly ServersContext _genericServersContext;
-
     public HellLetLooseResolver(
         IOptions<SteamCollectorConfiguration> baseConfiguration, ServersContext serversContext,
         ISteamServers steamServers, IClickHouseService clickHouse, ILogger<HellLetLooseResolver> logger, IServerUpdateQueue serverUpdateQueue) :
         base(baseConfiguration, serversContext, steamServers, clickHouse, logger, serverUpdateQueue)
     {
-        _genericServersContext = serversContext;
     }
 
 
@@ -32,7 +29,7 @@ public class HellLetLooseResolver : BaseResolver
     {
         var servers = await _genericServersContext.HellLetLooseServers
             .Where(server => server.NextCheck < DateTime.UtcNow && server.AppID == AppId).AsNoTracking()
-            .OrderBy(server => server.NextCheck).Take(50000)
+            .OrderBy(server => server.NextCheck).Take(_configuration.ServersPerPollRun)
             .ToListAsync();
         // Abort run if less then 100 servers to poll, and no server is over 5 minutes overdue
         if (servers.Count < 100 && servers.Any(server => server.NextCheck > DateTime.UtcNow.AddMinutes(5)) == false)
