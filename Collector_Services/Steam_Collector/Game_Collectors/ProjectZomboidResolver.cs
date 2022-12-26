@@ -13,14 +13,12 @@ namespace UncoreMetrics.Steam_Collector.Game_Collectors;
 
 public class ProjectZomboidResolver : BaseResolver
 {
-    private readonly ServersContext _genericServersContext;
 
     public ProjectZomboidResolver(
         IOptions<SteamCollectorConfiguration> baseConfiguration, ServersContext serversContext,
         ISteamServers steamServers, IClickHouseService clickHouse, ILogger<ProjectZomboidResolver> logger, IServerUpdateQueue serverUpdateQueue) :
         base(baseConfiguration, serversContext, steamServers, clickHouse, logger, serverUpdateQueue)
     {
-        _genericServersContext = serversContext;
     }
 
 
@@ -31,7 +29,7 @@ public class ProjectZomboidResolver : BaseResolver
     {
         var servers = await _genericServersContext.ProjectZomboidServers
             .Where(server => server.NextCheck < DateTime.UtcNow && server.AppID == AppId).AsNoTracking()
-            .OrderBy(server => server.NextCheck).Take(50000)
+            .OrderBy(server => server.NextCheck).Take(_configuration.ServersPerPollRun)
             .ToListAsync();
         // Abort run if less then 10 servers to poll, and no server is over 5 minutes overdue
         if (servers.Count < 10 && servers.Any(server => server.NextCheck > DateTime.UtcNow.AddMinutes(5)) == false)
