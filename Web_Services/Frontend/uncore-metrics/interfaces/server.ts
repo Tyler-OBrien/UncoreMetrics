@@ -30,7 +30,19 @@ export interface Server {
     nextCheck:      Date;
     failedChecks:   number;
     foundAt:        Date;
+    serverPings:  ServerPing[];
 }
+export interface ServerPing {
+    serverId:     string;
+    locationID:   number;
+    pingMs:       number;
+    failed:       boolean;
+    lastCheck:    string;
+    nextCheck:    string;
+    failedChecks: number;
+}
+
+
 
 
 export interface ServerUptimeDataResponse {

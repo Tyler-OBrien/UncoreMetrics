@@ -12,6 +12,7 @@ import {
   SingleServerResponse,
 } from "../../interfaces/server";
 import { Server } from "../../interfaces/server";
+import { PingLocation, LocationRequest } from "../../interfaces/location";
 import styles from "./[serverid].module.css";
 import {
   VictoryChart,
@@ -48,6 +49,9 @@ const Server = () => {
 
   // @ts-ignore
   const [data, setData] = React.useState<Server>(undefined); // @ts-ignore
+
+  const [locations, setLocations] = React.useState<PingLocation[]>(undefined); // @ts-ignore
+
   const [uptimeData, setUptimeData] = React.useState<
     ServerUptimeDataResponse | ServerRawUptimeDataResponse
   >({
@@ -84,7 +88,26 @@ const Server = () => {
       clearInterval(chartInterval);
     };
   }, [ServerID]);
+  //https://stackoverflow.com/questions/6108819/javascript-timestamp-to-relative-time
+  function getRelativeTime(d1: Date, d2: Date = new Date()) {
+    // in miliseconds
+    var units = {
+      year: 24 * 60 * 60 * 1000 * 365,
+      month: (24 * 60 * 60 * 1000 * 365) / 12,
+      day: 24 * 60 * 60 * 1000,
+      hour: 60 * 60 * 1000,
+      minute: 60 * 1000,
+      second: 1000,
+    };
 
+    var rtf = new Intl.RelativeTimeFormat("en", { numeric: "auto" });
+    var elapsed = d1 - d2;
+
+    // "Math.abs" accounts for both "past" & "future" scenarios
+    for (var u in units)
+      if (Math.abs(elapsed) > units[u] || u == "second")
+        return rtf.format(Math.round(elapsed / units[u]), u);
+  }
   // https://stackoverflow.com/questions/11832914/how-to-round-to-at-most-2-decimal-places-if-necessary
   function SimpleRound(num: number, decimalPlaces = 0) {
     // @ts-ignore
@@ -104,6 +127,14 @@ const Server = () => {
     }
     if (serverResponse.data) {
       setData(serverResponse?.data);
+    }
+    var serverLocationFetch = await fetch(
+      `https://api.uncore.app/v1/locations`
+    );
+    const serverLocationResponse: LocationRequest =
+      await serverLocationFetch.json();
+    if (serverLocationResponse.data) {
+      setLocations(serverLocationResponse.data);
     }
     setLoading(false);
   };
@@ -251,10 +282,8 @@ const Server = () => {
         <Grid xs md={6} mdOffset={0} padding={3}>
           <Item className={styles.serverPropertyList}>
             <dl>
-            <dt>Server GUID: </dt>
-              <dd>
-                {data.serverID}
-              </dd>
+              <dt>Server GUID: </dt>
+              <dd>{data.serverID}</dd>
               <dt>Server Address: </dt>
               <dd>
                 {data.ipAddress}:{data.port}
@@ -276,11 +305,14 @@ const Server = () => {
               <dt>Timezone: </dt>
               <dd>{data.timezone}</dd>
               <dt>Last Check: </dt>
-              <dd>{new Date(data.lastCheck).toLocaleString()}</dd>
+              <dd>{getRelativeTime(new Date(data.lastCheck))}</dd>
               <dt>Found At: </dt>
-              <dd>{new Date(data.foundAt).toLocaleString()}</dd>
+              <dd>
+                {new Date(data.foundAt).toLocaleDateString()} -{" "}
+                {getRelativeTime(new Date(data.foundAt))}
+              </dd>
               <dt>Next Check </dt>
-              <dd>{new Date(data.nextCheck).toLocaleString()}</dd>
+              <dd>{getRelativeTime(new Date(data.nextCheck))}</dd>
               <dt>ISP: </dt>
               <dd>{data.isp}</dd>
               <dt>ASN: </dt>
@@ -348,7 +380,7 @@ const Server = () => {
                 interpolation="natural"
                 style={{ labels: {}, data: { stroke: "skyblue" } }}
                 theme={VictoryTheme.material}
-                scale={{ x: 'time'}}
+                scale={{ x: "time" }}
                 data={playerData?.data?.map((d: any) => {
                   return {
                     x: new Date(d.checkTime ?? d.averageTime),
@@ -362,8 +394,21 @@ const Server = () => {
         <Grid xs md={6} mdOffset={0} padding={3}>
           <Item className={styles.serverPropertyList}>
             <dl>
-              <dt>Ping from popular locations: </dt>
-              <dd>Coming Soon</dd>
+              {data.serverPings.map((ping) => {
+                return (
+                  <React.Fragment key={ping.locationID}>
+                    <dt>
+                      {locations.find(
+                        (location) => location.locationID == ping.locationID
+                      )?.locationName ?? ping.locationID}
+                    </dt>
+                    <dd>
+                      {ping.pingMs}ms -{" "}
+                      {getRelativeTime(new Date(ping.lastCheck))}
+                    </dd>
+                  </React.Fragment>
+                );
+              })}
             </dl>
           </Item>
         </Grid>
@@ -420,7 +465,7 @@ const Server = () => {
               <VictoryLine
                 interpolation="natural"
                 theme={VictoryTheme.material}
-                scale={{ x: 'time'}}
+                scale={{ x: "time" }}
                 style={{ labels: {}, data: { stroke: "skyblue" } }}
                 data={uptimeData?.data?.map((d: any) => {
                   return {
