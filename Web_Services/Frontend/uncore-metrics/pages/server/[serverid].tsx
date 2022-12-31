@@ -91,7 +91,8 @@ const Server = () => {
   //https://stackoverflow.com/questions/6108819/javascript-timestamp-to-relative-time
   function getRelativeTime(d1: Date, d2: Date = new Date()) {
     // in miliseconds
-    var units = {
+    
+    var units: Record<string, number> = {
       year: 24 * 60 * 60 * 1000 * 365,
       month: (24 * 60 * 60 * 1000 * 365) / 12,
       day: 24 * 60 * 60 * 1000,
@@ -101,11 +102,11 @@ const Server = () => {
     };
 
     var rtf = new Intl.RelativeTimeFormat("en", { numeric: "auto" });
-    var elapsed = d1 - d2;
+    var elapsed = d1.getTime() - d2.getTime();
 
     // "Math.abs" accounts for both "past" & "future" scenarios
     for (var u in units)
-      if (Math.abs(elapsed) > units[u] || u == "second")
+      if (Math.abs(elapsed) > units[u] || u == "second") // @ts-ignore
         return rtf.format(Math.round(elapsed / units[u]), u);
   }
   // https://stackoverflow.com/questions/11832914/how-to-round-to-at-most-2-decimal-places-if-necessary
