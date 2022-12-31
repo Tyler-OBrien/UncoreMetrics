@@ -22,12 +22,6 @@ public class Program
             "[{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz}] [{Level:u3}] [{SourceContext}] {Message:lj} {Exception}{NewLine}";
 
         Log.Logger = new LoggerConfiguration().MinimumLevel.Information()
-#if !DEBUG
-                .MinimumLevel.Override("Microsoft.EntityFrameworkCore", LogEventLevel.Warning)
-#endif
-            .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
-            .MinimumLevel.Override("System", LogEventLevel.Warning)
-            .MinimumLevel.Override("Microsoft.Hosting.Lifetime", LogEventLevel.Information)
             .WriteTo.Async(config =>
             {
                 config.File("Logs/Log.log", outputTemplate: outputFormat,
