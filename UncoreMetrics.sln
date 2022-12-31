@@ -26,6 +26,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DiscordBot", "Integration_S
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Ping_Collector", "Ping_Collector", "{C73E1C5A-25FD-4C05-8A19-E59DA956CCB6}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ping_Collector", "Collector_Services\Ping_Collector\Ping_Collector\Ping_Collector.csproj", "{F17F6E15-BB1B-4E9A-BB04-28E05F3DDB46}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ping_Collector_Probe", "Collector_Services\Ping_Collector\Ping_Collector_Probe\Ping_Collector_Probe.csproj", "{FEF2217D-78CC-45C1-B12C-73AD4137B5FE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -48,6 +52,14 @@ Global
 		{EB4C6968-C807-426A-ADC1-7C4CF2DFDA9B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EB4C6968-C807-426A-ADC1-7C4CF2DFDA9B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EB4C6968-C807-426A-ADC1-7C4CF2DFDA9B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F17F6E15-BB1B-4E9A-BB04-28E05F3DDB46}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F17F6E15-BB1B-4E9A-BB04-28E05F3DDB46}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F17F6E15-BB1B-4E9A-BB04-28E05F3DDB46}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F17F6E15-BB1B-4E9A-BB04-28E05F3DDB46}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FEF2217D-78CC-45C1-B12C-73AD4137B5FE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FEF2217D-78CC-45C1-B12C-73AD4137B5FE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FEF2217D-78CC-45C1-B12C-73AD4137B5FE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FEF2217D-78CC-45C1-B12C-73AD4137B5FE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -58,6 +70,8 @@ Global
 		{E2B360F6-F5EC-4E82-852D-7C9E578B87B8} = {FEE2070E-977D-4884-8FC6-B2B8870CB4D8}
 		{EB4C6968-C807-426A-ADC1-7C4CF2DFDA9B} = {FDE0F169-7104-49A4-8BB3-3A81DAA71846}
 		{C73E1C5A-25FD-4C05-8A19-E59DA956CCB6} = {6BA5B9D6-F869-4231-8207-6F990CDDE85C}
+		{F17F6E15-BB1B-4E9A-BB04-28E05F3DDB46} = {C73E1C5A-25FD-4C05-8A19-E59DA956CCB6}
+		{FEF2217D-78CC-45C1-B12C-73AD4137B5FE} = {C73E1C5A-25FD-4C05-8A19-E59DA956CCB6}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {4696E927-2217-439C-AA5E-0FF1538A3DD8}
