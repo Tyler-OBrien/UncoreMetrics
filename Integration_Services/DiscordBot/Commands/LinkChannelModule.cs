@@ -71,7 +71,7 @@ namespace DiscordBot.Commands
                 }
 
                 var tryGetServer =
-                    await ServersContext.Servers.FirstOrDefaultAsync(findServer => findServer.ServerID == serverGUID);
+                    await ServersContext.Servers.AsNoTracking().FirstOrDefaultAsync(findServer => findServer.ServerID == serverGUID);
                 if (tryGetServer == null)
                 {
                     await ctx.EditResponseAsync(new DiscordWebhookBuilder()
