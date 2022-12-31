@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
+using UncoreMetrics.Data.GameData;
 using UncoreMetrics.Data.GameData._7DaysToDie;
 using UncoreMetrics.Data.GameData.ARK;
 using UncoreMetrics.Data.GameData.Arma3;
@@ -28,6 +29,10 @@ public class ServersContext : DbContext
     public DbSet<Server> Servers { get; set; }
 
     public DbSet<ScrapeJob> ScrapeJobs { get; set; }
+
+    public DbSet<ServerPing> PingData { get; set; }
+
+    public DbSet<Location> Locations { get; set; }
 
     public DbSet<SevenDaysToDieServer> SevenDaysToDieServers { get; set; }
 
@@ -135,5 +140,15 @@ public class ServersContext : DbContext
 
         modelBuilder.Entity<ScrapeJob>().ToTable("Scrape_Jobs");
         modelBuilder.Entity<ScrapeJob>().HasKey(job => job.InternalId);
+
+
+        modelBuilder.Entity<ServerPing>().ToTable("Server_Pings");
+        modelBuilder.Entity<ServerPing>().HasKey(ping => new { ping.ServerId, ping.LocationID} );
+        modelBuilder.Entity<ServerPing>().HasIndex(ping => ping.ServerId);
+        modelBuilder.Entity<ServerPing>().HasIndex(ping => new { ping.ServerId, ping.LocationID, ping.NextCheck});
+
+
+        modelBuilder.Entity<Location>().ToTable("Locations");
+        modelBuilder.Entity<Location>().HasKey(ping => new { ping.LocationID });
     }
 }

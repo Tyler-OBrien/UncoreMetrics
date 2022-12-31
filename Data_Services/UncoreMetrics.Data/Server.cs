@@ -3,6 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Net;
 using System.Text.Json.Serialization;
 using NpgsqlTypes;
+using UncoreMetrics.Data.GameData;
 
 namespace UncoreMetrics.Data;
 
@@ -20,6 +21,15 @@ public enum Continent
 
 public class Server
 {
+
+    public Server()
+    {
+
+    }
+    public Server(Server toCopy)
+    {
+        Copy(toCopy);
+    }
     [Required] public Guid ServerID { get; set; }
 
     [Required] public string Name { get; set; }
@@ -104,6 +114,9 @@ public class Server
     [Required] public int FailedChecks { get; set; }
 
     [Required] public DateTime FoundAt { get; set; }
+
+    
+    public List<ServerPing> ServerPings { get; set; }
 
     public void Copy(Server toCopy)
     {
