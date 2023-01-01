@@ -143,7 +143,8 @@ public abstract class BaseResolver
     /// <returns></returns>
     public virtual async Task<int> Poll()
     {
-        var servers = await _steamServers.GenericServerPoll(await GetServers());
+        var cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromMinutes(_configuration.RunForceTimeoutMinutes));
+        var servers = await _steamServers.GenericServerPoll(await GetServers(), cancellationTokenSource.Token);
         // Abort run if no servers are returned..
         if (servers.Count == 0)
             return 0;
@@ -158,10 +159,11 @@ public abstract class BaseResolver
     /// <returns></returns>
     public virtual async Task<int> Discovery()
     {
+        var cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromMinutes(_configuration.RunForceTimeoutMinutes));
         var query = CustomQuery;
         if (query == null) query = SteamServerListQueryBuilder.New().AppID(AppId.ToString()).Dedicated().NotEmpty();
 
-        var servers = await _steamServers.GenericServerDiscovery(query);
+        var servers = await _steamServers.GenericServerDiscovery(query, cancellationTokenSource.Token);
         var addresses = servers.Select(i => i.Address).ToList();
         var ports = servers.Select(i => i.Port).ToList();
 
@@ -243,7 +245,8 @@ public abstract class BaseResolver
         var bulkConfig = new BulkConfig
         {
             PropertiesToExclude = new List<string> { "SearchVector" },
-            PropertiesToExcludeOnUpdate = new List<string> { "FoundAt", "ServerID", "SearchVector" }
+            PropertiesToExcludeOnUpdate = new List<string> { "FoundAt", "ServerID", "SearchVector" },
+
         };
 
 

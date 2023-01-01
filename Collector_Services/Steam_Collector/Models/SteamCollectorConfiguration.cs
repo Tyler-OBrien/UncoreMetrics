@@ -8,6 +8,8 @@ public class SteamCollectorConfiguration : BaseConfiguration
 
     public int ServersPerPollRun { get; set; }
 
+    public int RunForceTimeoutMinutes { get; set; }
+
     public int PollRunTimeout { get; set; }
 
     public int DiscoveryRunTimeout { get; set; }

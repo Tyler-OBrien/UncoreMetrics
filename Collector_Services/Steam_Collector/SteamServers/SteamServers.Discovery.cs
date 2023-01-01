@@ -68,7 +68,7 @@ public partial class SteamServers : ISteamServers
     /// <param name="appID"></param>
     /// <returns>Returns a list of full Server info to be actioned on with stats for that specific Server type</returns>
     public async Task<List<DiscoveredServerInfo>> GenericServerDiscovery(
-        SteamServerListQueryBuilder queryListQueryBuilder)
+        SteamServerListQueryBuilder queryListQueryBuilder, CancellationToken token)
     {
         if (_steamApi == null) throw new NullReferenceException("Steam API cannot be null to use HandleGeneric");
 
@@ -100,19 +100,19 @@ public partial class SteamServers : ISteamServers
             "Removed {removedPrivateIPServers} Servers containing Private IP Addresses (Valve Servers use Relays and don't expose, among others)",
             serverListCount - serverList.Count);
 
-        var servers = await GetAllServersDiscovery(serverList);
+        var servers = await GetAllServersDiscovery(serverList, token);
 
 
         return servers;
     }
 
 
-    private async Task<List<DiscoveredServerInfo>> GetAllServersDiscovery(List<SteamListServer> servers)
+    private async Task<List<DiscoveredServerInfo>> GetAllServersDiscovery(List<SteamListServer> servers, CancellationToken token)
     {
         const string runType = "Discovery";
         using var context = LogContext.PushProperty("RunType", runType);
         var stopwatch = Stopwatch.StartNew();
-        using var cancellationTokenSource = new CancellationTokenSource();
+        using var cancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(token);
         await _scrapeJobStatusService.StartRun(servers.Count, runType, cancellationTokenSource.Token);
 
         // Might want to make this configurable eventually.. Right now Windows runs way worse then other platforms like Linux
@@ -121,7 +121,7 @@ public partial class SteamServers : ISteamServers
         _logger.LogInformation("Queueing Tasks");
 
         var newSolver = new DiscoverySolver(_geoIpService, _logger);
-        using var pool = new QueryConnectionPool();
+        using var pool = new QueryConnectionPool(token: token);
         pool.ReceiveTimeout = 750;
         pool.SendTimeout = 750;
         pool.Message += msg => { _logger.LogInformation("Pool Message: {msg}", msg); };

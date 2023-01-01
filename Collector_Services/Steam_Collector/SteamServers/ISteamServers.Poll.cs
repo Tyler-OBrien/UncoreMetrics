@@ -11,5 +11,5 @@ public partial interface ISteamServers
     /// </summary>
     /// <param name="servers"></param>
     /// <returns>The list of resolved information about each server.</returns>
-    public Task<List<PollServerInfo>> GenericServerPoll(List<Server> servers);
+    public Task<List<PollServerInfo>> GenericServerPoll(List<Server> servers, CancellationToken token);
 }

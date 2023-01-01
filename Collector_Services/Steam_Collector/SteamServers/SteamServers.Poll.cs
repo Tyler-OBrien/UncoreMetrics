@@ -61,28 +61,27 @@ public partial class SteamServers : ISteamServers
     /// </summary>
     /// <param name="appID"></param>
     /// <returns>Returns a list of full Server info to be actioned on with stats for that specific Server type</returns>
-    public async Task<List<PollServerInfo>> GenericServerPoll(List<Server> servers)
+    public async Task<List<PollServerInfo>> GenericServerPoll(List<Server> servers, CancellationToken token)
     {
-        var polledServers = await GetAllServersPoll(servers);
-
+        var polledServers = await GetAllServersPoll(servers, token);
 
         return polledServers;
     }
 
 
-    private async Task<List<PollServerInfo>> GetAllServersPoll(List<Server> servers)
+    private async Task<List<PollServerInfo>> GetAllServersPoll(List<Server> servers, CancellationToken token)
     {
         const string runType = "Poll";
         using var context = LogContext.PushProperty("RunType", runType);
         var stopwatch = Stopwatch.StartNew();
-        using var cancellationTokenSource = new CancellationTokenSource();
+        using var cancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(token);
         await _scrapeJobStatusService.StartRun(servers.Count, runType, cancellationTokenSource.Token);
 
         // Might want to make this configurable eventually.. Right now Windows runs way worse then other platforms like Linux
         var maxConcurrency = _configuration.MaxConcurrency;
 
         var newSolver = new PollSolver(_logger);
-        using var pool = new QueryConnectionPool();
+        using var pool = new QueryConnectionPool(token: token);
         pool.ReceiveTimeout = 750;
         pool.SendTimeout = 750;
         pool.Message += msg => { _logger.LogInformation("Pool Message: {msg}", msg); };

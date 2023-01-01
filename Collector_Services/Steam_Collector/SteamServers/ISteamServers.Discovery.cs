@@ -11,5 +11,5 @@ public partial interface ISteamServers
     /// </summary>
     /// <param name="appID"></param>
     /// <returns>Returns a list of full Server info to be actioned on with stats for that specific Server type</returns>
-    public Task<List<DiscoveredServerInfo>> GenericServerDiscovery(SteamServerListQueryBuilder queryListQueryBuilder);
+    public Task<List<DiscoveredServerInfo>> GenericServerDiscovery(SteamServerListQueryBuilder queryListQueryBuilder, CancellationToken token);
 }
