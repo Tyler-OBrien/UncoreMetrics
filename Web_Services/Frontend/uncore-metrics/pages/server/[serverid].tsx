@@ -404,7 +404,7 @@ const Server = () => {
                       )?.locationName ?? ping.locationID}
                     </dt>
                     <dd>
-                      {ping.failed ? "Server blocks Pings": `${ping.pingMs}ms`} -{" "}
+                      {ping.failed && ping.pingMs == 0 ? "Server blocks Pings": `${ping.pingMs}ms`} -{" "}
                       {getRelativeTime(new Date(ping.lastCheck))}
                     </dd>
                   </React.Fragment>
