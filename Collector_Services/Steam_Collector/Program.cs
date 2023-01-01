@@ -24,7 +24,7 @@ public class Program
     private const string outputFormat =
         "[{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz}] [{Level:u3}] [{SourceContext}:{Resolver}:{RunType}] {Message:lj} {Exception}{NewLine}";
 
-    public static int Main(string[] args)
+    public async static Task<int> Main(string[] args)
     {
         var extraLogName = "";
         // If env, we assume this is being run as a single program being targetted by mutiple unit files with their own env, so we need custom log names
@@ -49,7 +49,7 @@ public class Program
         try
         {
             Log.Information("Starting host");
-            BuildHost(args).Run();
+            await BuildHost(args).RunAsync();
             return 0;
         }
         catch (Exception ex)

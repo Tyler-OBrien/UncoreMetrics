@@ -47,6 +47,11 @@ public class GameResolvers
                 "Unturned",
                 typeof(UnturnedResolver)
             }
+            ,
+            {
+                "Squad",
+                typeof(SquadResolver)
+            }
         };
 
     public bool DoesGameResolverExist(string name)

@@ -9,6 +9,7 @@ using UncoreMetrics.Data.GameData.HellLetLoose;
 using UncoreMetrics.Data.GameData.PostScriptum;
 using UncoreMetrics.Data.GameData.ProjectZomboid;
 using UncoreMetrics.Data.GameData.Rust;
+using UncoreMetrics.Data.GameData.Squad;
 using UncoreMetrics.Data.GameData.Unturned;
 using UncoreMetrics.Data.GameData.VRising;
 
@@ -60,6 +61,8 @@ public class ServersContext : DbContext
 
 
     public DbSet<VRisingServer> VRisingServers { get; set; }
+
+    public DbSet<SquadServer> SquadServers { get; set; }
 
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -136,6 +139,12 @@ public class ServersContext : DbContext
         modelBuilder.Entity<VRisingServer>().ToTable("V_Rising_Servers");
         modelBuilder.Entity<VRisingServer>().HasIndex(server => server.HeartDamage);
         modelBuilder.Entity<VRisingServer>().HasIndex(server => server.BloodBoundEquipment);
+
+        modelBuilder.Entity<SquadServer>().ToTable("Squad_Servers");
+        modelBuilder.Entity<SquadServer>().HasIndex(server => server.ValidLicense);
+        modelBuilder.Entity<SquadServer>().HasIndex(server => server.HasPassword);
+        modelBuilder.Entity<SquadServer>().HasIndex(server => server.GameMode);
+        modelBuilder.Entity<SquadServer>().HasIndex(server => server.GameVersion);
 
 
         modelBuilder.Entity<ScrapeJob>().ToTable("Scrape_Jobs");
