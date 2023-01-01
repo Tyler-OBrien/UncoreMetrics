@@ -55,10 +55,20 @@ namespace Ping_Collector.Controllers
         }
 
         [HttpPost("PingJobScrapeStatusUpdate")]
-        public async Task<ActionResult<IResponse>> SubmitScrapeJobUpdate([FromBody] ScrapeJob data, CancellationToken token)
+        public async Task<ActionResult<IResponse>> SubmitScrapeJobUpdate([FromBody] ScrapeJob job, CancellationToken token)
         {
-            await _genericServersContext.BulkInsertOrUpdateAsync(new[] { data },
-                cancellationToken: token);
+
+            var tryFind = await _genericServersContext.ScrapeJobs.FirstOrDefaultAsync(currentJob => currentJob.InternalId == job.InternalId, token);
+            if (tryFind != null)
+            {
+                tryFind.Copy(job);
+                await _genericServersContext.SaveChangesAsync(token);
+            }
+            else
+            {
+                await _genericServersContext.ScrapeJobs.AddAsync(job, token);
+                await _genericServersContext.SaveChangesAsync(token);
+            }
             return Ok(new GenericDataResponse(HttpStatusCode.OK, "Updated"));
 
         }
@@ -67,7 +77,10 @@ namespace Ping_Collector.Controllers
         [HttpPost("SubmitPingJobs")]
         public async Task<ActionResult<IResponse>> SubmitPostJobs([FromBody] PingJobCompleteDTO data, CancellationToken token)
         {
+            using var transaction = await _genericServersContext.Database.BeginTransactionAsync(token);
+
             await _genericServersContext.BulkInsertOrUpdateAsync(data.CompletedPings, cancellationToken: token);
+            await transaction.CommitAsync(token);
             return Ok(new GenericDataResponse(HttpStatusCode.OK, "Successfully Ingested, yum."));
         }
     }

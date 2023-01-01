@@ -1,4 +1,5 @@
 ﻿using EFCore.BulkExtensions;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using UncoreMetrics.Data;
 using UncoreMetrics.Steam_Collector.Models;
@@ -51,9 +52,17 @@ public class ScrapeJobStatusService : IScrapeJobStatusService
 
     private async Task UpdateStatus(ScrapeJob job, CancellationToken token)
     {
-        var bulkConfig = new BulkConfig();
 
-        await _genericServersContext.BulkInsertOrUpdateAsync(new[] { job }, bulkConfig,
-            cancellationToken: token);
+        var tryFind = await _genericServersContext.ScrapeJobs.FirstOrDefaultAsync(currentJob => currentJob.InternalId == job.InternalId, token);
+        if (tryFind != null)
+        {
+            tryFind.Copy(job);
+            await _genericServersContext.SaveChangesAsync(token);
+        }
+        else
+        {
+            await _genericServersContext.ScrapeJobs.AddAsync(job, token);
+            await _genericServersContext.SaveChangesAsync(token);
+        }
     }
 }

@@ -26,6 +26,22 @@ public class ScrapeJob
         InternalId = $"{GameType}-{Node}";
     }
 
+    public void Copy(ScrapeJob newInfo)
+    {
+        GameType = newInfo.GameType;
+        RunType = newInfo.RunType;
+        Node = newInfo.Node;
+        RunId = newInfo.RunId;
+        Progress = newInfo.Progress;
+        TotalDone = newInfo.TotalDone;
+        TotalCount = newInfo.TotalCount;
+        RunGuid = newInfo.RunGuid;
+        Running = newInfo.Running;
+        StartedAt = newInfo.StartedAt;
+        LastUpdateUtc = newInfo.LastUpdateUtc;
+        InternalId = $"{GameType}-{Node}";
+    }
+
     [NotMapped] public string Name => $"{GameType}-{Node}-{RunId}";
 
     public string GameType { get; set; }

@@ -229,7 +229,9 @@ public abstract class BaseResolver
             if (server.ServerID == Guid.Empty)
                 server.ServerID = Guid.NewGuid();
         var serverList = servers.ToList<Server>();
+        // Update Generic Servers
         await InsertGenericServer(serverList);
+        // Update Server Specific Info
         await _genericServersContext.BulkInsertOrUpdateAsync(servers);
         await transaction.CommitAsync();
         await ClickHouseSubmit(serverList);
@@ -246,10 +248,7 @@ public abstract class BaseResolver
         {
             PropertiesToExclude = new List<string> { "SearchVector" },
             PropertiesToExcludeOnUpdate = new List<string> { "FoundAt", "ServerID", "SearchVector" },
-
         };
-
-
         await _genericServersContext.BulkInsertOrUpdateAsync(servers, bulkConfig);
     }
 }
