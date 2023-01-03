@@ -63,7 +63,7 @@ public abstract class BaseResolver
     /// <returns></returns>
     public virtual async Task PollResult(List<PollServerInfo> servers)
     {
-        await HandleServersGenericStatusChange(servers.ToList<IGenericServerInfo>());
+        await HandleServersGenericStatusChange(servers.ToList<IGenericServerInfo>(), false);
         servers.ForEach(server => server.UpdateServer(AppId, _configuration.SecondsBetweenChecks,
             _configuration.SecondsBetweenFailedChecks, _configuration.DaysUntilServerMarkedDead));
         await HandleServersGeneric(servers.ToList<IGenericServerInfo>());
@@ -77,7 +77,7 @@ public abstract class BaseResolver
     /// <returns></returns>
     public virtual async Task DiscoveryResult(List<DiscoveredServerInfo> servers)
     {
-        await HandleServersGenericStatusChange(servers.ToList<IGenericServerInfo>());
+        await HandleServersGenericStatusChange(servers.ToList<IGenericServerInfo>(), true);
         servers.ForEach(server => server.UpdateServer(_configuration.SecondsBetweenChecks));
         await HandleServersGeneric(servers.ToList<IGenericServerInfo>());
     }
@@ -86,8 +86,9 @@ public abstract class BaseResolver
     /// Can be overriden to have custom behavior for server status. Called by Discovery/Poll Result to handle status changes, forwarded to NATS.
     /// </summary>
     /// <param name="servers"></param>
+    /// <param name="isDiscovery">If this run is discovery, don't mark any servers are newly down</param>
     /// <returns></returns>
-    public virtual async Task HandleServersGenericStatusChange(List<IGenericServerInfo> servers)
+    public virtual async Task HandleServersGenericStatusChange(List<IGenericServerInfo> servers, bool isDiscovery)
     {
         try
         {
@@ -103,7 +104,7 @@ public abstract class BaseResolver
             {
                 if (genericServerInfo.ExistingServer != null)
                 {
-                    if (genericServerInfo.ServerInfo == null && genericServerInfo.ExistingServer.IsOnline)
+                    if (genericServerInfo.ServerInfo == null && genericServerInfo.ExistingServer.IsOnline && isDiscovery == false)
                         newlyDownServers.Add(genericServerInfo.ExistingServer.ServerID);
                     else if (genericServerInfo.ServerInfo != null && genericServerInfo.ExistingServer.IsOnline == false)
                         newlyUpServers.Add(genericServerInfo.ExistingServer.ServerID);

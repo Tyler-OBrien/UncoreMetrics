@@ -53,7 +53,14 @@ public class RustResolver : BaseResolver
         customServer.Game = Name;
 
         if (server.ServerRules != null) customServer.ResolveGameDataPropertiesFromRules(server.ServerRules);
-        if (server.ServerPlayers != null) customServer.Players = (uint)server.ServerPlayers.Players.Count;
+        if (server.ServerPlayers != null)
+        {
+            customServer.Players = (uint)server.ServerPlayers.Players.Count;
+        } // Fall back to last poll's players rather then normal player count (which is usually way off for Rust since A2S_Players reports it as a byte / 255 max)
+        else if (server.ExistingServer != null)
+        {
+            customServer.Players = server.ExistingServer.Players;
+        }
 
         return customServer;
     }
