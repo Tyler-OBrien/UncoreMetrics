@@ -1,5 +1,6 @@
 import type { NextPage } from "next";
 import Head from "next/head";
+import Link from "next/link";
 import ServerDisplay from "../components/servers/server-display";
 
 const Home: NextPage = () => {
@@ -24,9 +25,9 @@ const Home: NextPage = () => {
             Powered by Uncore Metrics
           </a>
           <span className="flex">|</span>
-          <a className="flex  justify-center gap-2 " href="/about">
+          <Link className="flex  justify-center gap-2 " href="/about">
             About
-          </a>
+          </Link>
         </footer>
       </div>
     </div>
