@@ -170,7 +170,7 @@ public abstract class BaseResolver
 
         var entities = await _genericServersContext.Servers
             .Where(a => addresses.Contains(a.Address) || ports.Contains(a.QueryPort)).AsNoTracking()
-            .Select(i => new { i.Address, i.QueryPort, i.ServerID, i.IsOnline }).ToListAsync(); // SQL IN
+            .Select(i => new { i.Address, i.QueryPort, i.ServerID, i.IsOnline }).ToListAsync(cancellationTokenSource.Token); // SQL IN
 
         var hashMapDictionary = new Dictionary<IPEndPoint, Tuple<Guid, bool>>();
         foreach (var server in entities)
