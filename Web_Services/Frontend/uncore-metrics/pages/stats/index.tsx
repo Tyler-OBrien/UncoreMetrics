@@ -213,7 +213,7 @@ const Server = () => {
             </FormControl>
             <VictoryChart
               domainPadding={{ y: 20, x: 5 }}
-              scale={{ x: 'time'}}
+              scale='time'
               containerComponent={
                 <VictoryVoronoiContainer
                   labels={({ datum }) =>
@@ -299,7 +299,7 @@ const Server = () => {
                 interpolation="natural"
                 theme={VictoryTheme.material}
                 style={{ labels: {}, data: { stroke: "skyblue" } }}
-                scale={{ x: 'time'}}
+                scale='time'
                 data={uptimeData?.data?.map((d: ClickHouseUptimeData) => {
                   return {
                     x: new Date(d.averageTime),

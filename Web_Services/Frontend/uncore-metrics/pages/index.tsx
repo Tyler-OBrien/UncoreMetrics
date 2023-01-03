@@ -14,7 +14,7 @@ const Home: NextPage = () => {
           <ServerDisplay></ServerDisplay>
         </main>
 
-        <footer className="flex h-24 w-full items-center justify-center border-t">
+        <footer className="flex h-24 w-full items-center justify-center border-t space-x-2">
           <a
             className="flex items-center justify-center gap-2"
             href="https://github.com/Tyler-OBrien/UncoreMetrics"
@@ -22,6 +22,10 @@ const Home: NextPage = () => {
             rel="noopener noreferrer"
           >
             Powered by Uncore Metrics
+          </a>
+          <span className="flex">|</span>
+          <a className="flex  justify-center gap-2 " href="/about">
+            About
           </a>
         </footer>
       </div>
