@@ -358,6 +358,7 @@ const Server = () => {
             </FormControl>
             <VictoryChart
               domainPadding={{ y: 20, x: 5 }}
+              scale={{ x: "time" }}
               containerComponent={
                 <VictoryVoronoiContainer
                   labels={({ datum }) =>
@@ -381,7 +382,6 @@ const Server = () => {
                 interpolation="natural"
                 style={{ labels: {}, data: { stroke: "skyblue" } }}
                 theme={VictoryTheme.material}
-                scale='time'
                 data={playerData?.data?.map((d: any) => {
                   return {
                     x: new Date(d.checkTime ?? d.averageTime),
@@ -442,6 +442,7 @@ const Server = () => {
             </FormControl>
             <VictoryChart
               domainPadding={{ y: 20, x: 5 }}
+              scale={{ x: "time" }}
               containerComponent={
                 <VictoryVoronoiContainer
                   labels={({ datum }) =>
@@ -466,7 +467,7 @@ const Server = () => {
               <VictoryLine
                 interpolation="natural"
                 theme={VictoryTheme.material}
-                scale='time'
+                
                 style={{ labels: {}, data: { stroke: "skyblue" } }}
                 data={uptimeData?.data?.map((d: any) => {
                   return {
