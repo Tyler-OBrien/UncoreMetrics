@@ -35,7 +35,7 @@ namespace Ping_Collector.Controllers
         {
 
             var getPingJobsForLocation = await _genericServersContext.Servers.AsNoTracking().IgnoreAutoIncludes()
-                .Where(server => server.IsOnline && server.ServerPings.Any(ping => ping.LocationID == id && ping.NextCheck < DateTime.UtcNow) || server.ServerPings.Any(ping => ping.LocationID == id) == false).OrderBy(server => server.NextCheck)
+                .Where(server => server.IsOnline && server.ServerDead == false && server.ServerPings.Any(ping => ping.LocationID == id && ping.NextCheck < DateTime.UtcNow) || server.ServerPings.Any(ping => ping.LocationID == id) == false).OrderBy(server => server.NextCheck)
                 .Include(ping => ping.ServerPings).Select(server => new MiniServerDTO() { Address = server.Address, ServerId = server.ServerID, ServerPings = server.ServerPings}).Take(50_000).ToListAsync(token);
 
             return Ok(new DataResponse<List<MiniServerDTO>>(getPingJobsForLocation));
