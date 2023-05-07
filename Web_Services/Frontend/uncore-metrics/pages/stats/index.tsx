@@ -89,7 +89,7 @@ const Server = () => {
       groupby = 0;
     }
     serverPlayerDataRequest = await fetch(
-      `https://api.uncore.app/v1/servers/playerdataoverall/${game}?hours=${hours}${
+      `${window.location.origin == "uncore.app" ? "/api": "https://api.uncore.app"}/v1/servers/playerdataoverall/${game}?hours=${hours}${
         groupby >= 1 ? "&groupby=" + groupby : ""
       }`
     );
@@ -121,7 +121,7 @@ const Server = () => {
       groupby = 0;
     }
     serverUptimeDataRequest = await fetch(
-      `https://api.uncore.app/v1/servers/uptimedataoverall/${game}?hours=${hours}${
+      `${window.location.origin == "uncore.app" ? "/api": "https://api.uncore.app"}/v1/servers/uptimedataoverall/${game}?hours=${hours}${
         groupby >= 1 ? "&groupby=" + groupby : ""
       }`
     );

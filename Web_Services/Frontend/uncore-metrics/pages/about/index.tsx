@@ -21,7 +21,7 @@ const About: NextPage = () => {
           <Typography className="h2 text-xl">Open Source</Typography>
           <Typography>Uncore Metrics is fully <Link href="https://github.com/Tyler-OBrien/UncoreMetrics">open source</Link>, we use a <Link href="https://github.com/Tyler-OBrien/Okolni-Source-Query-Pool">modified Steam Server Query Library</Link> using a single UDP Socket to collect information via the Steam Server Query Protocol.</Typography>
           <Typography className="h2 text-xl">Infrastructure</Typography>
-          <Typography>The main server runs a 3700x, 64 gigabytes of ram, 1tb NVMe and 16 tb of slower spinning disk space for storing long term statistics. We use Clickhouse to store the results of every poll, around 100 million a day/3 billion a month. We, however, do take advantage of Materialized Views for better query response time/less resource use.</Typography>
+          <Typography>The main server runs a Ryzen 7700, 64GB RAM, 1tb NVMe and 12 tb HDD for storing long term statistics. We use Clickhouse to store the results of every poll, around 100 million a day/3 billion a month. We, however, do take advantage of Materialized Views for better query response time/less resource use.</Typography>
           <Typography className="h2 text-xl">Todo:</Typography>
           <List className="w-6/12" sx={{ listStyleType: 'disc' }}>
           <ListItem className="items-center justify-center" sx={{ display: 'list-item' }}>Improve Mobile View of the website</ListItem>
