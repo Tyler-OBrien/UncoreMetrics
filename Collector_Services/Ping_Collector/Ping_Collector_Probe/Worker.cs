@@ -61,7 +61,7 @@ namespace Ping_Collector_Probe
                     }
 
                     _logger.LogInformation("Finished Run...");
-                    await Task.Delay(5000, stoppingToken);
+                    await Task.Delay(30000, stoppingToken);
                 }
             }
             catch (Exception ex)
