@@ -49,7 +49,7 @@ export default function ScrapeJobDisplay() {
   }, []);
 
   const updateData = async () => {
-    const response = await fetch(`${window.location.origin == "uncore.app" ? "/api": "https://api.uncore.app"}/v1/jobs`);
+    const response = await fetch(`${globalThis?.window?.location?.origin?.endsWith("uncore.app") ? "/api": "https://api.uncore.app"}/v1/jobs`);
     const serverResponse: ScrapeJobResponse = await response.json();
     if (serverResponse.error) {
       setError(serverResponse.error.Message);

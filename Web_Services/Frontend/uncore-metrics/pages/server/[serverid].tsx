@@ -117,7 +117,7 @@ const Server = () => {
   }
   const updateData = async (serverid: string) => {
     const serverFetchRequest = fetch(
-      `${window.location.origin == "uncore.app" ? "/api": "https://api.uncore.app"}/v1/servers/${serverid}`
+      `${globalThis?.window?.location?.origin?.endsWith("uncore.app") ? "/api": "https://api.uncore.app"}/v1/servers/${serverid}`
     );
 
     const serverDataResponse = await serverFetchRequest;
@@ -130,7 +130,7 @@ const Server = () => {
       setData(serverResponse?.data);
     }
     var serverLocationFetch = await fetch(
-      `${window.location.origin == "uncore.app" ? "/api": "https://api.uncore.app"}/v1/locations`
+      `${globalThis?.window?.location?.origin?.endsWith("uncore.app") ? "/api": "https://api.uncore.app"}/v1/locations`
     );
     const serverLocationResponse: LocationRequest =
       await serverLocationFetch.json();
@@ -153,7 +153,7 @@ const Server = () => {
     let serverPlayerDataRequest;
     if (hours < 12 && hours != -1) {
       serverPlayerDataRequest = await fetch(
-        `${window.location.origin == "uncore.app" ? "/api": "https://api.uncore.app"}/v1/servers/playerdataraw/${serverid}?hours=${hours}`
+        `${globalThis?.window?.location?.origin?.endsWith("uncore.app") ? "/api": "https://api.uncore.app"}/v1/servers/playerdataraw/${serverid}?hours=${hours}`
       );
       const playerDataResponse: ServerRawPlayerDataResponse =
         await serverPlayerDataRequest.json();
@@ -170,7 +170,7 @@ const Server = () => {
     if (maxHoursGroupBy >= 12) {
       let groupby: number = Math.ceil(days / MAGIC_NUMBER_MAX_RESULTS);
       serverPlayerDataRequest = await fetch(
-        `${window.location.origin == "uncore.app" ? "/api": "https://api.uncore.app"}/v1/servers/playerdata1d/${serverid}?days=${days}${
+        `${globalThis?.window?.location?.origin?.endsWith("uncore.app") ? "/api": "https://api.uncore.app"}/v1/servers/playerdata1d/${serverid}?days=${days}${
           groupby > 1 ? "&groupby=" + groupby : ""
         }`
       );
@@ -180,7 +180,7 @@ const Server = () => {
         groupby = 0;
       }
       serverPlayerDataRequest = await fetch(
-        `${window.location.origin == "uncore.app" ? "/api": "https://api.uncore.app"}/v1/servers/playerdata/${serverid}?hours=${hours}${
+        `${globalThis?.window?.location?.origin?.endsWith("uncore.app") ? "/api": "https://api.uncore.app"}/v1/servers/playerdata/${serverid}?hours=${hours}${
           groupby >= 1 ? "&groupby=" + groupby : ""
         }`
       );
@@ -205,7 +205,7 @@ const Server = () => {
     let maxHoursGroupBy: number = Math.ceil(hours / MAGIC_NUMBER_MAX_RESULTS);
     if (hours < 12 && hours != -1) {
       serverUptimeDataRequest = await fetch(
-        `${window.location.origin == "uncore.app" ? "/api": "https://api.uncore.app"}/v1/servers/uptimedataraw/${serverid}?hours=${hours}`
+        `${globalThis?.window?.location?.origin?.endsWith("uncore.app") ? "/api": "https://api.uncore.app"}/v1/servers/uptimedataraw/${serverid}?hours=${hours}`
       );
       const uptimeDataResponse: ServerRawUptimeDataResponse =
         await serverUptimeDataRequest.json();
@@ -222,7 +222,7 @@ const Server = () => {
     if (maxHoursGroupBy >= 12) {
       let groupby: number = Math.ceil(days / MAGIC_NUMBER_MAX_RESULTS);
       serverUptimeDataRequest = await fetch(
-        `${window.location.origin == "uncore.app" ? "/api": "https://api.uncore.app"}/v1/servers/uptimedata1d/${serverid}?days=${days}${
+        `${globalThis?.window?.location?.origin?.endsWith("uncore.app") ? "/api": "https://api.uncore.app"}/v1/servers/uptimedata1d/${serverid}?days=${days}${
           groupby > 1 ? "&groupby=" + groupby : ""
         }`
       );
@@ -232,7 +232,7 @@ const Server = () => {
         groupby = 0;
       }
       serverUptimeDataRequest = await fetch(
-        `${window.location.origin == "uncore.app" ? "/api": "https://api.uncore.app"}/v1/servers/uptimedata/${serverid}?hours=${hours}${
+        `${globalThis?.window?.location?.origin?.endsWith("uncore.app") ? "/api": "https://api.uncore.app"}/v1/servers/uptimedata/${serverid}?hours=${hours}${
           groupby >= 1 ? "&groupby=" + groupby : ""
         }`
       );

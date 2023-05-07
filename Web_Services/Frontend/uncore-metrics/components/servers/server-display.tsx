@@ -194,13 +194,13 @@ export default function ServerDisplay() {
     let response: Response;
     if (search) {
       response = await fetch(
-        `${window.location.origin == "uncore.app" ? "/api": "https://api.uncore.app"}/v1/servers/search/${encodeURIComponent(
+        `${globalThis?.window?.location?.origin?.endsWith("uncore.app") ? "/api": "https://api.uncore.app"}/v1/servers/search/${encodeURIComponent(
           search
         )}?page=${page + 1}&pageSize=${rowsPerPage}&includeDead=true`
       );
     } else {
       response = await fetch(
-        `${window.location.origin == "uncore.app" ? "/api": "https://api.uncore.app"}/v1/servers?page=${
+        `${globalThis?.window?.location?.origin?.endsWith("uncore.app") ? "/api": "https://api.uncore.app"}/v1/servers?page=${
           page + 1
         }&pageSize=${rowsPerPage}`
       );
