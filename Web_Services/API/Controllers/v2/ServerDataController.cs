@@ -12,13 +12,13 @@ using UncoreMetrics.Data.ClickHouse.Models;
 namespace UncoreMetrics.API.Controllers;
 
 [ApiController]
-[Route("v1/servers")]
+[Route("v2/servers")]
 [SwaggerResponse(400, Type = typeof(ErrorResponseDetails<object>), Description = "On request failure, an object will be returned indicating what part of your request is invalid. Optionally includes details object of type BadRequestObjectResult.")]
 [SwaggerResponse(404, Type = typeof(ErrorResponse), Description = "On invalid route, an object will be returned indicating the invalid route.")]
 [SwaggerResponse(500, Type = typeof(ErrorResponse), Description = "On an internal server error, an object will be returned indicating the server error.")]
 [SwaggerResponse(405, Type = typeof(ErrorResponse), Description = "On an invalid request method,  an object will be returned indicating the wrong request method.")]
 [SwaggerResponse(429, Type = typeof(ErrorResponse), Description = "On hitting a rate limit, a rate limit response will be returned.")]
-public class GenericServerController : ControllerBase
+public class ServerDataController : ControllerBase
 {
     private readonly IClickHouseService _clickHouseService;
 
@@ -26,13 +26,73 @@ public class GenericServerController : ControllerBase
     private readonly ILogger _logger;
 
 
-    public GenericServerController(ServersContext serversContext, IClickHouseService clickHouse,
+    public ServerDataController(ServersContext serversContext, IClickHouseService clickHouse,
         ILogger<GenericServerController> logger)
     {
         _genericServersContext = serversContext;
         _clickHouseService = clickHouse;
         _logger = logger;
     }
+
+    [HttpGet("game/{gameid}")]
+    [SwaggerResponse(200, Type = typeof(DataResponse<PagedResult<ServerSearchResultDTO>>), Description = "On success, the API will respond with a server list item  object. If no servers are found, the list will be empty..")]
+    [SwaggerResponse(400, Type = typeof(ErrorResponse), Description = "If you exceed the max page side or min. page, an error will be returned.")]
+    public async Task<ActionResult<IResponse>> GetServersByGame(ulong gameid, CancellationToken token,
+    [FromQuery] bool? includeDead = false,
+    [FromQuery] int page = 1, [FromQuery] int pageSize = 25)
+    {
+        if (pageSize > 100)
+        {
+            return BadRequest(new ErrorResponse(HttpStatusCode.BadRequest, "Max Page Size is 100",
+                "page_size_out_of_range"));
+        }
+
+        if (page <= 0)
+        {
+            return BadRequest(new ErrorResponse(HttpStatusCode.BadRequest, "Minimum Page is 0",
+                "page_out_of_range"));
+        }
+
+        if (includeDead == false)
+        {
+            return Ok(new DataResponse<PagedResult<ServerSearchResultDTO>>(await _genericServersContext.Servers
+                .AsNoTracking()
+                .OrderByDescending(server => server.Players)
+                .Where(server => server.AppID == gameid && server.ServerDead == includeDead).Select(server => new ServerSearchResultDTO
+                {
+                    ServerID = server.ServerID,
+                    Name = server.Name,
+                    Game = server.Game,
+                    Map = server.Map,
+                    AppID = server.AppID,
+                    Players = server.Players,
+                    MaxPlayers = server.MaxPlayers,
+                    ISP = server.ISP,
+                    Country = server.Country
+                }).GetPaged(page, pageSize, token)));
+        }
+
+        return Ok(new DataResponse<PagedResult<ServerSearchResultDTO>>(await _genericServersContext.Servers
+            .AsNoTracking()
+            .Where(server => server.AppID == gameid)
+            .OrderByDescending(server => server.Players).Select(server => new ServerSearchResultDTO
+            {
+                ServerID = server.ServerID,
+                Name = server.Name,
+                Game = server.Game,
+                Map = server.Map,
+                AppID = server.AppID,
+                Players = server.Players,
+                MaxPlayers = server.MaxPlayers,
+                ISP = server.ISP,
+                Country = server.Country
+            }).GetPaged(page, pageSize, token)));
+    }
+
+
+
+
+
 
     [HttpGet]
     [SwaggerResponse(200, Type = typeof(DataResponse<PagedResult<ServerSearchResultDTO>>), Description = "On success, the API will respond with a server list item  object. If no servers are found, the list will be empty..")]
@@ -125,7 +185,7 @@ public class GenericServerController : ControllerBase
     }
     [HttpGet("uptime/{id}")]
     [SwaggerResponse(200, Type = typeof(DataResponse<double>), Description = "On success")]
-    public async Task<ActionResult<IResponse>> GetServer(Guid id, [FromQuery] int? hours, CancellationToken token)
+    public async Task<ActionResult<IResponse>> GetServer(Guid id, [FromQuery] int? hours, [FromQuery] DateTime startUtc, [FromQuery] DateTime endUtc, CancellationToken token)
     {
         if (hours.HasValue == false)
             hours = 24;
@@ -141,7 +201,7 @@ public class GenericServerController : ControllerBase
             hours = 6;
 
         // Eventually there should be actual date range selectors
-        if ((hours * 60)  > 1000)
+        if ((hours * 60) > 1000)
             return BadRequest(new ErrorResponse(HttpStatusCode.BadRequest,
                 $"Max Results Generated can be 1000. Your Query would have returned {hours * 60}",
                 "too_many_results"));
@@ -247,7 +307,7 @@ public class GenericServerController : ControllerBase
     {
         if (hours.HasValue == false)
             hours = 6;
- 
+
         if (hours * 60 > 1000)
             return BadRequest(new ErrorResponse(HttpStatusCode.BadRequest, $"Max Results Generated can be 1000. Your Query would have returned {hours * 60}",
                 "too_many_results"));
@@ -296,7 +356,7 @@ public class GenericServerController : ControllerBase
     {
         if (hours.HasValue == false)
             hours = 24;
-    
+
 
         if (groupby.HasValue == false)
         {
@@ -320,7 +380,7 @@ public class GenericServerController : ControllerBase
     {
         if (days.HasValue == false)
             days = 30;
-  
+
 
         if (groupby.HasValue == false)
         {

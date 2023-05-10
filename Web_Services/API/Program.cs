@@ -7,6 +7,8 @@ using Serilog;
 using Serilog.Events;
 using UncoreMetrics.API.Middleware;
 using UncoreMetrics.API.Models;
+using UncoreMetrics.API.Models.Services;
+using UncoreMetrics.API.Services;
 using UncoreMetrics.Data;
 using UncoreMetrics.Data.ClickHouse;
 using UncoreMetrics.Data.Configuration;
@@ -22,12 +24,15 @@ public class Program
             "[{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz}] [{Level:u3}] [{SourceContext}] {Message:lj} {Exception}{NewLine}";
 
         Log.Logger = new LoggerConfiguration().MinimumLevel.Information()
+            .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
+            .MinimumLevel.Override("System", LogEventLevel.Warning)
+            .MinimumLevel.Override("Microsoft.Hosting.Lifetime", LogEventLevel.Information)
             .WriteTo.Async(config =>
             {
                 config.File("Logs/Log.log", outputTemplate: outputFormat,
-                    restrictedToMinimumLevel: LogEventLevel.Information, retainedFileCountLimit: 30,
+                    retainedFileCountLimit: 30,
                     rollingInterval: RollingInterval.Day);
-                config.Console(outputTemplate: outputFormat, restrictedToMinimumLevel: LogEventLevel.Information);
+                config.Console(outputTemplate: outputFormat);
             }).Enrich.FromLogContext().CreateLogger();
         Log.Logger.Information("Loaded SeriLog Logger");
 
@@ -104,14 +109,18 @@ public class Program
             options.InvalidModelStateResponseFactory = ctx => new ModelStateFilterJSON();
         });
 
+        builder.Services.AddScoped<IPrometheusStatsCollector, PrometheusStatsCollector>();
 
         var app = builder.Build();
+
+        var serviceProvider = app.Services.GetRequiredService<IServiceProvider>();
 
 
         if (apiConfiguration.Prometheus_Metrics_Port != default)
         {
             Log.Logger.Information($"Enabling Prometheus Metrics at port {apiConfiguration.Prometheus_Metrics_Port}.");
             app.UseMetricServer(apiConfiguration.Prometheus_Metrics_Port);
+            Metrics.DefaultRegistry.AddBeforeCollectCallback(async token => await serviceProvider.GetRequiredService<IPrometheusStatsCollector>().AddStats(token));
         }
 
         app.UseSwagger();
@@ -126,7 +135,6 @@ public class Program
         app.UseAuthorization();
 
         app.MapControllers();
-
 
         if (apiConfiguration.Prometheus_Metrics_Port != default) app.UseHttpMetrics();
 
