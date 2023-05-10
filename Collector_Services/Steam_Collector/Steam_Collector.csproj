@@ -1,49 +1,43 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Worker">
-
-	<PropertyGroup>
-		<TargetFramework>net7.0</TargetFramework>
-		<Nullable>enable</Nullable>
-		<ImplicitUsings>enable</ImplicitUsings>
-		<UserSecretsId>dotnet-Steam_Collector-456F2E8C-01DB-4894-B828-287001A37A8C</UserSecretsId>
-		<DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
-		<DockerfileContext>..\..</DockerfileContext>
-		<EnforceCodeStyleInBuild>False</EnforceCodeStyleInBuild>
-		<RootNamespace>UncoreMetrics.$(MSBuildProjectName.Replace(" ", "_"))</RootNamespace>
-	</PropertyGroup>
-
-	<ItemGroup>
-	  <None Include="..\..\.editorconfig" Link=".editorconfig" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<PackageReference Include="ClrHeapAllocationAnalyzer" Version="3.0.0" />
-		<PackageReference Include="EFCore.BulkExtensions" Version="6.6.2" />
-		<PackageReference Include="MaxMind.GeoIP2" Version="5.1.0" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.1">
-			<PrivateAssets>all</PrivateAssets>
-			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-		</PackageReference>
-		<PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="7.0.1" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="7.0.1">
-			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-			<PrivateAssets>all</PrivateAssets>
-		</PackageReference>
-		<PackageReference Include="Microsoft.Extensions.Hosting" Version="7.0.0" />
-		<PackageReference Include="Microsoft.Extensions.Http.Polly" Version="7.0.1" />
-		<PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.17.0" />
-		<PackageReference Include="NATS.Client" Version="1.0.2" />
-		<PackageReference Include="Okolni.Source.Query" Version="1.2.6" />
-		<PackageReference Include="Sentry" Version="3.24.1" />
-		<PackageReference Include="Sentry.AspNetCore" Version="3.24.1" />
-		<PackageReference Include="Sentry.EntityFramework" Version="3.24.1" />
-		<PackageReference Include="Serilog" Version="2.12.0" />
-		<PackageReference Include="Serilog.Extensions.Hosting" Version="5.0.1" />
-		<PackageReference Include="Serilog.Sinks.Async" Version="1.5.0" />
-		<PackageReference Include="Serilog.Sinks.Console" Version="4.1.0" />
-		<PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<ProjectReference Include="..\..\Data_Services\UncoreMetrics.Data\UncoreMetrics.Data.csproj" />
-	</ItemGroup>
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>dotnet-Steam_Collector-456F2E8C-01DB-4894-B828-287001A37A8C</UserSecretsId>
+    <EnforceCodeStyleInBuild>False</EnforceCodeStyleInBuild>
+    <RootNamespace>UncoreMetrics.$(MSBuildProjectName.Replace(" ", "_"))</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <None Include="..\..\.editorconfig" Link=".editorconfig" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="ClrHeapAllocationAnalyzer" Version="3.0.0" />
+    <PackageReference Include="EFCore.BulkExtensions" Version="7.0.1" />
+    <PackageReference Include="MaxMind.GeoIP2" Version="5.1.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.0-preview.2.23128.3">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="8.0.0-preview.2.23128.3" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.0-preview.2.23128.3">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.0-preview.2.23128.3" />
+    <PackageReference Include="Microsoft.Extensions.Http.Polly" Version="8.0.0-preview.2.23153.2" />
+    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.18.1" />
+    <PackageReference Include="NATS.Client" Version="1.0.3" />
+    <PackageReference Include="Okolni.Source.Query.Pool" Version="1.2.8" />
+    <PackageReference Include="Sentry" Version="3.29.1" />
+    <PackageReference Include="Sentry.AspNetCore" Version="3.29.1" />
+    <PackageReference Include="Sentry.EntityFramework" Version="3.29.1" />
+    <PackageReference Include="Serilog" Version="2.12.0" />
+    <PackageReference Include="Serilog.Extensions.Hosting" Version="5.0.1" />
+    <PackageReference Include="Serilog.Sinks.Async" Version="1.5.0" />
+    <PackageReference Include="Serilog.Sinks.Console" Version="4.1.0" />
+    <PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Data_Services\UncoreMetrics.Data\UncoreMetrics.Data.csproj" />
+  </ItemGroup>
 </Project>
