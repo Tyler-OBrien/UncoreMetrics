@@ -1,7 +1,9 @@
+using System.Runtime.InteropServices.Marshalling;
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Prometheus;
+using Sentry;
 using Sentry.Extensibility;
 using Serilog;
 using Serilog.Events;
@@ -120,8 +122,23 @@ public class Program
         {
             Log.Logger.Information($"Enabling Prometheus Metrics at port {apiConfiguration.Prometheus_Metrics_Port}.");
             app.UseMetricServer(apiConfiguration.Prometheus_Metrics_Port);
-            Metrics.DefaultRegistry.AddBeforeCollectCallback(async token => await serviceProvider.GetRequiredService<IPrometheusStatsCollector>().AddStats(token));
+            Metrics.DefaultRegistry.AddBeforeCollectCallback(async (token) =>
+            {
+                try
+                {
+                    using var newScope = serviceProvider.CreateScope();
+                    await newScope.ServiceProvider.GetRequiredService<IPrometheusStatsCollector>().AddStats(token);
+                }
+                // Otherwise Prometheus swallowes these exceptions :(
+                catch (Exception ex)
+                {
+                    SentrySdk.CaptureException(ex);
+                    Serilog.Log.Logger.Error(ex, "Error when trying to execute AddBeforeCollectCallBack Prometheus callback");
+                }
+            });
         }
+
+
 
         app.UseSwagger();
         app.UseSwaggerUI();
