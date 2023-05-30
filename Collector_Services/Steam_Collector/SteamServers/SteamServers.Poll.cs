@@ -81,7 +81,7 @@ public partial class SteamServers : ISteamServers
         var maxConcurrency = _configuration.MaxConcurrency;
 
         var newSolver = new PollSolver(_logger);
-        using var pool = new QueryConnectionPool(token: token);
+        var pool = new QueryConnectionPool(token: token);
         pool.ReceiveTimeout = 750;
         pool.SendTimeout = 750;
         pool.Message += msg => { _logger.LogInformation("Pool Message: {msg}", msg); };
@@ -107,11 +107,12 @@ public partial class SteamServers : ISteamServers
             delayCount++;
         }
 
-        cancellationTokenSource.Cancel();
+        await cancellationTokenSource.CancelAsync();
         if (delayCount >= _configuration.PollRunTimeout)
             _logger.LogWarning("[Warning] Operation timed out, reached {delayMax} Seconds, so we terminated. ",
                 delayCount);
         var serverInfos = queue.Outgoing;
+        await pool.DisposeAsync(token);
 
 
         stopwatch.Stop();
@@ -124,7 +125,7 @@ public partial class SteamServers : ISteamServers
         _logger.LogInformation(
             "Total Players: {playersCount}, Total Servers: {serverInfosCount}",
             serverInfos.Sum(info => info.ServerInfo?.Players), serverInfos.Count);
-        await _scrapeJobStatusService.EndRun(runType);
+        await _scrapeJobStatusService.EndRun(runType, token);
         return serverInfos.ToList();
     }
 }

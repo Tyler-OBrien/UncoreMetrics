@@ -121,7 +121,7 @@ public partial class SteamServers : ISteamServers
         _logger.LogInformation("Queueing Tasks");
 
         var newSolver = new DiscoverySolver(_geoIpService, _logger);
-        using var pool = new QueryConnectionPool(token: token);
+        var pool = new QueryConnectionPool(token: token);
         pool.ReceiveTimeout = 750;
         pool.SendTimeout = 750;
         pool.Message += msg => { _logger.LogInformation("Pool Message: {msg}", msg); };
@@ -149,11 +149,12 @@ public partial class SteamServers : ISteamServers
             delayCount++;
         }
 
-        cancellationTokenSource.Cancel();
+        await cancellationTokenSource.CancelAsync();
         if (delayCount >= _configuration.DiscoveryRunTimeout)
             _logger.LogWarning("[Warning] Operation timed out, reached {delayMax} Seconds, so we terminated. ",
                 _configuration.DiscoveryRunTimeout);
         var serverInfos = queue.Outgoing.ToList();
+        await pool.DisposeAsync(token);
 
         stopwatch.Stop();
         _logger.LogInformation("Took {ElapsedMilliseconds}ms to get {ServersCount} Server infos from list",

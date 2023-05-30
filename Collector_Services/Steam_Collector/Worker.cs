@@ -31,7 +31,6 @@ public class Worker : BackgroundService
             _logger.LogInformation("Worker running at: {time}", DateTimeOffset.Now);
 
             await RunActions();
-            //await AltRun();
             _logger.LogInformation("Finished Run...");
             await Task.Delay(5000, stoppingToken);
         }
