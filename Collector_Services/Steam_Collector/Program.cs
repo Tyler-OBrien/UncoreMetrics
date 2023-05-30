@@ -37,7 +37,7 @@ public class Program
             .MinimumLevel.Override("Microsoft.EntityFrameworkCore", LogEventLevel.Warning)
 #endif
             .WriteTo.File($"Logs/{extraLogName}Log.log", outputTemplate: outputFormat,
-                    restrictedToMinimumLevel: LogEventLevel.Information, retainedFileCountLimit: 10,
+                restrictedToMinimumLevel: LogEventLevel.Information, retainedFileCountLimit: 10,
                 rollingInterval: RollingInterval.Day)
             .WriteTo.Console(outputTemplate: outputFormat, restrictedToMinimumLevel: LogEventLevel.Information)
             .Enrich.FromLogContext().CreateLogger();
@@ -113,9 +113,9 @@ public class Program
 
                 services.AddSingleton<IGeoIPService, MaxMindService>();
                 services.AddScoped<ISteamServers, SteamServers.SteamServers>();
-                services.AddScoped<IClickHouseService, ClickHouseService>();
+                services.AddSingleton<IClickHouseService, ClickHouseService>();
                 services.AddScoped<IScrapeJobStatusService, ScrapeJobStatusService>();
-                services.AddScoped<IServerUpdateQueue, ServerUpdateNATSQueue>();
+                services.AddSingleton<IServerUpdateQueue, ServerUpdateNATSQueue>();
 
                 services.AddHostedService<Worker>();
             })
@@ -135,6 +135,5 @@ public class Program
         Log.Logger.Error(e.Exception,
             "[ERROR] Unobserved Error: {UnobservedTaskExceptionEventArgs} - {UnobservedTaskExceptionEventArgsException} - {senderObj}",
             e, e.Exception, sender);
-        throw e.Exception;
     }
 }
