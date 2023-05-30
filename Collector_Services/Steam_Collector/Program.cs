@@ -36,13 +36,11 @@ public class Program
 #if !DEBUG
             .MinimumLevel.Override("Microsoft.EntityFrameworkCore", LogEventLevel.Warning)
 #endif
-            .WriteTo.Async(config =>
-            {
-                config.File($"Logs/{extraLogName}Log.log", outputTemplate: outputFormat,
+            .WriteTo.File($"Logs/{extraLogName}Log.log", outputTemplate: outputFormat,
                     restrictedToMinimumLevel: LogEventLevel.Information, retainedFileCountLimit: 10,
-                    rollingInterval: RollingInterval.Day);
-                config.Console(outputTemplate: outputFormat, restrictedToMinimumLevel: LogEventLevel.Information);
-            }).Enrich.FromLogContext().CreateLogger();
+                rollingInterval: RollingInterval.Day)
+            .WriteTo.Console(outputTemplate: outputFormat, restrictedToMinimumLevel: LogEventLevel.Information)
+            .Enrich.FromLogContext().CreateLogger();
         Log.Logger.Information("Loaded SeriLog Logger");
         TaskScheduler.UnobservedTaskException += TaskSchedulerOnUnobservedTaskException;
 
