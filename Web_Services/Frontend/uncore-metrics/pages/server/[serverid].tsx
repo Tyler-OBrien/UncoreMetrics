@@ -50,6 +50,10 @@ const Server = () => {
   // @ts-ignore
   const [data, setData] = React.useState<Server>(undefined); // @ts-ignore
 
+
+  const [specificGameData, setSpecificGameData] = React.useState<any>(undefined); // @ts-ignore
+
+
   const [locations, setLocations] = React.useState<PingLocation[]>(undefined); // @ts-ignore
 
   const [uptimeData, setUptimeData] = React.useState<
@@ -91,7 +95,7 @@ const Server = () => {
   //https://stackoverflow.com/questions/6108819/javascript-timestamp-to-relative-time
   function getRelativeTime(d1: Date, d2: Date = new Date()) {
     // in miliseconds
-    
+
     var units: Record<string, number> = {
       year: 24 * 60 * 60 * 1000 * 365,
       month: (24 * 60 * 60 * 1000 * 365) / 12,
@@ -117,7 +121,7 @@ const Server = () => {
   }
   const updateData = async (serverid: string) => {
     const serverFetchRequest = fetch(
-      `${globalThis?.window?.location?.origin?.endsWith("uncore.app") ? "/api": "https://api.uncore.app"}/v1/servers/${serverid}`
+      `${globalThis?.window?.location?.origin?.endsWith("uncore.app") ? "/api" : "https://api.uncore.app"}/v1/servers/${serverid}`
     );
 
     const serverDataResponse = await serverFetchRequest;
@@ -130,13 +134,27 @@ const Server = () => {
       setData(serverResponse?.data);
     }
     var serverLocationFetch = await fetch(
-      `${globalThis?.window?.location?.origin?.endsWith("uncore.app") ? "/api": "https://api.uncore.app"}/v1/locations`
+      `${globalThis?.window?.location?.origin?.endsWith("uncore.app") ? "/api" : "https://api.uncore.app"}/v1/locations`
     );
     const serverLocationResponse: LocationRequest =
       await serverLocationFetch.json();
     if (serverLocationResponse.data) {
       setLocations(serverLocationResponse.data);
     }
+    const specificGameDataFetch = fetch(
+      `${globalThis?.window?.location?.origin?.endsWith("uncore.app") ? "/api" : "https://api.uncore.app"}/v1/serverdata/${serverid}/${serverResponse.data?.appID ?? ""}`
+    );
+    const specificGameDataResponse = await specificGameDataFetch;
+    const serverData: any = await specificGameDataResponse.json();
+    if (serverData.error) {
+      setError(serverData.error.Message);
+    }
+    if (serverData.data) {
+      console.log(serverData.data)
+      setSpecificGameData(serverData.data);
+    }
+
+
     setLoading(false);
   };
   const handlePlayerDataTimeRangeChange = async (event: SelectChangeEvent) => {
@@ -153,7 +171,7 @@ const Server = () => {
     let serverPlayerDataRequest;
     if (hours < 12 && hours != -1) {
       serverPlayerDataRequest = await fetch(
-        `${globalThis?.window?.location?.origin?.endsWith("uncore.app") ? "/api": "https://api.uncore.app"}/v1/servers/playerdataraw/${serverid}?hours=${hours}`
+        `${globalThis?.window?.location?.origin?.endsWith("uncore.app") ? "/api" : "https://api.uncore.app"}/v1/servers/playerdataraw/${serverid}?hours=${hours}`
       );
       const playerDataResponse: ServerRawPlayerDataResponse =
         await serverPlayerDataRequest.json();
@@ -170,8 +188,7 @@ const Server = () => {
     if (maxHoursGroupBy >= 12) {
       let groupby: number = Math.ceil(days / MAGIC_NUMBER_MAX_RESULTS);
       serverPlayerDataRequest = await fetch(
-        `${globalThis?.window?.location?.origin?.endsWith("uncore.app") ? "/api": "https://api.uncore.app"}/v1/servers/playerdata1d/${serverid}?days=${days}${
-          groupby > 1 ? "&groupby=" + groupby : ""
+        `${globalThis?.window?.location?.origin?.endsWith("uncore.app") ? "/api" : "https://api.uncore.app"}/v1/servers/playerdata1d/${serverid}?days=${days}${groupby > 1 ? "&groupby=" + groupby : ""
         }`
       );
     } else {
@@ -180,8 +197,7 @@ const Server = () => {
         groupby = 0;
       }
       serverPlayerDataRequest = await fetch(
-        `${globalThis?.window?.location?.origin?.endsWith("uncore.app") ? "/api": "https://api.uncore.app"}/v1/servers/playerdata/${serverid}?hours=${hours}${
-          groupby >= 1 ? "&groupby=" + groupby : ""
+        `${globalThis?.window?.location?.origin?.endsWith("uncore.app") ? "/api" : "https://api.uncore.app"}/v1/servers/playerdata/${serverid}?hours=${hours}${groupby >= 1 ? "&groupby=" + groupby : ""
         }`
       );
     }
@@ -205,7 +221,7 @@ const Server = () => {
     let maxHoursGroupBy: number = Math.ceil(hours / MAGIC_NUMBER_MAX_RESULTS);
     if (hours < 12 && hours != -1) {
       serverUptimeDataRequest = await fetch(
-        `${globalThis?.window?.location?.origin?.endsWith("uncore.app") ? "/api": "https://api.uncore.app"}/v1/servers/uptimedataraw/${serverid}?hours=${hours}`
+        `${globalThis?.window?.location?.origin?.endsWith("uncore.app") ? "/api" : "https://api.uncore.app"}/v1/servers/uptimedataraw/${serverid}?hours=${hours}`
       );
       const uptimeDataResponse: ServerRawUptimeDataResponse =
         await serverUptimeDataRequest.json();
@@ -222,8 +238,7 @@ const Server = () => {
     if (maxHoursGroupBy >= 12) {
       let groupby: number = Math.ceil(days / MAGIC_NUMBER_MAX_RESULTS);
       serverUptimeDataRequest = await fetch(
-        `${globalThis?.window?.location?.origin?.endsWith("uncore.app") ? "/api": "https://api.uncore.app"}/v1/servers/uptimedata1d/${serverid}?days=${days}${
-          groupby > 1 ? "&groupby=" + groupby : ""
+        `${globalThis?.window?.location?.origin?.endsWith("uncore.app") ? "/api" : "https://api.uncore.app"}/v1/servers/uptimedata1d/${serverid}?days=${days}${groupby > 1 ? "&groupby=" + groupby : ""
         }`
       );
     } else {
@@ -232,8 +247,7 @@ const Server = () => {
         groupby = 0;
       }
       serverUptimeDataRequest = await fetch(
-        `${globalThis?.window?.location?.origin?.endsWith("uncore.app") ? "/api": "https://api.uncore.app"}/v1/servers/uptimedata/${serverid}?hours=${hours}${
-          groupby >= 1 ? "&groupby=" + groupby : ""
+        `${globalThis?.window?.location?.origin?.endsWith("uncore.app") ? "/api" : "https://api.uncore.app"}/v1/servers/uptimedata/${serverid}?hours=${hours}${groupby >= 1 ? "&groupby=" + groupby : ""
         }`
       );
     }
@@ -404,7 +418,7 @@ const Server = () => {
                       )?.locationName ?? ping.locationID}
                     </dt>
                     <dd>
-                      {ping.failed && ping.pingMs == 0 ? "Server blocks Pings": `${ping.pingMs}ms`} -{" "}
+                      {ping.failed && ping.pingMs == 0 ? "Server blocks Pings" : `${ping.pingMs}ms`} -{" "}
                       {getRelativeTime(new Date(ping.lastCheck))}
                     </dd>
                   </React.Fragment>
@@ -446,8 +460,7 @@ const Server = () => {
               containerComponent={
                 <VictoryVoronoiContainer
                   labels={({ datum }) =>
-                    `${new Date(datum.x).toLocaleString()}\n${
-                      datum.y
+                    `${new Date(datum.x).toLocaleString()}\n${datum.y
                     }% successful checks\n ${datum.online}/${datum.ping}`
                   }
                   labelComponent={
@@ -467,7 +480,7 @@ const Server = () => {
               <VictoryLine
                 interpolation="natural"
                 theme={VictoryTheme.material}
-                
+
                 style={{ labels: {}, data: { stroke: "skyblue" } }}
                 data={uptimeData?.data?.map((d: any) => {
                   return {
@@ -475,8 +488,8 @@ const Server = () => {
                     y: d.uptime
                       ? SimpleRound(d.uptime, 2)
                       : d.isOnline
-                      ? 100
-                      : 0,
+                        ? 100
+                        : 0,
                     ping: d.pingCount ?? (d.isOnline ? 1 : 0),
                     online: d.onlineCount ?? (d.isOnline ? 1 : 0),
                   };
@@ -484,6 +497,44 @@ const Server = () => {
                 domain={{ y: [0, 100] }}
               />
             </VictoryChart>
+          </Item>
+        </Grid>
+        <Grid xs md={6} mdOffset={0} padding={3}>
+          <Item className={styles.serverPropertyList}>
+            <dl>
+              {Object.keys(specificGameData).map((key: string) => {
+                return (
+                  <React.Fragment key={key}>
+                    <dt>
+                      {key}
+                    </dt>
+                    <dd>
+                      {
+                        specificGameData[key]
+                          ?.toString()
+                          ?.split('\\n')
+                          ?.map((line, index) => {
+                            // Regex to detect URLs
+                            const urlRegex = /(https?:\/\/[^\s]+)/g;
+
+                            // Convert URLs to anchor tags
+                            const convertedLine = line.split(urlRegex).map((text, i) => {
+                              return urlRegex.test(text) ? <a key={i} href={text} target="_blank" rel="nofollow ugc noopener noreferrer" style={{ color: 'blue', textDecoration: 'underline' }}>{text}</a> : text;
+                            });
+
+                            return (
+                              <React.Fragment key={index}>
+                                {convertedLine}
+                                <br />
+                              </React.Fragment>
+                            );
+                          })
+                      }
+                    </dd>
+                  </React.Fragment>
+                );
+              })}
+            </dl>
           </Item>
         </Grid>
       </Grid>
