@@ -513,12 +513,12 @@ const Server = () => {
                         specificGameData[key]
                           ?.toString()
                           ?.split('\\n')
-                          ?.map((line, index) => {
+                          ?.map((line: string, index: number) => {
                             // Regex to detect URLs
                             const urlRegex = /(https?:\/\/[^\s]+)/g;
 
                             // Convert URLs to anchor tags
-                            const convertedLine = line.split(urlRegex).map((text, i) => {
+                            const convertedLine = line.split(urlRegex).map((text: string, i: number) => {
                               return urlRegex.test(text) ? <a key={i} href={text} target="_blank" rel="nofollow ugc noopener noreferrer" style={{ color: 'blue', textDecoration: 'underline' }}>{text}</a> : text;
                             });
 
