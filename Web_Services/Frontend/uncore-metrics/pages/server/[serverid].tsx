@@ -150,7 +150,6 @@ const Server = () => {
       setError(serverData.error.Message);
     }
     if (serverData.data) {
-      console.log(serverData.data)
       setSpecificGameData(serverData.data);
     }
 
