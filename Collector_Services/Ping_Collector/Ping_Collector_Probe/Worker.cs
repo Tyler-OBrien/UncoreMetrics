@@ -135,7 +135,7 @@ namespace Ping_Collector_Probe
                 delayCount++;
             }
 
-            cancellationTokenSource.Cancel();
+            await cancellationTokenSource.CancelAsync();
             if (delayCount >= _config.PollRunTimeout)
                 _logger.LogWarning("[Warning] Operation timed out, reached {delayMax} Seconds, so we terminated. ",
                     _config.PollRunTimeout);
@@ -151,8 +151,7 @@ namespace Ping_Collector_Probe
             _logger.LogInformation(
                 "Total Servers: {serverInfosCount}",
                 serverInfos.Count);
-            await _scrapeJobStatusService.EndRun(runType);
-
+            await _scrapeJobStatusService.EndRun(runType );
             return serverInfos;
         }
 
@@ -205,17 +204,17 @@ namespace Ping_Collector_Probe
             {
                 try
                 {
-                    using (Ping ping = new Ping())
+                    using Ping ping = new Ping();
+                    var pingResponse = await ping.SendPingAsync(poolItem.Address, 1000);
+                    if (pingResponse.Status == IPStatus.Success)
                     {
-                        var pingResponse = await ping.SendPingAsync(poolItem.Address, 5000);
-                        if (pingResponse.Status == IPStatus.Success)
+                        return (new ServerPing()
                         {
-                            return (new ServerPing()
-                            {
-                                LastCheck = DateTime.UtcNow, PingMs = pingResponse.RoundtripTime,
-                                ServerId = poolItem.ServerId, LocationID = _config.Location.LocationID
-                            }, true);
-                        }
+                            LastCheck = DateTime.UtcNow,
+                            PingMs = pingResponse.RoundtripTime,
+                            ServerId = poolItem.ServerId,
+                            LocationID = _config.Location.LocationID
+                        }, true);
                     }
                 }
                 catch (PingException) { /* Yum */ }

@@ -45,7 +45,7 @@ namespace Ping_Collector_Probe
             }
             finally
             {
-                Log.CloseAndFlush();
+                await Log.CloseAndFlushAsync();
             }
         }
 
@@ -72,7 +72,7 @@ namespace Ping_Collector_Probe
 
 
                     services.AddSingleton<IScrapeJobStatusService, ScrapeJobStatusService>();
-                    services.AddScoped<IPingCollectorAPI, PingCollectorAPI>();
+                    services.AddSingleton<IPingCollectorAPI, PingCollectorAPI>();
                     services.AddHttpClient<IPingCollectorAPI, PingCollectorAPI>()
                         .SetHandlerLifetime(TimeSpan.FromMinutes(5))
                         .AddPolicyHandler(GetRetryPolicy());

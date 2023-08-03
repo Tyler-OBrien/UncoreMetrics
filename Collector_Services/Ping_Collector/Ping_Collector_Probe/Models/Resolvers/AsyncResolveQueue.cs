@@ -63,10 +63,13 @@ public class AsyncResolveQueue<TIn, TOut> : IDisposable
     {
         try
         {
+            if (token.IsCancellationRequested || _beingDisposed)
+                return;
+
             while (_incoming.TryDequeue(out var item))
             {
                 if (token.IsCancellationRequested || _beingDisposed)
-                    break;
+                    return;
                 try
                 {
                     Interlocked.Increment(ref _running);
