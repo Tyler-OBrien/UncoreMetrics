@@ -15,17 +15,15 @@ namespace Ping_Collector.Controllers
     [Route("v1/PingJobs")]
     public class PingJobsController : ControllerBase
     {
-        private readonly IClickHouseService _clickHouseService;
 
         private readonly ServersContext _genericServersContext;
         private readonly ILogger _logger;
 
 
-        public PingJobsController(ServersContext serversContext, IClickHouseService clickHouse,
+        public PingJobsController(ServersContext serversContext,
             ILogger<PingJobsController> logger)
         {
             _genericServersContext = serversContext;
-            _clickHouseService = clickHouse;
             _logger = logger;
         }
 

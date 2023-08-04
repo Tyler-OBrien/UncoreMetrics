@@ -101,8 +101,6 @@ public class Program
             options.UseNpgsql(pingCollectorConfiguration.PostgresConnectionString);
         });
 
-        builder.Services.AddScoped<IClickHouseService, ClickHouseService>();
-
         builder.Services.AddScoped<JSONErrorMiddleware>();
         builder.Services.Configure<ApiBehaviorOptions>(options =>
         {
