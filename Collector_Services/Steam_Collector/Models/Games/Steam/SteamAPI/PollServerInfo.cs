@@ -30,19 +30,16 @@ public class PollServerInfo : IGenericServerInfo
 
     public RuleResponse? ServerRules { get; set; }
 
-    // If was down before, but up Now, or up but now down
-    public bool StatusChanged { get; set; }
 
-
-    internal void UpdateServer(ulong appid, int nextCheckSeconds, List<int> nextCheckFailed, int daysUntilServerMarkedAsDead)
+    internal void UpdateServer(ulong appid, int nextCheckSeconds, List<int> nextCheckFailed, int daysUntilServerMarkedAsDead, bool failIfPlayersFails)
     {
-        if (ServerInfo == null)
+        if (ServerInfo == null || (ServerPlayers == null && failIfPlayersFails))
         {
             ExistingServer.FailedChecks += 1;
             var nextCheckFailedSeconds = nextCheckFailed.ElementAtOrDefault(ExistingServer.FailedChecks - 1);
             if (nextCheckFailedSeconds == default) nextCheckFailedSeconds = nextCheckFailed.Last();
             ExistingServer.NextCheck = DateTime.UtcNow.AddSeconds(nextCheckFailedSeconds);
-            if (ExistingServer.FailedChecks > 1)
+            if (ExistingServer.FailedChecks > 3)
             {
                 ExistingServer.Players = 0;
                 ExistingServer.IsOnline = false;

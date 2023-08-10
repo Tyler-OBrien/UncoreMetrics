@@ -55,6 +55,14 @@ public abstract class BaseResolver
     /// </summary>
     public virtual SteamServerListQueryBuilder? CustomQuery { get; }
 
+
+    /// <summary>
+    /// If failing to get A2S_Players should fail the check and not update anything (useful for Rust, where max players is often above what a2s_info is useful for..
+    /// </summary>
+    public virtual bool A2SPlayersFailEverything => false;
+
+
+
     /// <summary>
     ///     Can be overriden to handle the behavior of the result of Polls. By default, it calls HandleServersGenericStatusChange, updates each Server with the latest
     ///     information, and calls HandleServersGeneric
@@ -65,7 +73,7 @@ public abstract class BaseResolver
     {
         await HandleServersGenericStatusChange(servers.ToList<IGenericServerInfo>(), false);
         servers.ForEach(server => server.UpdateServer(AppId, _configuration.SecondsBetweenChecks,
-            _configuration.SecondsBetweenFailedChecks, _configuration.DaysUntilServerMarkedDead));
+            _configuration.SecondsBetweenFailedChecks, _configuration.DaysUntilServerMarkedDead, A2SPlayersFailEverything));
         await HandleServersGeneric(servers.ToList<IGenericServerInfo>());
     }
 

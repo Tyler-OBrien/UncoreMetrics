@@ -122,8 +122,7 @@ public partial class SteamServers : ISteamServers
 
         var newSolver = new DiscoverySolver(_geoIpService, _logger);
         var pool = new QueryConnectionPool(token: token);
-        pool.ReceiveTimeout = 750;
-        pool.SendTimeout = 750;
+      
         pool.Message += msg => { _logger.LogInformation("Pool Message: {msg}", msg); };
         pool.Error += exception =>
         {
@@ -131,6 +130,8 @@ public partial class SteamServers : ISteamServers
             throw exception;
         };
         pool.Setup();
+        pool.ReceiveTimeout = 2000;
+        pool.SendTimeout = 2000;
 
         using var queue = new AsyncResolveQueue<QueryPoolItem<SteamListServer>, DiscoveredServerInfo>(_logger,
             servers.Select(server => new QueryPoolItem<SteamListServer>(pool, server)), maxConcurrency, newSolver,

@@ -82,8 +82,6 @@ public partial class SteamServers : ISteamServers
 
         var newSolver = new PollSolver(_logger);
         var pool = new QueryConnectionPool(token: token);
-        pool.ReceiveTimeout = 750;
-        pool.SendTimeout = 750;
         pool.Message += msg => { _logger.LogInformation("Pool Message: {msg}", msg); };
         pool.Error += exception =>
         {
@@ -91,6 +89,8 @@ public partial class SteamServers : ISteamServers
             throw exception;
         };
         pool.Setup();
+        pool.ReceiveTimeout = 2000;
+        pool.SendTimeout = 2000;
         using var queue = new AsyncResolveQueue<QueryPoolItem<Server>, PollServerInfo>(_logger,
             servers.Select(server => new QueryPoolItem<Server>(pool, server)), maxConcurrency, newSolver,
             cancellationTokenSource.Token);

@@ -25,6 +25,8 @@ public class RustResolver : BaseResolver
     public override string Name => "Rust";
     public override ulong AppId => 252490;
 
+    public override bool A2SPlayersFailEverything => true;
+
     public override async Task<List<Server>> GetServers()
     {
         var servers = await _genericServersContext.RustServers

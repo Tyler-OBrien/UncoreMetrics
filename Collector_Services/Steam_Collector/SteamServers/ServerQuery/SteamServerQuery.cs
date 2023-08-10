@@ -26,7 +26,7 @@ public static class SteamServerQuery
     {
         try
         {
-            var info = await pool.GetInfoAsync(endPoint, 5); // Get the Server info
+            var info = await pool.GetInfoAsync(endPoint, 3); // Get the Server info
 
             return info;
         }
@@ -48,7 +48,7 @@ public static class SteamServerQuery
     {
         try
         {
-            var players = await pool.GetPlayersAsync(endPoint, 5); // Get the Server info
+            var players = await pool.GetPlayersAsync(endPoint, 3); // Get the Server info
 
             return players;
         }
@@ -70,7 +70,7 @@ public static class SteamServerQuery
     {
         try
         {
-            var rules = await pool.GetRulesAsync(endPoint, 5); // Get the Server info
+            var rules = await pool.GetRulesAsync(endPoint, 3); // Get the Server info
 
             return rules;
         }
