@@ -361,3 +361,10 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+Collector_Services/Ping_Collector/Ping_Collector_Probe/Logs/
+
+Collector_Services/Steam_Collector/Logs/
+
+Web_Services/API/Logs/
+
+Integration_Services/DiscordBot/Logs/

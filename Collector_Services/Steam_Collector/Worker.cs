@@ -6,7 +6,9 @@ namespace UncoreMetrics.Steam_Collector;
 
 public class Worker : BackgroundService
 {
-    public const int SECONDS_BETWEEN_DISCOVERY = 600;
+
+    private readonly Random random = new Random();
+    public const int SECONDS_BETWEEN_DISCOVERY = 300;
 
     private readonly SteamCollectorConfiguration _configuration;
     private readonly ILogger<Worker> _logger;
@@ -32,7 +34,7 @@ public class Worker : BackgroundService
 
             await RunActions();
             _logger.LogInformation("Finished Run...");
-            await Task.Delay(5000, stoppingToken);
+            await Task.Delay(4000 + random.Next(1000, 4000) , stoppingToken);
         }
     }
 
@@ -49,7 +51,7 @@ public class Worker : BackgroundService
             _logger.LogInformation("----------------------");
             _logger.LogInformation("Starting Discovery...");
             _logger.LogInformation("----------------------");
-            _nextDiscoveryTime = DateTime.UtcNow.AddSeconds(SECONDS_BETWEEN_DISCOVERY);
+            _nextDiscoveryTime = DateTime.UtcNow.AddSeconds(SECONDS_BETWEEN_DISCOVERY + random.Next(600));
             var serversCount = await resolver.Discovery();
             _logger.LogInformation("----------------------");
             _logger.LogInformation("Discovery Complete... Found {serversCount} Servers.", serversCount);

@@ -125,7 +125,7 @@ namespace UncoreMetrics.API.Controllers;
             Type baseType = typeof(Server);
             Type derivedType = derivedObject.GetType();
 
-            // Get the properties that are declared only in the derived class
+            // Get the properties that are dec11lared only in the derived class
             PropertyInfo[] derivedProperties = derivedType.GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
 
             Dictionary<string, object> extraProperties = new Dictionary<string, object>();
@@ -135,7 +135,7 @@ namespace UncoreMetrics.API.Controllers;
             {
                 if (baseType.GetProperty(property.Name) == null) // Ensure the property is not in the base class
                 {
-                    extraProperties.Add(property.Name, property.GetValue(derivedObject));
+                    extraProperties.Add(property.Name, property.GetValue(derivedObject)!);
                 }
             }
 

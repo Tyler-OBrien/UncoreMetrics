@@ -12,19 +12,29 @@
     <None Include="..\..\.editorconfig" Link=".editorconfig" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="MaxMind.GeoIP2" Version="5.2.0" />
+    <PackageReference Include="ClrHeapAllocationAnalyzer" Version="3.0.0" />
+    <PackageReference Include="EFCore.BulkExtensions" Version="8.0.0-rc.1.2" />
+    <PackageReference Include="MaxMind.GeoIP2" Version="5.1.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.4">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="7.0.4">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.0" />
     <PackageReference Include="Microsoft.Extensions.Http.Polly" Version="8.0.0" />
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.19.5" />
-    <PackageReference Include="NATS.Client" Version="1.1.1" />
-    <PackageReference Include="Okolni.Source.Query.Pool" Version="1.5.0" />
-    <PackageReference Include="Sentry" Version="3.41.3" />
-    <PackageReference Include="Sentry.AspNetCore" Version="3.41.3" />
-    <PackageReference Include="Sentry.EntityFramework" Version="3.41.3" />
+    <PackageReference Include="NATS.Client" Version="1.1.0" />
+    <PackageReference Include="Okolni.Source.Query.Pool" Version="1.4.3-alpha" />
+    <PackageReference Include="Sentry" Version="3.41.0" />
+    <PackageReference Include="Sentry.AspNetCore" Version="3.41.0" />
+    <PackageReference Include="Sentry.EntityFramework" Version="3.41.0" />
     <PackageReference Include="Serilog" Version="3.1.1" />
-    <PackageReference Include="Serilog.Extensions.Hosting" Version="8.0.0" />
+    <PackageReference Include="Serilog.Extensions.Hosting" Version="7.0.0" />
     <PackageReference Include="Serilog.Sinks.Async" Version="1.5.0" />
-    <PackageReference Include="Serilog.Sinks.Console" Version="5.0.1" />
+    <PackageReference Include="Serilog.Sinks.Console" Version="5.0.0" />
     <PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
   </ItemGroup>
   <ItemGroup>
