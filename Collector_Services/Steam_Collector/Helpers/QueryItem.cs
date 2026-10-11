@@ -2,7 +2,7 @@
 
 namespace UncoreMetrics.Steam_Collector.Helpers;
 
-public class QueryPoolItem<T>
+public struct QueryPoolItem<T>
 {
     public QueryPoolItem(IQueryConnectionPool queryConnectionPool, T item)
     {

@@ -26,22 +26,22 @@ public class ClickHouseServer
 
     public async Task Insert(IEnumerable<ClickHouseGenericServer> servers, CancellationToken token = default)
     {
-        using var connection = CreateConnection();
+        await using var connection = CreateConnection();
         using var bulkCopyInterface = new ClickHouseBulkCopy(connection)
         {
             DestinationTableName = TableName,
             BatchSize = 100000
         };
-
+        await bulkCopyInterface.InitAsync();
         // Example data to insert
         await bulkCopyInterface.WriteToServerAsync(ClickHouseGenericServer.ToDatabase(servers), token);
     }
 
     public async Task<double> GetServerUptime(string serverId, int lastHours = 0, CancellationToken token = default)
     {
-        using var connection = CreateConnection();
+        await using var connection = CreateConnection();
 
-        using var command = connection.CreateCommand();
+        await using var command = connection.CreateCommand();
         command.AddParameter("serverId", "UUID", serverId);
         command.CommandText =
            "SELECT countMerge(online_count) / countMerge(ping_count) * 100 FROM generic_server_stats_uptime_mv Where server_id = {serverId:UUID}";
@@ -62,15 +62,15 @@ public class ClickHouseServer
 
     public async Task<List<ClickHouseRawUptimeData>> GetUptimeDataRaw(string serverID, int lastHours, CancellationToken token = default)
     {
-        using var connection = CreateConnection();
+        await using var connection = CreateConnection();
 
-        using var command = connection.CreateCommand();
+        await using var command = connection.CreateCommand();
         command.AddParameter("serverId", "UUID", serverID);
         command.AddParameter("lastHours", "Int32", lastHours);
 
         command.CommandText =
             "Select server_id, is_online, current_check_time from generic_server_stats where server_id = {serverId:UUID} and current_check_time > DATE_SUB(NOW(), INTERVAL {lastHours:Int32} HOUR) Order by current_check_time desc LIMIT 1000";
-        var result = await command.ExecuteReaderAsync(token);
+        await using var result = await command.ExecuteReaderAsync(token);
         List<ClickHouseRawUptimeData> data = new List<ClickHouseRawUptimeData>(lastHours * 2);
         while (await result.ReadAsync(token))
         {
@@ -82,15 +82,15 @@ public class ClickHouseServer
 
     public async Task<List<ClickHouseUptimeData>> GetUptimeData(string serverID, int lastHours, CancellationToken token = default)
     {
-        using var connection = CreateConnection();
+        await using var connection = CreateConnection();
 
-        using var command = connection.CreateCommand();
+        await using var command = connection.CreateCommand();
         command.AddParameter("serverId", "UUID", serverID);
         command.AddParameter("lastHours", "Int32", lastHours);
 
         command.CommandText =
             "Select server_id, appid, countMerge(online_count) as online_count, countMerge(ping_count) as ping_count, average_time from generic_server_stats_uptime_mv where server_id = {serverId:UUID} and average_time > DATE_SUB(NOW(), INTERVAL {lastHours:Int32} HOUR) GROUP BY server_id, appid, average_time Order by average_time desc LIMIT 500;";
-        var result = await command.ExecuteReaderAsync(token);
+        await using var result = await command.ExecuteReaderAsync(token);
         List<ClickHouseUptimeData> data = new List<ClickHouseUptimeData>(lastHours * 2);
         while (await result.ReadAsync(token))
         {
@@ -102,16 +102,16 @@ public class ClickHouseServer
 
     public async Task<List<ClickHouseUptimeData>> GetUptimeData(string serverID, int lastHours, int hoursGroupBy, CancellationToken token = default)
     {
-        using var connection = CreateConnection();
+        await using var connection = CreateConnection();
 
-        using var command = connection.CreateCommand();
+        await using var command = connection.CreateCommand();
         command.AddParameter("serverId", "UUID", serverID);
         command.AddParameter("lastHours", "Int32", lastHours);
         command.AddParameter("hoursGroupBy", "Int32", hoursGroupBy);
 
         command.CommandText =
             "Select server_id, appid, countMerge(online_count) as online_count, countMerge(ping_count) as ping_count, average_time from generic_server_stats_uptime_mv where server_id = {serverId:UUID} and average_time > DATE_SUB(NOW(), INTERVAL {lastHours:Int32} HOUR) GROUP BY server_id, appid, toStartOfInterval(average_time, INTERVAL {hoursGroupBy:Int32} HOUR) as average_time Order by average_time desc LIMIT 500;";
-        var result = await command.ExecuteReaderAsync(token);
+        await using var result = await command.ExecuteReaderAsync(token);
         List<ClickHouseUptimeData> data = new List<ClickHouseUptimeData>(lastHours / hoursGroupBy);
         while (await result.ReadAsync(token))
         {
@@ -122,15 +122,15 @@ public class ClickHouseServer
 
     public async Task<List<ClickHouseUptimeData>> GetUptimeData1d(string serverId, int lastDays, CancellationToken token = default)
     {
-        using var connection = CreateConnection();
+        await using var connection = CreateConnection();
 
-        using var command = connection.CreateCommand();
+        await using var command = connection.CreateCommand();
         command.AddParameter("serverId", "UUID", serverId);
         command.AddParameter("lastDays", "Int32", lastDays);
 
         command.CommandText =
             "Select server_id, appid, countMerge(online_count) as online_count, countMerge(ping_count) as ping_count, average_time from generic_server_stats_uptime_mv_day where server_id = {serverId:UUID} and average_time > DATE_SUB(NOW(), INTERVAL {lastDays:Int32} DAY) GROUP BY server_id, appid, average_time Order by average_time desc LIMIT 500;";
-        var result = await command.ExecuteReaderAsync(token);
+        await using var result = await command.ExecuteReaderAsync(token);
         List<ClickHouseUptimeData> data = new List<ClickHouseUptimeData>(lastDays);
         while (await result.ReadAsync(token))
         {
@@ -142,16 +142,16 @@ public class ClickHouseServer
 
     public async Task<List<ClickHouseUptimeData>> GetUptimeData1d(string serverId, int lastDays, int daysGroupBy, CancellationToken token = default)
     {
-        using var connection = CreateConnection();
+        await using var connection = CreateConnection();
 
-        using var command = connection.CreateCommand();
+        await using var command = connection.CreateCommand();
         command.AddParameter("serverId", "UUID", serverId);
         command.AddParameter("lastDays", "Int32", lastDays);
         command.AddParameter("daysGroupBy", "Int32", daysGroupBy);
 
         command.CommandText =
             "Select server_id, appid, countMerge(online_count) as online_count, countMerge(ping_count) as ping_count, average_time from generic_server_stats_uptime_mv_day where server_id = {serverId:UUID} and average_time > DATE_SUB(NOW(), INTERVAL {lastDays:Int32} DAY) GROUP BY server_id, appid, toStartOfInterval(average_time, INTERVAL {daysGroupBy:Int32} DAY) as average_time Order by average_time desc LIMIT 500;";
-        var result = await command.ExecuteReaderAsync(token);
+        await using var result = await command.ExecuteReaderAsync(token);
         List<ClickHouseUptimeData> data = new List<ClickHouseUptimeData>(lastDays / daysGroupBy);
         while (await result.ReadAsync(token))
         {
@@ -162,9 +162,9 @@ public class ClickHouseServer
 
     public async Task<List<ClickHouseUptimeData>> GetUptimeDataOverall(ulong? appId, int lastHours, CancellationToken token = default)
     {
-        using var connection = CreateConnection();
+        await using var connection = CreateConnection();
 
-        using var command = connection.CreateCommand();
+        await using var command = connection.CreateCommand();
         command.AddParameter("lastHours", "Int32", lastHours);
         bool hasAppid = false;
         if (appId == null || appId == 0)
@@ -180,7 +180,7 @@ public class ClickHouseServer
                 "Select appid, countMerge(online_count) as online_count, countMerge(ping_count) as ping_count, average_time from generic_server_stats_uptime_mv where appid = {appId:UInt64} and average_time > DATE_SUB(NOW(), INTERVAL {lastHours:Int32} HOUR) GROUP BY appid, average_time Order by average_time desc LIMIT 500;";
         }
 
-        var result = await command.ExecuteReaderAsync(token);
+        await using var result = await command.ExecuteReaderAsync(token);
         List<ClickHouseUptimeData> data = new List<ClickHouseUptimeData>(lastHours * 2);
         while (await result.ReadAsync(token))
         {
@@ -192,9 +192,9 @@ public class ClickHouseServer
 
     public async Task<List<ClickHouseUptimeData>> GetUptimeDataOverall(ulong? appId, int lastHours, int hoursGroupBy, CancellationToken token = default)
     {
-        using var connection = CreateConnection();
+        await using var connection = CreateConnection();
 
-        using var command = connection.CreateCommand();
+        await using var command = connection.CreateCommand();
         command.AddParameter("lastHours", "Int32", lastHours);
         command.AddParameter("hoursGroupBy", "Int32", hoursGroupBy);
         bool hasAppid = false;
@@ -213,7 +213,7 @@ public class ClickHouseServer
 
 
 
-        var result = await command.ExecuteReaderAsync(token);
+        await using var result = await command.ExecuteReaderAsync(token);
         List<ClickHouseUptimeData> data = new List<ClickHouseUptimeData>(lastHours / hoursGroupBy);
         while (await result.ReadAsync(token))
         {
@@ -224,16 +224,16 @@ public class ClickHouseServer
 
     public async Task<List<ClickHouseRawPlayerData>> GetPlayerDataRaw(string serverID, int lastHours, CancellationToken token = default)
     {
-        using var connection = CreateConnection();
+        await using var connection = CreateConnection();
 
-        using var command = connection.CreateCommand();
+        await using var command = connection.CreateCommand();
         command.AddParameter("serverId", "UUID", serverID);
         command.AddParameter("lastHours", "Int32", lastHours);
 
         command.CommandText =
             "Select server_id, players, current_check_time from generic_server_stats where server_id = {serverId:UUID} and current_check_time > DATE_SUB(NOW(), INTERVAL {lastHours:Int32} HOUR) Order by current_check_time desc LIMIT 1000";
 
-        var result = await command.ExecuteReaderAsync(token);
+        await using var result = await command.ExecuteReaderAsync(token);
         List<ClickHouseRawPlayerData> data = new List<ClickHouseRawPlayerData>(lastHours * 2);
         while (await result.ReadAsync(token))
         {
@@ -246,15 +246,15 @@ public class ClickHouseServer
 
     public async Task<List<ClickHousePlayerData>> GetPlayerData(string serverID, int lastHours, CancellationToken token = default)
     {
-        using var connection = CreateConnection();
+        await using var connection = CreateConnection();
 
-        using var command = connection.CreateCommand();
+        await using var command = connection.CreateCommand();
         command.AddParameter("serverId", "UUID", serverID);
         command.AddParameter("lastHours", "Int32", lastHours);
 
         command.CommandText =
             "Select server_id, appid, avgMerge(players_avg) as players_avg, minMerge(players_min) as players_min, maxMerge(players_max) as players_max, average_time from generic_server_stats_players_mv where server_id = {serverId:UUID} and average_time > DATE_SUB(NOW(), INTERVAL {lastHours:Int32} HOUR) GROUP BY server_id, appid, average_time Order by average_time desc LIMIT 500;";
-        var result = await command.ExecuteReaderAsync(token);
+        await using var result = await command.ExecuteReaderAsync(token);
         List<ClickHousePlayerData> data = new List<ClickHousePlayerData>(lastHours * 2);
         while (await result.ReadAsync(token))
         {
@@ -265,16 +265,16 @@ public class ClickHouseServer
     }
     public async Task<List<ClickHousePlayerData>> GetPlayerData(string serverID, int lastHours, int hoursGroupBy, CancellationToken token = default)
     {
-        using var connection = CreateConnection();
+        await using var connection = CreateConnection();
 
-        using var command = connection.CreateCommand();
+        await using var command = connection.CreateCommand();
         command.AddParameter("serverId", "UUID", serverID);
         command.AddParameter("lastHours", "Int32", lastHours);
         command.AddParameter("hoursGroupBy", "Int32", hoursGroupBy);
 
         command.CommandText =
             "Select server_id, appid, avgMerge(players_avg) as players_avg, minMerge(players_min) as players_min, maxMerge(players_max) as players_max, average_time from generic_server_stats_players_mv where server_id = {serverId:UUID} and average_time > DATE_SUB(NOW(), INTERVAL {lastHours:Int32} HOUR) GROUP BY server_id, appid, toStartOfInterval(average_time, INTERVAL {hoursGroupBy:Int32} HOUR) as average_time Order by average_time desc LIMIT 500;";
-        var result = await command.ExecuteReaderAsync(token);
+        await using var result = await command.ExecuteReaderAsync(token);
         List<ClickHousePlayerData> data = new List<ClickHousePlayerData>(lastHours / hoursGroupBy);
         while (await result.ReadAsync(token))
         {
@@ -286,15 +286,15 @@ public class ClickHouseServer
 
     public async Task<List<ClickHousePlayerData>> GetPlayerData1d(string serverId, int lastDays, CancellationToken token = default)
     {
-        using var connection = CreateConnection();
+        await using var connection = CreateConnection();
 
-        using var command = connection.CreateCommand();
+        await using var command = connection.CreateCommand();
         command.AddParameter("serverId", "UUID", serverId);
         command.AddParameter("lastDays", "Int32", lastDays);
 
         command.CommandText =
             "Select server_id, appid, avgMerge(players_avg) as players_avg, minMerge(players_min) as players_min, maxMerge(players_max) as players_max, average_time from generic_server_stats_players_mv_day where server_id = {serverId:UUID} and average_time > DATE_SUB(NOW(), INTERVAL {lastDays:Int32} DAY) GROUP BY server_id, appid, average_time Order by average_time desc LIMIT 500;";
-        var result = await command.ExecuteReaderAsync(token);
+        await using var result = await command.ExecuteReaderAsync(token);
         List<ClickHousePlayerData> data = new List<ClickHousePlayerData>(lastDays);
         while (await result.ReadAsync(token))
         {
@@ -305,16 +305,16 @@ public class ClickHouseServer
     }
     public async Task<List<ClickHousePlayerData>> GetPlayerData1d(string serverId, int lastDays, int daysGroupBy, CancellationToken token = default)
     {
-        using var connection = CreateConnection();
+        await using var connection = CreateConnection();
 
-        using var command = connection.CreateCommand();
+        await using var command = connection.CreateCommand();
         command.AddParameter("serverId", "UUID", serverId);
         command.AddParameter("lastDays", "Int32", lastDays);
         command.AddParameter("daysGroupBy", "Int32", daysGroupBy);
 
         command.CommandText =
             "Select server_id, appid, avgMerge(players_avg) as players_avg, minMerge(players_min) as players_min, maxMerge(players_max) as players_max, average_time from generic_server_stats_players_mv_day where server_id = {serverId:UUID} and average_time > DATE_SUB(NOW(), INTERVAL {lastDays:Int32} DAY) GROUP BY server_id, appid, toStartOfInterval(average_time, INTERVAL {daysGroupBy:Int32} DAY) as average_time Order by average_time desc LIMIT 500;";
-        var result = await command.ExecuteReaderAsync(token);
+        await using var result = await command.ExecuteReaderAsync(token);
         List<ClickHousePlayerData> data = new List<ClickHousePlayerData>(lastDays / daysGroupBy);
         while (await result.ReadAsync(token))
         {
@@ -327,9 +327,9 @@ public class ClickHouseServer
 
     public async Task<List<ClickHousePlayerData>> GetPlayerDataOverall(ulong? appId, int lastHours, CancellationToken token = default)
     {
-        using var connection = CreateConnection();
+        await using var connection = CreateConnection();
 
-        using var command = connection.CreateCommand();
+        await using var command = connection.CreateCommand();
         command.AddParameter("lastHours", "Int32", lastHours);
         bool hasAppid = false;
         if (appId == null || appId == 0)
@@ -351,7 +351,7 @@ public class ClickHouseServer
            command.CommandText =
                "Select sum(temp.players_max) as players_max, temp.appid as appid, temp.average_time as average_time from (select appid, (maxMerge(players_max)) as players_max, average_time from generic_server_stats_players_mv_overall where average_time > DATE_SUB(NOW(), INTERVAL {lastHours:Int32} HOUR) and appid = {appId:UInt64} group by appid, average_time, server_id order by average_time desc) temp group by temp.appid, temp.average_time order by average_time desc";
         }
-        var result = await command.ExecuteReaderAsync(token);
+        await using var result = await command.ExecuteReaderAsync(token);
         List<ClickHousePlayerData> data = new List<ClickHousePlayerData>(lastHours * 2);
         while (await result.ReadAsync(token))
         {
@@ -362,9 +362,9 @@ public class ClickHouseServer
     }
     public async Task<List<ClickHousePlayerData>> GetPlayerDataOverall(ulong? appId, int lastHours, int hoursGroupBy, CancellationToken token = default)
     {
-        using var connection = CreateConnection();
+        await using var connection = CreateConnection();
 
-        using var command = connection.CreateCommand();
+        await using var command = connection.CreateCommand();
         command.AddParameter("lastHours", "Int32", lastHours);
         command.AddParameter("hoursGroupBy", "Int32", hoursGroupBy);
         bool hasAppid = false;
@@ -386,7 +386,7 @@ public class ClickHouseServer
             command.CommandText =
                 "Select sum(temp.players_max) as players_max, temp.appid as appid, temp.average_time as average_time from (select appid, (maxMerge(players_max)) as players_max, average_time from generic_server_stats_players_mv_overall where average_time > DATE_SUB(NOW(), INTERVAL {lastHours:Int32} HOUR) and appid = {appId:UInt64} group by appid,  toStartOfInterval(average_time, INTERVAL {hoursGroupBy:Int32} HOUR) as average_time, server_id order by average_time desc) temp group by temp.appid, temp.average_time order by average_time desc";
         }
-        var result = await command.ExecuteReaderAsync(token);
+        await using var result = await command.ExecuteReaderAsync(token);
         List<ClickHousePlayerData> data = new List<ClickHousePlayerData>(lastHours / hoursGroupBy);
         while (await result.ReadAsync(token))
         {
@@ -395,6 +395,23 @@ public class ClickHouseServer
 
         return data;
     }
+
+    public async Task<ulong> GetOverallAnalytics(CancellationToken token = default)
+    {
+        await using var connection = CreateConnection();
+
+        await using var command = connection.CreateCommand();
+
+        command.CommandText =
+            "SELECT count() AS total_rows FROM generic_server_stats WHERE current_check_time >= (now() - toIntervalDay(1))";
+
+
+        var getScalar = await command.ExecuteScalarAsync(token);
+
+
+        return Convert.ToUInt64(getScalar);
+    }
+
 
 
     private ClickHousePlayerData OverallPlayerDataFromReader(DbDataReader reader,  bool hasAppId)

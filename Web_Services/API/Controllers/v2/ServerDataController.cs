@@ -98,6 +98,15 @@ public class ServerDataController : ControllerBase
         return Ok(new DataResponse<List<ClickHousePlayerData>>(await _clickHouseService.GetPlayerData(id.ToString(), hours.Value, groupby.Value, token)));
     }
 
+    [HttpGet("OverallAnalytics")]
+    [SwaggerResponse(200, Type = typeof(DataResponse<List<ClickHouseUptimeData>>), Description = "On success")]
+    public async Task<ActionResult<IResponse>> GetOverallAnalytics(CancellationToken token)
+    {
+        var getResponse = await _clickHouseService.GetOverallAnalytics(token);
+
+        return Ok(new DataResponse<OverallAnalyticsResponseDTO>(new OverallAnalyticsResponseDTO() { ServerAnalyticsLast24H = getResponse }));
+    }
+
 
 
 }

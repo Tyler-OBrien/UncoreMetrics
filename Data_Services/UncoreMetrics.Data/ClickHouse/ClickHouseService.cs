@@ -70,4 +70,6 @@ public class ClickHouseService : IClickHouseService
 
     public Task<List<ClickHousePlayerData>> GetPlayerData1d(string serverId, int lastDays, int daysGroupBy,
         CancellationToken token = default) => _server.GetPlayerData1d(serverId, lastDays, daysGroupBy, token);
+
+    public Task<ulong> GetOverallAnalytics(CancellationToken token) => _server.GetOverallAnalytics(token);
 }

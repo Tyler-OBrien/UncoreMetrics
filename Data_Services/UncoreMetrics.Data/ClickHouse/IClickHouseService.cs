@@ -51,4 +51,6 @@ public interface IClickHouseService
         CancellationToken token = default);
 
     public Task<List<ClickHousePlayerData>> GetPlayerData1d(string serverId, int lastDays, int daysGroupBy, CancellationToken token = default);
+
+    public Task<ulong> GetOverallAnalytics(CancellationToken token);
 }

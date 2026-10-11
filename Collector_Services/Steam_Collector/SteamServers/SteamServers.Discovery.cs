@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Net;
 using System.Runtime.InteropServices;
+using Okolni.Source.Query.Pool.Common;
 using Okolni.Source.Query.Source;
 using Sentry;
 using Serilog.Context;
@@ -167,6 +168,8 @@ public partial class SteamServers : ISteamServers
         _logger.LogInformation(
             "Total Players: {playersCount}, Total Servers: {serverInfosCount}",
             serverInfos.Sum(info => info.ServerInfo?.Players), serverInfos.Count);
+        _logger.LogInformation($"Server Query Pool Information, {ArrayPoolInterface.NotReturnedArrays} Not Returned Arrays into ArrayPool");
+
         await _scrapeJobStatusService.EndRun(runType);
 
         return serverInfos;
