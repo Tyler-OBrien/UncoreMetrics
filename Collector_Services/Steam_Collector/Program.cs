@@ -80,7 +80,6 @@ public class Program
                     options.MinimumBreadcrumbLevel = LogLevel.Debug;
                     options.MinimumEventLevel = LogLevel.Warning;
                     options.TracesSampleRate = 1.0;
-                    options.AddEntityFramework();
                 });
                 services.AddSentry().AddSentryOptions((options =>
                 {
@@ -90,7 +89,6 @@ public class Program
                     options.MinimumBreadcrumbLevel = LogLevel.Debug;
                     options.MinimumEventLevel = LogLevel.Warning;
                     options.TracesSampleRate = 1.0;
-                    options.AddEntityFramework();
                 } ));
                 services.AddLogging();
 

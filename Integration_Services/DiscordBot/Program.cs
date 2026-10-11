@@ -88,7 +88,6 @@ namespace DiscordBot
                             options.MinimumBreadcrumbLevel = LogLevel.Debug;
                             options.MinimumEventLevel = LogLevel.Warning;
                             options.TracesSampleRate = 1.0;
-                            options.AddEntityFramework();
                         });
                     }
 

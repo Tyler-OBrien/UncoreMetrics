@@ -9,7 +9,6 @@ using DSharpPlus.EventArgs;
 using DSharpPlus.Interactivity.Extensions;
 using DSharpPlus.SlashCommands;
 using Humanizer;
-using Humanizer.Localisation;
 using Microsoft.Extensions.Options;
 using Sentry;
 using Sentry.Extensibility;
