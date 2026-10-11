@@ -1,20 +1,20 @@
 #See https://aka.ms/containerfastmode to understand how Visual Studio uses this Dockerfile to build your images for faster debugging.
+# Build from the repo root: docker build -f Collector_Services/Ping_Collector/Ping_Collector/Dockerfile .
 
-FROM mcr.microsoft.com/dotnet/aspnet:7.0 AS base
+FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS base
 WORKDIR /app
-EXPOSE 80
-EXPOSE 443
+EXPOSE 8080
 
-FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 WORKDIR /src
-COPY ["Ping_Collector/Ping_Collector.csproj", "Ping_Collector/"]
-RUN dotnet restore "Ping_Collector/Ping_Collector.csproj"
+COPY ["Collector_Services/Ping_Collector/Ping_Collector/Ping_Collector.csproj", "Collector_Services/Ping_Collector/Ping_Collector/"]
+COPY ["Data_Services/UncoreMetrics.Data/UncoreMetrics.Data.csproj", "Data_Services/UncoreMetrics.Data/"]
+RUN dotnet restore "Collector_Services/Ping_Collector/Ping_Collector/Ping_Collector.csproj"
 COPY . .
-WORKDIR "/src/Ping_Collector"
-RUN dotnet build "Ping_Collector.csproj" -c Release -o /app/build
+WORKDIR "/src/Collector_Services/Ping_Collector/Ping_Collector"
 
 FROM build AS publish
-RUN dotnet publish "Ping_Collector.csproj" -c Release -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "Ping_Collector.csproj" -c Release -o /app/publish --no-restore /p:UseAppHost=false
 
 FROM base AS final
 WORKDIR /app
