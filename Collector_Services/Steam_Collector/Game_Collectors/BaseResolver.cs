@@ -174,7 +174,6 @@ public abstract class BaseResolver
 
         var servers = await _steamServers.GenericServerDiscovery(query, cancellationTokenSource.Token);
         var addresses = servers.Select(i => i.Address).ToList();
-        var ports = servers.Select(i => i.Port).ToList();
 
         var entities = await _genericServersContext.Servers
             .Where(a => addresses.Contains(a.Address)).AsNoTracking()
@@ -213,10 +212,11 @@ public abstract class BaseResolver
             var unfoundServers = servers.Where(server => server.ServerID == Guid.Empty);
 
             var addresses = unfoundServers.Select(i => i.Address).ToList();
-            var ports = unfoundServers.Select(i => i.QueryPort).ToList();
 
+            // Filter by address only, then match address + query port exactly below. Also filtering by port would
+            // pull in every server sharing a common port like 27015.
             var entities = await _genericServersContext.Servers
-                .Where(a => addresses.Contains(a.Address) || ports.Contains(a.QueryPort)).AsNoTracking()
+                .Where(a => addresses.Contains(a.Address)).AsNoTracking()
                 .Select(i => new { i.Address, i.QueryPort, i.ServerID }).ToListAsync(); // SQL IN
 
             var hashMapDictionary = new Dictionary<IPEndPoint, Guid>();
