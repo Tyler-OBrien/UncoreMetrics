@@ -30,10 +30,14 @@ public class PollSolver : IGenericAsyncSolver<QueryPoolItem<Server>, PollServerI
         {
             var endPoint = new IPEndPoint(server.Address, server.QueryPort);
             var info = await pool.GetServerInfoSafeAsync(endPoint);
+            // Without info the check fails regardless (see PollServerInfo.UpdateServer), so don't spend
+            // two more rounds of timeouts on rules and players for a server that isn't answering
+            if (info == null)
+                return (new PollServerInfo(server, null, null, null), success: false);
             var rules = await pool.GetRulesSafeAsync(endPoint);
             var players = await pool.GetPlayersSafeAsync(endPoint);
 
-            if (info != null && rules != null && players != null)
+            if (rules != null && players != null)
                 return (new PollServerInfo(server, info, players, rules), success: true);
 #if DEBUG
             _logger.LogDebug("Failed to get {Address} - {Name} - {LastCheck}", server.Address, server.Name,

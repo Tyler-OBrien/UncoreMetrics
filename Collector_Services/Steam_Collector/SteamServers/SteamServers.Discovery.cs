@@ -35,10 +35,13 @@ public class DiscoverySolver : IGenericAsyncSolver<QueryPoolItem<SteamListServer
             var (Host, Port) = SteamServerQuery.ParseIPAndPort(server.Address);
             var endPoint = new IPEndPoint(Host, Port);
             var info = await pool.GetServerInfoSafeAsync(endPoint);
+            // Discovery drops servers without info anyway, so skip the rest
+            if (info == null)
+                return (null, success: false);
             var rules = await pool.GetRulesSafeAsync(endPoint);
             var players = await pool.GetPlayersSafeAsync(endPoint);
             var geoIpInformation = await _geoIpService.GetIpInformation(Host.ToString());
-            if (info != null && rules != null && players != null)
+            if (rules != null && players != null)
                 return (new DiscoveredServerInfo(Host, Port, server, info, players, rules, geoIpInformation),
                     success: true);
 #if DEBUG
