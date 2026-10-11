@@ -119,7 +119,7 @@ public class SteamServerListQueryBuilder
     /// </summary>
     public SteamServerListQueryBuilder Map(string Map)
     {
-        _stringBuilder.Append($"\\gamedir\\{Uri.EscapeDataString(Map)}");
+        _stringBuilder.Append($"\\map\\{Uri.EscapeDataString(Map)}");
         return this;
     }
 
