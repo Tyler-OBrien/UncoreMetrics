@@ -33,6 +33,9 @@ public class JSONErrorMiddleware : IMiddleware
         {
             Log.Error(ex, "Unexpected error");
             SentrySdk.CaptureException(ex);
+            if (context.Response.HasStarted)
+                return;
+            context.Response.StatusCode = StatusCodes.Status500InternalServerError;
             var errorResponse =
                 new ErrorResponse(context.Response.StatusCode, "Internal Server Error", "internal_error");
 

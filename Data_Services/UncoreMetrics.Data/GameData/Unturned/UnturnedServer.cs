@@ -2,7 +2,7 @@
 
 public class UnturnedServer : Server
 {
-    [ServerRulesProperty("Browser_Desc_Full_Line_{0}")]
+    [ServerRulesProperty("Browser_Desc_Full_Line_{0}", ValueType.Running)]
     public string? BrowserDescription { get; set; }
 
 

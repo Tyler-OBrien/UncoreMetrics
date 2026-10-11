@@ -51,6 +51,9 @@ public class ServerDataController : ControllerBase
                 $"Please use uptimedata1d to group data larger then 24 hours. Note that the granularity/min groupby of that data is 1 day. ", "too_old_data"));
         }
 
+        if (groupby <= 0)
+            return BadRequest(new ErrorResponse(HttpStatusCode.BadRequest, "groupby must be greater than 0", "invalid_groupby"));
+
         if (groupby.HasValue == false)
         {
             if (hours / 0.5 > 500)
@@ -82,6 +85,9 @@ public class ServerDataController : ControllerBase
             return BadRequest(new ErrorResponse(HttpStatusCode.BadRequest,
                 $"Please use playerdata1d to group data larger then 24 hours. Note that the granularity/min groupby of that data is 1 day. ", "too_old_data"));
         }
+
+        if (groupby <= 0)
+            return BadRequest(new ErrorResponse(HttpStatusCode.BadRequest, "groupby must be greater than 0", "invalid_groupby"));
 
         if (groupby.HasValue == false)
         {
