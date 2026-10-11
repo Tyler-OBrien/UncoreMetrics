@@ -1,0 +1,34 @@
+name: Build and test
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Restore
+        run: dotnet restore UncoreMetrics.sln
+
+      - name: Build
+        run: dotnet build UncoreMetrics.sln -c Release --no-restore
+
+      - name: Test
+        run: dotnet test --solution UncoreMetrics.sln -c Release --no-build
+
+      - name: Check for vulnerable packages
+        run: |
+          dotnet list UncoreMetrics.sln package --vulnerable --include-transitive | tee vulnerable.txt
+          if grep -q "has the following vulnerable packages" vulnerable.txt; then
+            echo "::error::Vulnerable packages found"
+            exit 1
+          fi
