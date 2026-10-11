@@ -35,9 +35,7 @@ public static class IPAddressExtensions
         // IPv6
         if (ip.AddressFamily == AddressFamily.InterNetworkV6)
             return ip.IsIPv6LinkLocal ||
-#if NET6_0
                    ip.IsIPv6UniqueLocal ||
-#endif
                    ip.IsIPv6SiteLocal;
 
         throw new NotSupportedException(

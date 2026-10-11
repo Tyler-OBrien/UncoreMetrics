@@ -36,7 +36,7 @@ namespace DiscordBot.Helpers
             var cf = new ConnectionFactory();
             var natsConnection = cf.CreateConnection(GetOpts());
 
-            natsConnection.SubscribeAsync("ServerUpdate", (obj, args) =>
+            natsConnection.SubscribeAsync("ServerUpdate", async (obj, args) =>
             {
                 try
                 {
@@ -44,12 +44,12 @@ namespace DiscordBot.Helpers
                     var updateInfo = JsonSerializer.Deserialize<ServerUpdateNATs>(DATA);
                     if (updateInfo.ServersDown != null && updateInfo.ServersDown.Any())
                     {
-                        DealWithServerUpdate(updateInfo.ServersDown, "Down");
+                        await DealWithServerUpdate(updateInfo.ServersDown, "Down");
                     }
 
                     if (updateInfo.ServersUp != null && updateInfo.ServersUp.Any())
                     {
-                        DealWithServerUpdate(updateInfo.ServersUp, "Up");
+                        await DealWithServerUpdate(updateInfo.ServersUp, "Up");
                     }
                 }
                 catch (Exception e)

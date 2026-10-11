@@ -2,7 +2,6 @@ using Microsoft.EntityFrameworkCore;
 using Polly;
 using Polly.Extensions.Http;
 using Sentry;
-using Sentry.AspNetCore;
 using Sentry.Extensions.Logging;
 using Serilog;
 using Serilog.Context;
@@ -81,15 +80,7 @@ public class Program
                     options.MinimumEventLevel = LogLevel.Warning;
                     options.TracesSampleRate = 1.0;
                 });
-                services.AddSentry().AddSentryOptions((options =>
-                {
-                    options.Dsn = baseConfiguration?.SENTRY_DSN ?? string.Empty;
-                    options.SendDefaultPii = true;
-                    options.AttachStacktrace = true;
-                    options.MinimumBreadcrumbLevel = LogLevel.Debug;
-                    options.MinimumEventLevel = LogLevel.Warning;
-                    options.TracesSampleRate = 1.0;
-                } ));
+                services.AddSentry();
                 services.AddLogging();
 
                 var resolver = new GameResolvers();

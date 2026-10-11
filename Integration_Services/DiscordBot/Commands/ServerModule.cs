@@ -52,9 +52,7 @@ namespace DiscordBot.Commands
                     searchAddress = IPAddress.None;
                 }
 
-                Guid searchGUID;
-                Guid.TryParse(search, out searchGUID);
-                if (searchGUID == null)
+                if (Guid.TryParse(search, out var searchGUID) == false)
                 {
                     searchGUID = Guid.Empty;
                 }

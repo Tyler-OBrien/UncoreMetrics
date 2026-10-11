@@ -142,14 +142,14 @@ namespace DiscordBot.Commands
                         new DiscordWebhookBuilder().WithContent(
                             $"Looks like it worked! Check out the channel {channel.Mention}!"));
                 }
-                catch (UnauthorizedException unauthorized)
+                catch (UnauthorizedException)
                 {
                     await ctx.EditResponseAsync(new DiscordWebhookBuilder()
                         .WithContent(
                             "The bot needs Send Messages Permission in the channel in order to be able to send out alerts."));
                     return;
                 }
-                catch (NotFoundException notfound)
+                catch (NotFoundException)
                 {
                     await ctx.EditResponseAsync(new DiscordWebhookBuilder()
                         .WithContent(

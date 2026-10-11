@@ -39,8 +39,6 @@ public static class SteamServerQuery
         {
             return null;
         }
-
-        return null;
     }
 
 
@@ -61,8 +59,6 @@ public static class SteamServerQuery
         {
             return null;
         }
-
-        return null;
     }
 
 
@@ -83,7 +79,5 @@ public static class SteamServerQuery
         {
             return null;
         }
-
-        return null;
     }
 }

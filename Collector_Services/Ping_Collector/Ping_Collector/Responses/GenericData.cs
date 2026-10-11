@@ -20,7 +20,7 @@ public class GenericDataResponse : DataResponse<GenericData>
         Data = new GenericData(code, message);
     }
 
-    [JsonPropertyName("data")] public GenericData Data { get; set; }
+    [JsonPropertyName("data")] public new GenericData Data { get; set; }
 }
 
 public class GenericData

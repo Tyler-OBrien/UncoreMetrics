@@ -81,6 +81,13 @@ public class AsyncResolveQueue<TIn, TOut> : IDisposable
                     if (outItem.item != null && !_beingDisposed)
                         Outgoing.Add(outItem.item);
                 }
+                // Count a throwing item as failed and keep this worker alive, otherwise the queue could never reach Done
+                catch (Exception ex)
+                {
+                    Interlocked.Increment(ref _failed);
+                    _logger.LogError(ex, "Exception solving item in Thread {CurrentManagedThreadId}",
+                        Environment.CurrentManagedThreadId);
+                }
                 finally
                 {
                     Interlocked.Increment(ref _completed);

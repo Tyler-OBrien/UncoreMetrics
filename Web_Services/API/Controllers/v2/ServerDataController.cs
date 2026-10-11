@@ -99,7 +99,7 @@ public class ServerDataController : ControllerBase
     }
 
     [HttpGet("OverallAnalytics")]
-    [SwaggerResponse(200, Type = typeof(DataResponse<List<ClickHouseUptimeData>>), Description = "On success")]
+    [SwaggerResponse(200, Type = typeof(DataResponse<OverallAnalyticsResponseDTO>), Description = "On success")]
     public async Task<ActionResult<IResponse>> GetOverallAnalytics(CancellationToken token)
     {
         var getResponse = await _clickHouseService.GetOverallAnalytics(token);
