@@ -5,7 +5,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Ping_Collector_Probe.Models;
-using Ping_Collector_Probe.Models.Resolvers;
+using UncoreMetrics.Data.Helpers;
 using Ping_Collector_Probe.Services;
 using Sentry;
 using Serilog.Context;

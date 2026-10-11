@@ -1,4 +1,4 @@
-﻿namespace UncoreMetrics.Steam_Collector.Helpers;
+﻿namespace UncoreMetrics.Data.Helpers;
 
 public interface IGenericAsyncSolver<TIn, TOut>
 {

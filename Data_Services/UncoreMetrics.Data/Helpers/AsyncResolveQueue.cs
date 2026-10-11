@@ -1,6 +1,7 @@
 ﻿using System.Collections.Concurrent;
+using Microsoft.Extensions.Logging;
 
-namespace Ping_Collector_Probe.Models.Resolvers;
+namespace UncoreMetrics.Data.Helpers;
 
 public class AsyncResolveQueue<TIn, TOut> : IDisposable
 {
