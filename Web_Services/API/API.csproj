@@ -13,7 +13,7 @@
 	  <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
 	  <PublishSingleFile>true</PublishSingleFile>
 	  <SelfContained>true</SelfContained>
-	  <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+	  <RuntimeIdentifier>linux-x64</RuntimeIdentifier>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
