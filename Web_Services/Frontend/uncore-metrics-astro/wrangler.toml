@@ -1,8 +1,14 @@
-name = "uncore-metrics-website"
+name = "uncore-metrics-beta"
 main = "@astrojs/cloudflare/entrypoints/server"
 compatibility_date = "2025-06-19"
 compatibility_flags = [ "nodejs_compat" ]
-# account_id = "<your account id>"  # add before deploying
+account_id = "6b9f7e0e1478562986a4db3cf9fcfac3"
+workers_dev = false
+
+# Served at beta.uncore.app through a route; DNS is a proxied AAAA record for beta pointing at 100:: (discard prefix)
+routes = [
+  { pattern = "beta.uncore.app/*", zone_name = "uncore.app" }
+]
 
 [vars]
 # The Uncore Metrics REST API. Called server-side only: pages fetch at render time,

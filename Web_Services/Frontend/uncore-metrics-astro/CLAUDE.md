@@ -19,7 +19,7 @@ pnpm build            # Type-check (astro check) + build to ./dist
 pnpm preview          # Preview the production build locally
 ```
 
-Deploy with `wrangler deploy` after adding `account_id` to `wrangler.toml`.
+Deploy with `pnpm build && pnpm exec wrangler deploy`. It's served at `beta.uncore.app/*` via a worker route (DNS: proxied AAAA `beta` → `100::`).
 
 ## Architecture
 
@@ -35,8 +35,9 @@ rebranded.
   Add a path to `ALLOWED` before an island can use it.
 - The API base URL is the `UNCORE_API_URL` var in `wrangler.toml`. In dev, `.env` wins (see `.env.example`), because
   wrangler's vars are loaded by `astro dev` too.
-- Responses that aren't JSON count as failures. `uptimedataoverall` on api.uncore.app is behind Cloudflare Access and
-  returns an HTML login page, so the site doesn't use it and the proxy doesn't allow it.
+- Responses that aren't JSON count as failures. `uptimedataoverall` is deliberately hidden behind Cloudflare Access on
+  api.uncore.app because the query is very expensive (it returns an HTML login page), so the site doesn't use it and the
+  proxy doesn't allow it. Don't add it back.
 
 **API shapes:** `models/api.ts`. The API uses ASP.NET's default camelCase, so `ServerID` is `serverID`, `ISP` is `isp`
 and `AppID` is `appID`. Error bodies capitalize `Message`.
