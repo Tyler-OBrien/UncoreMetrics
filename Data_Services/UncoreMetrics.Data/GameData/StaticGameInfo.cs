@@ -24,6 +24,15 @@ namespace UncoreMetrics.Data.GameData
                 new GameInformation(393380, "Squad", "Squad"),
                 new GameInformation(304930, "Unturned", "Unturned"),
                 new GameInformation(1604030, "V Rising", "V-Rising"),
+                // Tracked by the collector's GenericResolver (no game-specific table)
+                new GameInformation(730, "Counter-Strike 2", "Counter-Strike-2"),
+                new GameInformation(892970, "Valheim", "Valheim"),
+                new GameInformation(550, "Left 4 Dead 2", "Left-4-Dead-2"),
+                new GameInformation(4000, "Garry's Mod", "Garrys-Mod"),
+                new GameInformation(440, "Team Fortress 2", "Team-Fortress-2"),
+                new GameInformation(1203620, "Enshrouded", "Enshrouded"),
+                new GameInformation(1149460, "Icarus", "Icarus"),
+                new GameInformation(244850, "Space Engineers", "Space-Engineers"),
             });
     }
 

@@ -77,6 +77,12 @@ public abstract class BaseResolver
     /// </summary>
     public virtual bool A2SPlayersFailEverything => false;
 
+    /// <summary>
+    /// Whether to query A2S_RULES. Resolvers that don't store any rules data (or games whose servers don't answer it)
+    /// return false, which saves a query per server and stops discovery dropping servers that have no rules.
+    /// </summary>
+    public virtual bool QueryRules => true;
+
 
 
     /// <summary>
@@ -169,7 +175,7 @@ public abstract class BaseResolver
     public virtual async Task<int> Poll()
     {
         var cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromMinutes(_configuration.RunForceTimeoutMinutes));
-        var servers = await _steamServers.GenericServerPoll(await GetServers(), cancellationTokenSource.Token);
+        var servers = await _steamServers.GenericServerPoll(await GetServers(), cancellationTokenSource.Token, QueryRules);
         // Abort run if no servers are returned..
         if (servers.Count == 0)
             return 0;
@@ -188,7 +194,7 @@ public abstract class BaseResolver
         var query = CustomQuery;
         if (query == null) query = SteamServerListQueryBuilder.New().AppID(AppId.ToString()).Dedicated().NotEmpty();
 
-        var servers = await _steamServers.GenericServerDiscovery(query, cancellationTokenSource.Token);
+        var servers = await _steamServers.GenericServerDiscovery(query, cancellationTokenSource.Token, QueryRules);
         var addresses = servers.Select(i => i.Address).ToList();
 
         var entities = await _genericServersContext.Servers
@@ -256,8 +262,9 @@ public abstract class BaseResolver
         var serverList = servers.ToList<Server>();
         // Update Generic Servers
         await InsertGenericServer(serverList);
-        // Update Server Specific Info
-        await _genericServersContext.BulkInsertOrUpdateAsync(servers);
+        // Update Server Specific Info (for plain Server rows the generic upsert above already wrote everything)
+        if (typeof(T) != typeof(Server))
+            await _genericServersContext.BulkInsertOrUpdateAsync(servers);
         await transaction.CommitAsync();
         await ClickHouseSubmit(serverList);
     }

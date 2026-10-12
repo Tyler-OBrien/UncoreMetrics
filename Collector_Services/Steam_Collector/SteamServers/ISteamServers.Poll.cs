@@ -11,5 +11,6 @@ public partial interface ISteamServers
     /// </summary>
     /// <param name="servers"></param>
     /// <returns>The list of resolved information about each server.</returns>
-    public Task<List<PollServerInfo>> GenericServerPoll(List<Server> servers, CancellationToken token);
+    /// <param name="queryRules">False to skip A2S_RULES (for games whose rules aren't used or that don't answer it)</param>
+    public Task<List<PollServerInfo>> GenericServerPoll(List<Server> servers, CancellationToken token, bool queryRules = true);
 }

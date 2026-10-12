@@ -11,5 +11,6 @@ public partial interface ISteamServers
     /// </summary>
     /// <param name="appID"></param>
     /// <returns>Returns a list of full Server info to be actioned on with stats for that specific Server type</returns>
-    public Task<List<DiscoveredServerInfo>> GenericServerDiscovery(SteamServerListQueryBuilder queryListQueryBuilder, CancellationToken token);
+    /// <param name="queryRules">False to skip A2S_RULES (for games whose rules aren't used or that don't answer it)</param>
+    public Task<List<DiscoveredServerInfo>> GenericServerDiscovery(SteamServerListQueryBuilder queryListQueryBuilder, CancellationToken token, bool queryRules = true);
 }

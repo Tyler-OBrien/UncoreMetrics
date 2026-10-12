@@ -75,6 +75,27 @@ public sealed class PostgresFixture : IAsyncLifetime
         new(Options.Create(Configuration), context, Substitute.For<ISteamServers>(), Substitute.For<IClickHouseService>(),
             NullLogger<RustResolver>.Instance, Substitute.For<IServerUpdateQueue>());
 
+    public static GenericResolver CreateGenericResolver(ServersContext context, string gameType) =>
+        new(GenericGames.All[gameType], Options.Create(Configuration), context, Substitute.For<ISteamServers>(),
+            Substitute.For<IClickHouseService>(), NullLogger<GenericResolver>.Instance, Substitute.For<IServerUpdateQueue>());
+
+    /// <summary>Plain servers (no game-specific table) for a generic game, all due for a check.</summary>
+    public static List<Server> CreateServers(int count, ulong appId, string game, int addressOffset)
+    {
+        var now = DateTime.UtcNow;
+        return Enumerable.Range(addressOffset, count).Select(i =>
+        {
+            var address = new IPAddress([(byte)(150 + i / 65536), (byte)(i / 256 % 256), (byte)(i % 256), 2]);
+            return new Server
+            {
+                ServerID = Guid.NewGuid(), Name = $"{game} server {i}", Game = game, Map = "de_dust2", AppID = appId,
+                Address = address, IpAddressBytes = address.GetAddressBytes(), Port = 27015, QueryPort = 27015,
+                Players = 10, MaxPlayers = 32, IsOnline = true, LastCheck = now.AddMinutes(-1),
+                NextCheck = now.AddMinutes(-10), FoundAt = now.AddDays(-5)
+            };
+        }).ToList();
+    }
+
     /// <summary>Rust servers with unique addresses, all due for a check.</summary>
     public static List<RustServer> CreateRustServers(int count, int addressOffset = 0)
     {

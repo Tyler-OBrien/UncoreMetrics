@@ -43,6 +43,37 @@ public class SteamCollectorHostTests
     }
 }
 
+public class GenericGameHostTests
+{
+    [Theory]
+    [InlineData("Valheim", 892970UL)]
+    [InlineData("cs2", 730UL)]
+    public void GenericGameType_ResolvesGenericResolver(string gameType, ulong appId)
+    {
+        using var host = Program.BuildHost(
+            ["--Base:GameType=" + gameType, "--Base:PostgresConnectionString=Host=unused", "--Base:SENTRY_DSN=", "--Base:NATSConnectionURL="]);
+        using var scope = host.Services.CreateScope();
+
+        var resolver = scope.ServiceProvider.GetRequiredService<UncoreMetrics.Steam_Collector.Game_Collectors.BaseResolver>();
+
+        var generic = Assert.IsType<UncoreMetrics.Steam_Collector.Game_Collectors.GenericResolver>(resolver);
+        Assert.Equal(appId, generic.AppId);
+        Assert.False(generic.QueryRules);
+    }
+
+    [Fact]
+    public void DedicatedGameType_StillResolvesItsOwnResolver()
+    {
+        using var host = Program.BuildHost(["--Base:GameType=Rust", "--Base:PostgresConnectionString=Host=unused", "--Base:SENTRY_DSN=", "--Base:NATSConnectionURL="]);
+        using var scope = host.Services.CreateScope();
+
+        var resolver = scope.ServiceProvider.GetRequiredService<UncoreMetrics.Steam_Collector.Game_Collectors.BaseResolver>();
+
+        Assert.IsType<UncoreMetrics.Steam_Collector.Game_Collectors.RustResolver>(resolver);
+        Assert.True(resolver.QueryRules);
+    }
+}
+
 public class DiscordBotHostTests
 {
     [Fact]

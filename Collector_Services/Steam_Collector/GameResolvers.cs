@@ -57,7 +57,13 @@ public class GameResolvers
     public bool DoesGameResolverExist(string name)
     {
         if (string.IsNullOrWhiteSpace(name)) return false;
-        return _gameResolvers.ContainsKey(name);
+        return _gameResolvers.ContainsKey(name) || GenericGames.All.ContainsKey(name);
+    }
+
+    /// <summary>The generic game for this type, or null when it has a dedicated resolver.</summary>
+    public GenericGame? GetGenericGame(string name)
+    {
+        return !_gameResolvers.ContainsKey(name) && GenericGames.All.TryGetValue(name, out var game) ? game : null;
     }
 
     public Type GetResolver(string name)
@@ -67,6 +73,6 @@ public class GameResolvers
 
     public string GetValidResolvers()
     {
-        return string.Join(", ", _gameResolvers.Keys.ToList());
+        return string.Join(", ", _gameResolvers.Keys.Concat(GenericGames.All.Keys));
     }
 }

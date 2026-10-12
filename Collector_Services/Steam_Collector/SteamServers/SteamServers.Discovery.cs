@@ -19,11 +19,14 @@ public class DiscoverySolver : IGenericAsyncSolver<QueryPoolItem<SteamListServer
 {
     private readonly IGeoIPService _geoIpService;
     private readonly ILogger _logger;
+    private readonly bool _queryRules;
 
-    public DiscoverySolver(IGeoIPService geoIpService, ILogger logger)
+    /// <param name="queryRules">False for games whose rules aren't used (or that don't answer A2S_RULES)</param>
+    public DiscoverySolver(IGeoIPService geoIpService, ILogger logger, bool queryRules = true)
     {
         _geoIpService = geoIpService;
         _logger = logger;
+        _queryRules = queryRules;
     }
 
     public async Task<(DiscoveredServerInfo? item, bool success)> Solve(QueryPoolItem<SteamListServer> poolItem)
@@ -38,10 +41,10 @@ public class DiscoverySolver : IGenericAsyncSolver<QueryPoolItem<SteamListServer
             // Discovery drops servers without info anyway, so skip the rest
             if (info == null)
                 return (null, success: false);
-            var rules = await pool.GetRulesSafeAsync(endPoint);
+            var rules = _queryRules ? await pool.GetRulesSafeAsync(endPoint) : null;
             var players = await pool.GetPlayersSafeAsync(endPoint);
             var geoIpInformation = await _geoIpService.GetIpInformation(Host.ToString());
-            if (rules != null && players != null)
+            if (players != null && (rules != null || !_queryRules))
                 return (new DiscoveredServerInfo(Host, Port, server, info, players, rules, geoIpInformation),
                     success: true);
 #if DEBUG
@@ -73,7 +76,7 @@ public partial class SteamServers : ISteamServers
     /// <param name="appID"></param>
     /// <returns>Returns a list of full Server info to be actioned on with stats for that specific Server type</returns>
     public async Task<List<DiscoveredServerInfo>> GenericServerDiscovery(
-        SteamServerListQueryBuilder queryListQueryBuilder, CancellationToken token)
+        SteamServerListQueryBuilder queryListQueryBuilder, CancellationToken token, bool queryRules = true)
     {
         if (_steamApi == null) throw new NullReferenceException("Steam API cannot be null to use HandleGeneric");
 
@@ -102,14 +105,15 @@ public partial class SteamServers : ISteamServers
             "Removed {removedPrivateIPServers} Servers containing Private IP Addresses (Valve Servers use Relays and don't expose, among others)",
             serverListCount - serverList.Count);
 
-        var servers = await GetAllServersDiscovery(serverList, token);
+        var servers = await GetAllServersDiscovery(serverList, token, queryRules);
 
 
         return servers;
     }
 
 
-    private async Task<List<DiscoveredServerInfo>> GetAllServersDiscovery(List<SteamListServer> servers, CancellationToken token)
+    private async Task<List<DiscoveredServerInfo>> GetAllServersDiscovery(List<SteamListServer> servers, CancellationToken token,
+        bool queryRules)
     {
         const string runType = "Discovery";
         using var context = LogContext.PushProperty("RunType", runType);
@@ -122,7 +126,7 @@ public partial class SteamServers : ISteamServers
 
         _logger.LogInformation("Queueing Tasks");
 
-        var newSolver = new DiscoverySolver(_geoIpService, _logger);
+        var newSolver = new DiscoverySolver(_geoIpService, _logger, queryRules);
         var pool = new QueryConnectionPool(token: token);
       
         pool.Message += msg => { _logger.LogInformation("Pool Message: {msg}", msg); };

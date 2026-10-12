@@ -16,10 +16,13 @@ namespace UncoreMetrics.Steam_Collector.SteamServers;
 public class PollSolver : IGenericAsyncSolver<QueryPoolItem<Server>, PollServerInfo>
 {
     private readonly ILogger _logger;
+    private readonly bool _queryRules;
 
-    public PollSolver(ILogger logger)
+    /// <param name="queryRules">False for games whose rules aren't used (or that don't answer A2S_RULES)</param>
+    public PollSolver(ILogger logger, bool queryRules = true)
     {
         _logger = logger;
+        _queryRules = queryRules;
     }
 
     public async Task<(PollServerInfo? item, bool success)> Solve(QueryPoolItem<Server> item)
@@ -34,10 +37,10 @@ public class PollSolver : IGenericAsyncSolver<QueryPoolItem<Server>, PollServerI
             // two more rounds of timeouts on rules and players for a server that isn't answering
             if (info == null)
                 return (new PollServerInfo(server, null, null, null), success: false);
-            var rules = await pool.GetRulesSafeAsync(endPoint);
+            var rules = _queryRules ? await pool.GetRulesSafeAsync(endPoint) : null;
             var players = await pool.GetPlayersSafeAsync(endPoint);
 
-            if (rules != null && players != null)
+            if (players != null && (rules != null || !_queryRules))
                 return (new PollServerInfo(server, info, players, rules), success: true);
 #if DEBUG
             _logger.LogDebug("Failed to get {Address} - {Name} - {LastCheck}", server.Address, server.Name,
@@ -67,15 +70,17 @@ public partial class SteamServers : ISteamServers
     /// </summary>
     /// <param name="appID"></param>
     /// <returns>Returns a list of full Server info to be actioned on with stats for that specific Server type</returns>
-    public async Task<List<PollServerInfo>> GenericServerPoll(List<Server> servers, CancellationToken token)
+    public async Task<List<PollServerInfo>> GenericServerPoll(List<Server> servers, CancellationToken token,
+        bool queryRules = true)
     {
-        var polledServers = await GetAllServersPoll(servers, token);
+        var polledServers = await GetAllServersPoll(servers, token, queryRules);
 
         return polledServers;
     }
 
 
-    private async Task<List<PollServerInfo>> GetAllServersPoll(List<Server> servers, CancellationToken token)
+    private async Task<List<PollServerInfo>> GetAllServersPoll(List<Server> servers, CancellationToken token,
+        bool queryRules)
     {
         const string runType = "Poll";
         using var context = LogContext.PushProperty("RunType", runType);
@@ -86,7 +91,7 @@ public partial class SteamServers : ISteamServers
         // Might want to make this configurable eventually.. Right now Windows runs way worse then other platforms like Linux
         var maxConcurrency = _configuration.MaxConcurrency;
 
-        var newSolver = new PollSolver(_logger);
+        var newSolver = new PollSolver(_logger, queryRules);
         var pool = new QueryConnectionPool(token: token);
         pool.Message += msg => { _logger.LogInformation("Pool Message: {msg}", msg); };
         pool.Error += exception =>

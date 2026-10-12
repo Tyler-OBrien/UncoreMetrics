@@ -97,7 +97,12 @@ public class Program
                 if (resolver.DoesGameResolverExist(gameType) == false)
                     throw new InvalidOperationException(
                         $"Could not find Game Type Resolver: {baseConfiguration.GameType}, Valid Options: {resolver.GetValidResolvers()}");
-                services.AddScoped(typeof(BaseResolver), resolver.GetResolver(gameType));
+                var genericGame = resolver.GetGenericGame(gameType);
+                if (genericGame != null)
+                    services.AddScoped<BaseResolver>(provider =>
+                        ActivatorUtilities.CreateInstance<GenericResolver>(provider, genericGame));
+                else
+                    services.AddScoped(typeof(BaseResolver), resolver.GetResolver(gameType));
                 LogContext.PushProperty("Resolver", gameType, true);
                 Log.Logger.Warning("Starting up with Resolver: {gameType}", gameType);
 

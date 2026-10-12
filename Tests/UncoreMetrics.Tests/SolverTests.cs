@@ -7,6 +7,7 @@ using Okolni.Source.Query.Source;
 using UncoreMetrics.Data;
 using UncoreMetrics.Steam_Collector.Helpers;
 using UncoreMetrics.Steam_Collector.Helpers.Maxmind;
+using UncoreMetrics.Steam_Collector.Models.Tools.Maxmind;
 using UncoreMetrics.Steam_Collector.Models.Games.Steam.SteamAPI;
 using UncoreMetrics.Steam_Collector.SteamServers;
 
@@ -64,6 +65,37 @@ public class SolverTests
         Assert.Equal("Up", result!.ServerInfo!.Name);
         await pool.Received(1).GetRulesAsync(new IPEndPoint(server.Address, server.QueryPort), Arg.Any<int>());
         await pool.Received(1).GetPlayersAsync(new IPEndPoint(server.Address, server.QueryPort), Arg.Any<int>());
+    }
+
+    [Fact]
+    public async Task PollSolver_WithRulesOff_SucceedsWithoutQueryingRules()
+    {
+        var server = CreateServer();
+        var pool = PoolWithInfo(new InfoResponse { Name = "Valheim server" });
+
+        var (result, success) = await new PollSolver(NullLogger.Instance, queryRules: false)
+            .Solve(new QueryPoolItem<Server>(pool, server));
+
+        Assert.True(success);
+        Assert.Null(result!.ServerRules);
+        await pool.DidNotReceive().GetRulesAsync(Arg.Any<IPEndPoint>(), Arg.Any<int>());
+        await pool.Received(1).GetPlayersAsync(Arg.Any<IPEndPoint>(), Arg.Any<int>());
+    }
+
+    [Fact]
+    public async Task DiscoverySolver_WithRulesOff_KeepsServersThatHaveNoRules()
+    {
+        var pool = PoolWithInfo(new InfoResponse { Name = "Valheim server" });
+        pool.GetRulesAsync(Arg.Any<IPEndPoint>(), Arg.Any<int>()).ThrowsAsync(new TimeoutException());
+        var geoIp = Substitute.For<IGeoIPService>();
+        geoIp.GetIpInformation(Arg.Any<string>()).Returns(new IPInformation());
+
+        var (result, success) = await new DiscoverySolver(geoIp, NullLogger.Instance, queryRules: false)
+            .Solve(new QueryPoolItem<SteamListServer>(pool, new SteamListServer { Address = "1.2.3.4:2457" }));
+
+        Assert.True(success);
+        Assert.NotNull(result);
+        await pool.DidNotReceive().GetRulesAsync(Arg.Any<IPEndPoint>(), Arg.Any<int>());
     }
 
     [Fact]
