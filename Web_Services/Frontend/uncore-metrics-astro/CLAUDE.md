@@ -19,7 +19,7 @@ pnpm build            # Type-check (astro check) + build to ./dist
 pnpm preview          # Preview the production build locally
 ```
 
-Deploy with `pnpm build && pnpm exec wrangler deploy`. It's served at `beta.uncore.app/*` via a worker route (DNS: proxied AAAA `beta` → `100::`).
+Deploy with `pnpm build && pnpm exec wrangler deploy`. It's served at `uncore.app/*` via a worker route.
 
 ## Architecture
 

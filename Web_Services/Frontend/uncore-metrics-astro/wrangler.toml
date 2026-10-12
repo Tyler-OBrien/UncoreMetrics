@@ -5,9 +5,9 @@ compatibility_flags = [ "nodejs_compat" ]
 account_id = "6b9f7e0e1478562986a4db3cf9fcfac3"
 workers_dev = false
 
-# Served at beta.uncore.app through a route; DNS is a proxied AAAA record for beta pointing at 100:: (discard prefix)
+# Served at uncore.app through a route (api.uncore.app is a different host, so it isn't matched)
 routes = [
-  { pattern = "beta.uncore.app/*", zone_name = "uncore.app" }
+  { pattern = "uncore.app/*", zone_name = "uncore.app" }
 ]
 
 [vars]
