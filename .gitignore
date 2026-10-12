@@ -368,3 +368,5 @@ Collector_Services/Steam_Collector/Logs/
 Web_Services/API/Logs/
 
 Integration_Services/DiscordBot/Logs/
+.env
+.DS_Store

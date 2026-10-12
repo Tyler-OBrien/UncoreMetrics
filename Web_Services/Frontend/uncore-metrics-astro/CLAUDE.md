@@ -5,8 +5,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## What This Project Does
 
 The Uncore Metrics website: live status, player counts, uptime history and ping results for Steam game servers. It
-reads the UncoreMetrics REST API (`Web_Services/API`, deployed at `https://api.uncore.app`). It replaces the older
-client-side Next.js site in `../uncore-metrics`, which is still in the repo.
+reads the UncoreMetrics REST API (`Web_Services/API`, deployed at `https://api.uncore.app`).
 
 ## Commands
 

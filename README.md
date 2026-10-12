@@ -5,6 +5,6 @@ The [Steam Collector](https://github.com/Tyler-OBrien/UncoreMetrics/tree/master/
 
 [UncoreMetrics.Data](https://github.com/Tyler-OBrien/UncoreMetrics/tree/master/Data_Services/UncoreMetrics.Data), contains the models for each of the database models and various EF Core/Clickhouse setup items.
 
-The [API](https://github.com/Tyler-OBrien/UncoreMetrics/tree/master/Web_Services/API) is implemented in ASP.NET Core as a simple REST API, and is used to get information displayed by the [Front end](https://github.com/Tyler-OBrien/UncoreMetrics/tree/master/Web_Services/Frontend/uncore-metrics), which is in Next.js using Typescript.
+The [API](https://github.com/Tyler-OBrien/UncoreMetrics/tree/master/Web_Services/API) is implemented in ASP.NET Core as a simple REST API, and is used to get information displayed by the [Front end](https://github.com/Tyler-OBrien/UncoreMetrics/tree/master/Web_Services/Frontend/uncore-metrics-astro), an Astro (SSR) site running on Cloudflare Workers at [uncore.app](https://uncore.app).
 
 The Steam Collector uses a [modified Steam Query Library](https://github.com/Tyler-OBrien/Okolni-Source-Query-Pool) that uses a single UDP Socket to send/recv from mutiple servers at once, instead of spawning a single socket per connection/server. It can scan a few thousand servers a second, the biggest slow down being servers which are dead/won't respond.
