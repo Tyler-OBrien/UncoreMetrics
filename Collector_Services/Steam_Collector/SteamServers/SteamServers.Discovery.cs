@@ -145,8 +145,10 @@ public partial class SteamServers : ISteamServers
         var delayCount = 0; 
         while (!queue.Done && delayCount <= _configuration.DiscoveryRunTimeout)
         {
-            LogStatus(pool, servers.Count, queue.Completed, queue.Failed, queue.Successful, maxConcurrency,
-                queue.Running);
+            // Every 10 seconds: with many collectors running, logging every second adds up (console, file and Sentry breadcrumbs)
+            if (delayCount % StatusLogIntervalSeconds == 0)
+                LogStatus(pool, servers.Count, queue.Completed, queue.Failed, queue.Successful, maxConcurrency,
+                    queue.Running);
 
             var scrapeJobUpdate = _scrapeJobStatusService.UpdateStatus(
                 (int)Math.Round(queue.Completed / (double)servers.Count * 100), queue.Completed, servers.Count,
@@ -155,6 +157,7 @@ public partial class SteamServers : ISteamServers
             delayCount++;
         }
 
+        LogStatus(pool, servers.Count, queue.Completed, queue.Failed, queue.Successful, maxConcurrency, queue.Running);
         await cancellationTokenSource.CancelAsync();
         if (delayCount >= _configuration.DiscoveryRunTimeout)
             _logger.LogWarning("[Warning] Operation timed out, reached {delayMax} Seconds, so we terminated. ",
@@ -178,6 +181,8 @@ public partial class SteamServers : ISteamServers
 
         return serverInfos;
     }
+
+    private const int StatusLogIntervalSeconds = 10;
 
     private void LogStatus(QueryConnectionPool pool, int tasksCount, int totalCompleted, int failed,
         int successfullyCompleted, int concurrencyLimit, int totalQueued = 0)
