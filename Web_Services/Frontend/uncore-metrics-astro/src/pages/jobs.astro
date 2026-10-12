@@ -1,0 +1,20 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Hero from "../components/Hero.astro";
+import ErrorState from "../components/ErrorState.astro";
+import JobsLive from "../components/JobsLive";
+import { getJobs } from "../lib/api";
+
+const result = await getJobs();
+Astro.response.headers.set("cache-control", "public, max-age=5");
+---
+
+<BaseLayout title="Scrape jobs · Uncore Metrics">
+	<main id="main-content" class="wrapper stack gap-8 py-10">
+		<Hero
+			title="Scrape jobs"
+			tagline="The collectors' current runs. Discovery finds new servers from the Steam server list, polling re-checks known ones."
+		/>
+		{result.error ? <ErrorState message={result.error} /> : <JobsLive client:load initial={result.data} />}
+	</main>
+</BaseLayout>

@@ -8,7 +8,8 @@ const GUID = "[0-9a-fA-F-]{36}";
 const ALLOWED: RegExp[] = [
   new RegExp(`^v1/servers/${GUID}$`),
   new RegExp(`^v1/servers/(uptimedataraw|uptimedata|uptimedata1d|playerdataraw|playerdata|playerdata1d)/${GUID}$`),
-  /^v1\/servers\/(uptimedataoverall|playerdataoverall)(\/\d+)?$/,
+  // uptimedataoverall is left out: on api.uncore.app it sits behind Cloudflare Access
+  /^v1\/servers\/playerdataoverall(\/\d+)?$/,
   new RegExp(`^v2/servers/(uptimedata|playerdata)/${GUID}$`),
   /^v1\/jobs$/,
 ];
@@ -27,6 +28,14 @@ export const GET: APIRoute = async ({ params, url }) => {
     upstream = await fetch(`${apiBase()}/${path}${url.search}`, { headers: { accept: "application/json" } });
   } catch {
     return Response.json({ error: { code: 502, Message: "Couldn't reach the API", type: "bad_gateway" } }, { status: 502 });
+  }
+
+  // Anything but JSON (e.g. a Cloudflare Access login page) is an upstream failure, not data
+  if (!(upstream.headers.get("content-type") ?? "").includes("json")) {
+    return Response.json(
+      { error: { code: 502, Message: "The API returned an unexpected response", type: "bad_gateway" } },
+      { status: 502 }
+    );
   }
 
   return new Response(upstream.body, {

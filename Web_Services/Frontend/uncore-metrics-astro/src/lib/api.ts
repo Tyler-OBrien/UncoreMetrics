@@ -39,6 +39,11 @@ export async function apiGet<T>(path: string): Promise<ApiResult<T>> {
     return { data: null, error: "Couldn't reach the Uncore Metrics API." };
   }
 
+  // Anything but JSON (e.g. a Cloudflare Access login page) is a failure, not data
+  if (!(response.headers.get("content-type") ?? "").includes("json")) {
+    return { data: null, error: `The API returned an unexpected response (HTTP ${response.status}).` };
+  }
+
   let body: Partial<DataResponse<T> & ErrorResponse>;
   try {
     body = await response.json();
@@ -82,8 +87,15 @@ export const getJobs = () => apiGet<ScrapeJob[]>("v1/jobs");
 
 export const getOverallAnalytics = () => apiGet<OverallAnalytics>("v2/servers/OverallAnalytics");
 
-/** The game list, falling back to a built-in copy if the API doesn't have v1/games yet. */
-export async function getGames(): Promise<Game[]> {
+/**
+ * The game list, falling back to a built-in copy if the API doesn't have v1/games yet. `fromApi` also tells callers
+ * whether the API is new enough to filter servers by appId (both shipped together); an older API ignores the filter.
+ */
+export async function getGames(): Promise<{ games: Game[]; fromApi: boolean }> {
   const result = await apiGet<Game[]>("v1/games");
-  return result.data?.length ? result.data : FALLBACK_GAMES;
+  return result.data?.length ? { games: result.data, fromApi: true } : { games: FALLBACK_GAMES, fromApi: false };
+}
+
+export function gameNameMap(games: Game[]): Record<number, string> {
+  return Object.fromEntries(games.map((game) => [game.appId, game.name]));
 }

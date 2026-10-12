@@ -1,0 +1,49 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Hero from "../../components/Hero.astro";
+import ServerTable from "../../components/ServerTable.astro";
+import Pagination from "../../components/Pagination.astro";
+import ErrorState from "../../components/ErrorState.astro";
+import { getServers, searchServers } from "../../lib/api";
+import { formatNumber } from "../../lib/format";
+
+const params = Astro.url.searchParams;
+const query = params.get("q")?.trim() ?? "";
+const includeDead = params.get("dead") === "1";
+const page = Math.max(1, Number.parseInt(params.get("page") ?? "1", 10) || 1);
+
+const result = query
+	? await searchServers(query, { page, pageSize: 50, includeDead })
+	: await getServers({ page, pageSize: 50, includeDead });
+const list = result.data;
+
+Astro.response.headers.set("cache-control", "public, max-age=30");
+---
+
+<BaseLayout title={query ? `"${query}" · Servers · Uncore Metrics` : "Servers · Uncore Metrics"}>
+	<main id="main-content" class="wrapper stack gap-8 py-10">
+		<Hero title={query ? `Results for “${query}”` : "Servers"} tagline="Sorted by current player count." />
+
+		<form method="get" class="flex flex-wrap items-center gap-3" role="search">
+			<label for="q" class="sr-only">Search servers</label>
+			<input id="q" name="q" type="search" value={query} class="text-input max-w-xl" placeholder="Server name or IP address" />
+			<label class="flex items-center gap-2 text-sm">
+				<input type="checkbox" name="dead" value="1" checked={includeDead} />
+				Include dead servers
+			</label>
+			<button type="submit" class="graph-select">Search</button>
+		</form>
+
+		{
+			!list ? (
+				<ErrorState message={result.error ?? "No results."} />
+			) : (
+				<div class="stack gap-4">
+					<p class="muted text-sm">{formatNumber(list.rowCount)} servers</p>
+					<ServerTable servers={list.results} />
+					<Pagination currentPage={list.currentPage} pageCount={list.pageCount} />
+				</div>
+			)
+		}
+	</main>
+</BaseLayout>

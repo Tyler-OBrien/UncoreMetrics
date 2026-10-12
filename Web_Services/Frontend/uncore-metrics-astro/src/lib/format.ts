@@ -37,6 +37,14 @@ export function formatPercent(value: number | null | undefined): string {
   return `${value.toLocaleString("en", { maximumFractionDigits: 1 })}%`;
 }
 
+/**
+ * "12 / 100". Some games (Rust) overflow A2S_Info's one-byte max player count, so a server can report more players
+ * than its maximum; the maximum is meaningless then and left out.
+ */
+export function formatPlayers(players: number, maxPlayers: number): string {
+  return players > maxPlayers ? formatNumber(players) : `${formatNumber(players)} / ${formatNumber(maxPlayers)}`;
+}
+
 const ENVIRONMENTS: Record<string, string> = { l: "Linux", w: "Windows", m: "Mac" };
 
 export function environmentName(code: string | null | undefined): string {

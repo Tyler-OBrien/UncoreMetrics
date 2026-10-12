@@ -1,0 +1,47 @@
+---
+import type { ServerSummary } from "../../models/api";
+import { formatPlayers } from "../lib/format";
+
+interface Props {
+	servers: ServerSummary[];
+	/** Hide the game column on pages that are already about one game. */
+	showGame?: boolean;
+}
+const { servers, showGame = true } = Astro.props;
+---
+{
+	servers.length === 0 ? (
+		<p class="muted">No servers found.</p>
+	) : (
+		<div class="surface table-scroll">
+			<table class="data-table">
+				<thead>
+					<tr>
+						<th>Server</th>
+						{showGame && <th>Game</th>}
+						<th>Map</th>
+						<th class="num">Players</th>
+						<th>Country</th>
+						<th>Network</th>
+					</tr>
+				</thead>
+				<tbody>
+					{servers.map((server) => (
+						<tr>
+							<td>
+								<a href={`/servers/${server.serverID}`}>{server.name}</a>
+							</td>
+							{showGame && <td>{server.game}</td>}
+							<td>{server.map}</td>
+							<td class="num">
+								{formatPlayers(server.players, server.maxPlayers)}
+							</td>
+							<td>{server.country ?? "—"}</td>
+							<td class="muted">{server.isp ?? "—"}</td>
+						</tr>
+					))}
+				</tbody>
+			</table>
+		</div>
+	)
+}

@@ -1,0 +1,25 @@
+---
+/** Previous / next links that keep the current query string (search, filters) and change only `page`. */
+interface Props {
+	currentPage: number;
+	pageCount: number;
+}
+const { currentPage, pageCount } = Astro.props;
+
+const pageUrl = (page: number) => {
+	const url = new URL(Astro.url);
+	url.searchParams.set("page", String(page));
+	return `${url.pathname}${url.search}`;
+};
+---
+{
+	pageCount > 1 && (
+		<nav class="flex items-center justify-between gap-4" aria-label="Pagination">
+			{currentPage > 1 ? <a href={pageUrl(currentPage - 1)}>← Previous</a> : <span />}
+			<span class="muted text-sm">
+				Page {currentPage} of {pageCount}
+			</span>
+			{currentPage < pageCount ? <a href={pageUrl(currentPage + 1)}>Next →</a> : <span />}
+		</nav>
+	)
+}

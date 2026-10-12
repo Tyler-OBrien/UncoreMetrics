@@ -1,0 +1,36 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Hero from "../components/Hero.astro";
+import TimeSeriesGraph from "../components/graph/TimeSeriesGraph";
+import { gameNameMap, getGames } from "../lib/api";
+
+const { games } = await getGames();
+const requested = Number.parseInt(Astro.url.searchParams.get("game") ?? "", 10);
+const selected = games.find((game) => game.appId === requested) ?? null;
+const gameNames = gameNameMap(games);
+const scope = { appId: selected?.appId ?? null };
+
+Astro.response.headers.set("cache-control", "public, max-age=300");
+---
+
+<BaseLayout title={`${selected ? `${selected.name} stats` : "Stats"} · Uncore Metrics`}>
+	<main id="main-content" class="wrapper stack gap-8 py-10">
+		<Hero
+			title={selected ? `${selected.name} stats` : "Stats"}
+			tagline={selected ? "Total players across this game's servers." : "Total players across every game."}
+		/>
+
+		<form method="get" class="flex items-center gap-3">
+			<label for="game" class="text-sm">Game</label>
+			<select id="game" name="game" class="graph-select" onchange="this.form.submit()">
+				<option value="">All games</option>
+				{games.map((game) => <option value={game.appId} selected={game.appId === selected?.appId}>{game.name}</option>)}
+			</select>
+			<noscript><button type="submit" class="graph-select">Show</button></noscript>
+		</form>
+
+		<section class="surface p-5">
+			<TimeSeriesGraph client:only="preact" kind="players" scope={scope} title="Players (sum of each server's peak)" gameNames={gameNames} />
+		</section>
+	</main>
+</BaseLayout>

@@ -1,0 +1,149 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import ErrorState from "../../components/ErrorState.astro";
+import LiveServerStatus from "../../components/LiveServerStatus";
+import TimeSeriesGraph from "../../components/graph/TimeSeriesGraph";
+import { getGames, getLocations, getServer, getServerGameData } from "../../lib/api";
+import { environmentName, formatNumber, labelFromKey, relativeTime } from "../../lib/format";
+
+const id = Astro.params.id ?? "";
+const result = await getServer(id);
+if (result.error) Astro.response.status = 404;
+const server = result.data;
+
+const [gameData, locations, { games }] = server
+	? await Promise.all([getServerGameData(server.serverID, server.appID), getLocations(), getGames()])
+	: [null, null, { games: [] }];
+
+const game = server ? games.find((g) => g.appId === server.appID) : undefined;
+
+// Game-specific fields, skipping empty values and lists (shown separately)
+const extraFields = Object.entries(gameData?.data ?? {}).filter(
+	([, value]) => value !== null && value !== "" && !Array.isArray(value)
+);
+const extraLists = Object.entries(gameData?.data ?? {}).filter(
+	([, value]) => Array.isArray(value) && value.length > 0
+) as [string, (string | number)[]][];
+
+const locationById = new Map((locations?.data ?? []).map((location) => [location.locationID, location]));
+const pings = (server?.serverPings ?? [])
+	.map((ping) => ({ ping, location: locationById.get(ping.locationID) }))
+	.sort((a, b) => (a.ping.failed ? 1 : 0) - (b.ping.failed ? 1 : 0) || a.ping.pingMs - b.ping.pingMs);
+
+const formatValue = (value: unknown) =>
+	typeof value === "boolean" ? (value ? "Yes" : "No") : typeof value === "number" ? formatNumber(value, 2) : String(value);
+
+Astro.response.headers.set("cache-control", "public, max-age=15");
+---
+
+<BaseLayout title={server ? `${server.name} · Uncore Metrics` : "Server not found · Uncore Metrics"}>
+	<main id="main-content" class="wrapper stack gap-8 py-10">
+		{
+			!server ? (
+				<ErrorState title="Server not found" message={result.error ?? "This server doesn't exist."} />
+			) : (
+				<>
+					<header class="stack gap-2">
+						<a href={game ? `/games/${game.slugName}` : "/servers"} class="muted text-sm">
+							{server.game}
+						</a>
+						<h1 class="text-3xl font-bold" style="overflow-wrap: anywhere;">{server.name}</h1>
+						<p class="muted tabular-nums">
+							{server.ipAddress}:{server.port} · query port {server.queryPort}
+						</p>
+					</header>
+
+					<section class="surface p-6">
+						<LiveServerStatus client:load initial={server} />
+					</section>
+
+					<section class="grid gap-6 lg:grid-cols-2">
+						<div class="surface p-5">
+							<TimeSeriesGraph client:only="preact" kind="players" scope={{ serverId: server.serverID }} title="Players" />
+						</div>
+						<div class="surface p-5">
+							<TimeSeriesGraph client:only="preact" kind="uptime" scope={{ serverId: server.serverID }} title="Uptime" />
+						</div>
+					</section>
+
+					<section class="surface p-6 stack gap-4">
+						<h2 class="text-xl font-semibold">Details</h2>
+						<dl class="fact-grid">
+							<div><dt>Country</dt><dd>{server.country ?? "—"}</dd></div>
+							<div><dt>Continent</dt><dd>{server.continent ?? "—"}</dd></div>
+							<div><dt>Timezone</dt><dd>{server.timezone ?? "—"}</dd></div>
+							<div><dt>Network</dt><dd>{server.isp ?? "—"}{server.asn ? ` (AS${server.asn})` : ""}</dd></div>
+							<div><dt>Operating system</dt><dd>{environmentName(server.environment)}</dd></div>
+							<div><dt>VAC</dt><dd>{server.vac === null ? "—" : server.vac ? "Secured" : "Not secured"}</dd></div>
+							<div><dt>Password</dt><dd>{server.visibility === null ? "—" : server.visibility ? "Required" : "None"}</dd></div>
+							<div><dt>First seen</dt><dd title={server.foundAt}>{relativeTime(server.foundAt)}</dd></div>
+							{server.keywords && <div class="sm:col-span-2"><dt>Keywords</dt><dd>{server.keywords}</dd></div>}
+						</dl>
+					</section>
+
+					{
+						(extraFields.length > 0 || extraLists.length > 0) && (
+							<section class="surface p-6 stack gap-4">
+								<h2 class="text-xl font-semibold">{server.game} settings</h2>
+								{extraFields.length > 0 && (
+									<dl class="fact-grid">
+										{extraFields.map(([key, value]) => (
+											<div>
+												<dt>{labelFromKey(key)}</dt>
+												<dd>{formatValue(value)}</dd>
+											</div>
+										))}
+									</dl>
+								)}
+								{extraLists.map(([key, values]) => (
+									<details>
+										<summary>
+											{labelFromKey(key)} ({values.length})
+										</summary>
+										<ul class="muted text-sm mt-2">
+											{values.map((value) => (
+												<li>{String(value)}</li>
+											))}
+										</ul>
+									</details>
+								))}
+							</section>
+						)
+					}
+
+					{
+						pings.length > 0 && (
+							<section class="stack gap-4">
+								<h2 class="text-xl font-semibold">Ping from our locations</h2>
+								<div class="surface table-scroll">
+									<table class="data-table">
+										<thead>
+											<tr>
+												<th>Location</th>
+												<th>Country</th>
+												<th>Network</th>
+												<th class="num">Ping</th>
+												<th>Checked</th>
+											</tr>
+										</thead>
+										<tbody>
+											{pings.map(({ ping, location }) => (
+												<tr>
+													<td>{location?.locationName ?? `Location ${ping.locationID}`}</td>
+													<td>{location?.country ?? "—"}</td>
+													<td class="muted">{location?.isp ?? "—"}</td>
+													<td class="num">{ping.failed ? <span class="value-bad">Failed</span> : `${formatNumber(ping.pingMs, 1)} ms`}</td>
+													<td class="muted" title={ping.lastCheck}>{relativeTime(ping.lastCheck)}</td>
+												</tr>
+											))}
+										</tbody>
+									</table>
+								</div>
+							</section>
+						)
+					}
+				</>
+			)
+		}
+	</main>
+</BaseLayout>

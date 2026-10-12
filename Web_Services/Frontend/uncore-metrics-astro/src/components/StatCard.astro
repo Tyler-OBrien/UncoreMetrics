@@ -1,0 +1,13 @@
+---
+interface Props {
+	label: string;
+	value: string;
+	hint?: string;
+}
+const { label, value, hint } = Astro.props;
+---
+<div class="surface p-5 stack gap-1 w-full">
+	<span class="muted text-sm">{label}</span>
+	<span class="text-3xl font-bold tabular-nums">{value}</span>
+	{hint && <span class="muted text-sm">{hint}</span>}
+</div>

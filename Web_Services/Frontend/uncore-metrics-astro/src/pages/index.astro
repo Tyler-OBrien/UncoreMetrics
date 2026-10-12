@@ -1,4 +1,63 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
+import Hero from "../components/Hero.astro";
+import Grid from "../components/Grid.astro";
+import StatCard from "../components/StatCard.astro";
+import { getGames, getOverallAnalytics, getServers } from "../lib/api";
+import { formatNumber } from "../lib/format";
+
+const [{ games, fromApi }, analytics] = await Promise.all([getGames(), getOverallAnalytics()]);
+
+// Online server count per game. Only trustworthy when the API supports the appId filter (see getGames).
+const counts = fromApi
+	? await Promise.all(games.map((game) => getServers({ appId: game.appId, pageSize: 1 })))
+	: [];
+const serverCount = (index: number) => counts[index]?.data?.rowCount;
+const totalServers = counts.reduce((sum, result) => sum + (result.data?.rowCount ?? 0), 0);
+
+Astro.response.headers.set("cache-control", "public, max-age=60");
 ---
-<BaseLayout title="Uncore Metrics"><main id="main-content" class="wrapper">Scaffold</main></BaseLayout>
+
+<BaseLayout title="Uncore Metrics" description="Live status, player counts and uptime for Steam game servers">
+	<main id="main-content" class="wrapper stack gap-10 py-10">
+		<Hero
+			title="Uncore Metrics"
+			tagline="Live status, player counts and uptime history for tens of thousands of Steam game servers, collected with the Source query protocol."
+		>
+			<form action="/servers" method="get" class="flex gap-2" role="search">
+				<label for="search" class="sr-only">Search servers</label>
+				<input id="search" name="q" type="search" class="text-input" placeholder="Search by server name or IP address" />
+				<button type="submit" class="graph-select">Search</button>
+			</form>
+		</Hero>
+
+		<section class="grid gap-4 sm:grid-cols-3">
+			<StatCard
+				label="Server checks, last 24 hours"
+				value={formatNumber(analytics.data?.serverAnalyticsLast24H)}
+			/>
+			<StatCard label="Games tracked" value={String(games.length)} />
+			{fromApi && <StatCard label="Live servers" value={formatNumber(totalServers)} />}
+		</section>
+
+		<section class="stack gap-4">
+			<h2 class="text-xl font-semibold">Games</h2>
+			<Grid variant="small">
+				{
+					games.map((game, index) => (
+						<li>
+							<a href={`/games/${game.slugName}`} class="surface surface-hover p-5 stack gap-1 w-full no-underline">
+								<span class="text-lg font-semibold">{game.name}</span>
+								<span class="muted text-sm">
+									{serverCount(index) !== undefined
+										? `${formatNumber(serverCount(index))} live servers`
+										: `Steam app ${game.appId}`}
+								</span>
+							</a>
+						</li>
+					))
+				}
+			</Grid>
+		</section>
+	</main>
+</BaseLayout>

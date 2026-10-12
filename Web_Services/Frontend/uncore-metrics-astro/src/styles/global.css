@@ -469,3 +469,96 @@ main select, main input[type="text"], main input[type="search"], main input[type
 .chart-legend button { display: inline-flex; align-items: center; gap: .4rem; padding: .35rem .25rem; border: 0; background: transparent; color: var(--gray-200); cursor: pointer; }
 .chart-legend button[aria-pressed="false"] { opacity: .5; text-decoration: line-through; }
 .chart-legend span { width: .6rem; height: .6rem; border-radius: 2px; }
+
+/* ---- Uncore Metrics additions ------------------------------------------- */
+
+/* Form controls (chart range picker, search box, filters) */
+.graph-select,
+.text-input {
+	background-color: var(--surface-bg);
+	border: 1px solid var(--surface-border);
+	border-radius: 0.5rem;
+	color: var(--gray-0);
+	font-size: var(--fs-sm);
+	padding: 0.45rem 0.7rem;
+}
+.text-input {
+	width: 100%;
+	font-size: var(--fs-md);
+	padding: 0.6rem 0.85rem;
+}
+.graph-select:focus-visible,
+.text-input:focus-visible {
+	outline: 2px solid var(--accent-regular);
+	outline-offset: 1px;
+}
+
+/* Data tables (server lists, ping results, locations) */
+.table-scroll {
+	overflow-x: auto;
+}
+.data-table {
+	width: 100%;
+	border-collapse: collapse;
+	font-size: var(--fs-sm);
+}
+.data-table th {
+	text-align: start;
+	font-weight: 600;
+	color: var(--gray-300);
+	padding: 0.6rem 0.75rem;
+	border-bottom: 1px solid var(--surface-border);
+	white-space: nowrap;
+}
+.data-table td {
+	padding: 0.6rem 0.75rem;
+	border-bottom: 1px solid var(--surface-border);
+	vertical-align: top;
+}
+.data-table tr:last-child td {
+	border-bottom: 0;
+}
+.data-table .num {
+	text-align: end;
+	font-variant-numeric: tabular-nums;
+	white-space: nowrap;
+}
+.data-table a {
+	color: var(--gray-0);
+	font-weight: 600;
+}
+
+.muted {
+	color: var(--gray-400);
+}
+
+/* Labelled facts on detail pages */
+.fact-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(12rem, 1fr));
+	gap: 1rem 1.5rem;
+	margin: 0;
+}
+.fact-grid dt {
+	font-size: var(--fs-sm);
+	color: var(--gray-400);
+}
+.fact-grid dd {
+	margin: 0.15rem 0 0;
+	font-weight: 600;
+	overflow-wrap: anywhere;
+}
+
+/* Progress bars on the jobs page */
+.progress {
+	height: 0.5rem;
+	border-radius: 999rem;
+	background-color: var(--surface-border);
+	overflow: hidden;
+}
+.progress > span {
+	display: block;
+	height: 100%;
+	background-color: var(--accent-regular);
+	transition: width 0.4s ease;
+}

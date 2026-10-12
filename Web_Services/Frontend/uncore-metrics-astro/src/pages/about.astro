@@ -1,0 +1,61 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Hero from "../components/Hero.astro";
+
+Astro.response.headers.set("cache-control", "public, max-age=3600");
+---
+
+<BaseLayout title="About · Uncore Metrics">
+	<main id="main-content" class="wrapper stack gap-8 py-10" style="max-width: 52rem;">
+		<Hero title="About Uncore Metrics" />
+
+		<section class="stack gap-3">
+			<p>
+				Uncore Metrics queries community Steam game servers, collects statistics about them, and shows them here. We try
+				to query each server about once a minute. Server pings run about once every 10 minutes.
+			</p>
+		</section>
+
+		<section class="stack gap-3">
+			<h2 class="text-xl font-semibold">Discord bot</h2>
+			<p>
+				Uncore Metrics has a Discord bot, which you can
+				<a href="https://discord.com/oauth2/authorize?client_id=1054223662124912700&permissions=415001504832&scope=bot">invite with this link</a>.
+				Use <code>/search</code> or <code>/server</code> to look up servers, and <code>/linkchannel</code> to get
+				notifications in a channel when a server goes up or down.
+			</p>
+		</section>
+
+		<section class="stack gap-3">
+			<h2 class="text-xl font-semibold">Collection policies</h2>
+			<p>
+				Uncore Metrics discovers servers through the Steam Web API every 5 minutes, looking for servers of each game that
+				have players. Once a server is picked up, we keep polling it even when it's empty. If a server starts failing, we
+				check it less often the more it fails, eventually only once an hour, and mark it as dead after 14 days of failures.
+			</p>
+		</section>
+
+		<section class="stack gap-3">
+			<h2 class="text-xl font-semibold">Open source</h2>
+			<p>
+				Uncore Metrics is <a href="https://github.com/Tyler-OBrien/UncoreMetrics">fully open source</a>. It uses a
+				<a href="https://github.com/Tyler-OBrien/Okolni-Source-Query-Pool">modified Steam server query library</a> that
+				shares a single UDP socket to query servers with the Steam server query protocol.
+			</p>
+		</section>
+
+		<section class="stack gap-3">
+			<h2 class="text-xl font-semibold">Infrastructure</h2>
+			<p>
+				The main server runs a Ryzen 7700 with 64 GB of RAM, a 1 TB NVMe drive and 12 TB of HDD for long-term statistics.
+				ClickHouse stores the result of every poll, around 100 million a day or 3 billion a month, with materialized views
+				for faster queries.
+			</p>
+		</section>
+
+		<section class="stack gap-3">
+			<h2 class="text-xl font-semibold">Contact</h2>
+			<p>You can email me at tyler @ this website.</p>
+		</section>
+	</main>
+</BaseLayout>

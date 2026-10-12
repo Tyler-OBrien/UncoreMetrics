@@ -1,0 +1,11 @@
+---
+/** Online / offline / dead chip, using global.css's status-chip styles. */
+interface Props {
+	isOnline: boolean;
+	serverDead?: boolean;
+	id?: string;
+}
+const { isOnline, serverDead = false, id } = Astro.props;
+const [label, tone] = serverDead ? ["Dead", "bad"] : isOnline ? ["Online", "good"] : ["Offline", "elevated"];
+---
+<span id={id} class={`status-chip status-chip-${tone}`}><span class="chip-dot"></span>{label}</span>
