@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Worker">
   <PropertyGroup>
-    <TargetFramework>net10.0</TargetFramework>
+    <TargetFramework>net11.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UserSecretsId>dotnet-Steam_Collector-456F2E8C-01DB-4894-B828-287001A37A8C</UserSecretsId>
@@ -13,8 +13,8 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="MaxMind.GeoIP2" Version="6.1.0" />
-    <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.12" />
-    <PackageReference Include="Microsoft.Extensions.Http.Polly" Version="10.0.12" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="11.0.0-rc.1.26425.128" />
+    <PackageReference Include="Microsoft.Extensions.Http.Polly" Version="11.0.0-rc.1.26425.128" />
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.23.0" />
     <PackageReference Include="NATS.Client" Version="1.1.8" />
     <PackageReference Include="Okolni.Source.Query.Pool" Version="1.5.2" />
