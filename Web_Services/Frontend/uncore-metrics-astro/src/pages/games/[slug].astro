@@ -1,0 +1,67 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Hero from "../../components/Hero.astro";
+import ServerTable from "../../components/ServerTable.astro";
+import Pagination from "../../components/Pagination.astro";
+import ErrorState from "../../components/ErrorState.astro";
+import StatCard from "../../components/StatCard.astro";
+import TimeSeriesGraph from "../../components/graph/TimeSeriesGraph";
+import { gameNameMap, getGames, getServers } from "../../lib/api";
+import { findGameBySlug } from "../../data/games";
+import { formatNumber } from "../../lib/format";
+
+const { games, fromApi } = await getGames();
+const game = findGameBySlug(games, Astro.params.slug ?? "");
+if (!game) return new Response(null, { status: 404, statusText: "Not found" });
+
+const page = Math.max(1, Number.parseInt(Astro.url.searchParams.get("page") ?? "1", 10) || 1);
+// An API without v1/games also lacks the appId filter and would return every game's servers
+const servers = fromApi ? await getServers({ appId: game.appId, page, pageSize: 50 }) : null;
+const list = servers?.data;
+
+Astro.response.headers.set("cache-control", "public, max-age=30");
+---
+
+<BaseLayout title={`${game.name} servers · Uncore Metrics`} description={`Live ${game.name} server status, player counts and history`}>
+	<main id="main-content" class="wrapper stack gap-8 py-10">
+		<Hero title={game.name} tagline={`Live ${game.name} servers, sorted by player count.`} />
+
+		{
+			list && (
+				<section class="grid gap-4 sm:grid-cols-3">
+					<StatCard label="Live servers" value={formatNumber(list.rowCount)} />
+					<StatCard label="Steam app id" value={String(game.appId)} />
+				</section>
+			)
+		}
+
+		<section class="surface p-5">
+			<TimeSeriesGraph
+				client:only="preact"
+				kind="players"
+				scope={{ appId: game.appId }}
+				title="Total players (sum of each server's peak)"
+				gameNames={gameNameMap(games)}
+			/>
+		</section>
+
+		<section class="stack gap-4">
+			<h2 class="text-xl font-semibold">Servers</h2>
+			{
+				!servers ? (
+					<p class="muted">
+						Listing servers by game needs the updated API (with <code>v1/games</code> and the <code>appId</code> filter).
+						Until it's deployed, <a href={`/servers?q=${encodeURIComponent(game.name)}`}>search for {game.name} servers</a>.
+					</p>
+				) : !list ? (
+					<ErrorState message={servers.error ?? "No servers."} />
+				) : (
+					<>
+						<ServerTable servers={list.results} showGame={false} />
+						<Pagination currentPage={list.currentPage} pageCount={list.pageCount} />
+					</>
+				)
+			}
+		</section>
+	</main>
+</BaseLayout>

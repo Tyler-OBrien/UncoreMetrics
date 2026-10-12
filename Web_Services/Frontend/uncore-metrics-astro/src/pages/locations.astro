@@ -1,0 +1,99 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Hero from "../components/Hero.astro";
+import ErrorState from "../components/ErrorState.astro";
+import { getLocations } from "../lib/api";
+
+const result = await getLocations();
+const locations = result.data ?? [];
+
+// Group by country, largest groups first
+const byCountry = new Map<string, typeof locations>();
+for (const location of locations) {
+	const country = location.country || "Unknown";
+	byCountry.set(country, [...(byCountry.get(country) ?? []), location]);
+}
+const groups = [...byCountry.entries()]
+	.map(([country, items]) => ({ country, items: items.sort((a, b) => a.locationName.localeCompare(b.locationName)) }))
+	.sort((a, b) => b.items.length - a.items.length || a.country.localeCompare(b.country));
+
+Astro.response.headers.set("cache-control", "public, max-age=300");
+---
+
+<BaseLayout title="Ping locations · Uncore Metrics">
+	<main id="main-content" class="wrapper stack gap-8 py-10">
+		<Hero
+			title="Ping locations"
+			tagline={`Servers are pinged from ${locations.length} locations about every 10 minutes. A server's page shows its ping from each.`}
+		/>
+
+		{
+			result.error ? (
+				<ErrorState message={result.error} />
+			) : (
+				<>
+					<div>
+						<label for="location-filter" class="sr-only">Filter locations</label>
+						<input id="location-filter" type="search" class="text-input max-w-xl" placeholder="Filter by name, country, network or ASN" />
+					</div>
+
+					{groups.map(({ country, items }) => (
+						<section class="stack gap-3" data-location-group>
+							<h2 class="text-lg font-semibold">
+								{country} <span class="muted text-sm">({items.length})</span>
+							</h2>
+							<div class="surface table-scroll">
+								<table class="data-table">
+									<thead>
+										<tr>
+											<th>Location</th>
+											<th>Network</th>
+											<th>ASN</th>
+											<th class="num">Coordinates</th>
+										</tr>
+									</thead>
+									<tbody>
+										{items.map((location) => (
+											<tr data-filter-text={`${location.locationName} ${location.country} ${location.isp} ${location.asn}`.toLowerCase()}>
+												<td>{location.locationName}</td>
+												<td>{location.isp}</td>
+												<td class="muted">{location.asn}</td>
+												<td class="num muted">
+													{location.latitude.toFixed(2)}, {location.longitude.toFixed(2)}
+												</td>
+											</tr>
+										))}
+									</tbody>
+								</table>
+							</div>
+						</section>
+					))}
+
+					<p id="location-empty" class="muted" hidden>No locations match.</p>
+				</>
+			)
+		}
+	</main>
+</BaseLayout>
+
+<script>
+	// Client-side filter: hide non-matching rows, and groups with no rows left
+	const input = document.getElementById("location-filter") as HTMLInputElement | null;
+	const empty = document.getElementById("location-empty");
+	input?.addEventListener("input", () => {
+		const terms = input.value.toLowerCase().split(/\s+/).filter(Boolean);
+		let anyVisible = false;
+		document.querySelectorAll<HTMLElement>("[data-location-group]").forEach((group) => {
+			let groupVisible = false;
+			group.querySelectorAll<HTMLElement>("tr[data-filter-text]").forEach((row) => {
+				const text = row.dataset.filterText ?? "";
+				const match = terms.every((term) => text.includes(term));
+				row.hidden = !match;
+				groupVisible ||= match;
+			});
+			group.hidden = !groupVisible;
+			anyVisible ||= groupVisible;
+		});
+		if (empty) empty.hidden = anyVisible;
+	});
+</script>
