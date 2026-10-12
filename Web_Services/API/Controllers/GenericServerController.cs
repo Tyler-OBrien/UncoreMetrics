@@ -1,5 +1,7 @@
 ﻿using System.Net;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OutputCaching;
+using UncoreMetrics.API.Services;
 using Microsoft.EntityFrameworkCore;
 using Swashbuckle.AspNetCore.Annotations;
 using UncoreMetrics.API.Models.DTOs;
@@ -35,6 +37,7 @@ public class GenericServerController : ControllerBase
     }
 
     [HttpGet]
+    [OutputCache(PolicyName = CachePolicies.ServerLists)]
     [SwaggerResponse(200, Type = typeof(DataResponse<PagedResult<ServerSearchResultDTO>>), Description = "On success, the API will respond with a server list item  object. If no servers are found, the list will be empty..")]
     [SwaggerResponse(400, Type = typeof(ErrorResponse), Description = "If you exceed the max page side or min. page, an error will be returned.")]
     public async Task<ActionResult<IResponse>> GetServers(CancellationToken token,
@@ -283,11 +286,13 @@ public class GenericServerController : ControllerBase
     }
 
     [HttpGet("playerdataoverall")]
+    [OutputCache(PolicyName = CachePolicies.OverallPlayers)]
     [SwaggerResponse(200, Type = typeof(DataResponse<List<ClickHousePlayerData>>), Description = "On success")]
 
     public Task<ActionResult<IResponse>> GetPlayersDataOverall([FromQuery] int? hours, [FromQuery] int? groupby, CancellationToken token) => GetPlayersDataOveralAppId(null, hours, groupby, token);
 
     [HttpGet("playerdataoverall/{appid?}")]
+    [OutputCache(PolicyName = CachePolicies.OverallPlayers)]
     [SwaggerResponse(200, Type = typeof(DataResponse<List<ClickHousePlayerData>>), Description = "On success")]
     [SwaggerResponse(400, Type = typeof(ErrorResponse), Description = "If you exceed the max results, an error will be returned.")]
     public async Task<ActionResult<IResponse>> GetPlayersDataOveralAppId(ulong? appid, [FromQuery] int? hours, [FromQuery] int? groupby, CancellationToken token)
@@ -343,6 +348,7 @@ public class GenericServerController : ControllerBase
 
 
     [HttpGet("search/{search}")]
+    [OutputCache(PolicyName = CachePolicies.ServerLists)]
     [SwaggerResponse(200, Type = typeof(DataResponse<PagedResult<ServerSearchResultDTO>>),
         Description =
             "On success, the API will respond with a server list item  object. If no servers are found, the list will be empty..")]

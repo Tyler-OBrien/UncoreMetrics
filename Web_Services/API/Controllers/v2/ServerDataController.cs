@@ -1,5 +1,7 @@
 ﻿using System.Net;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OutputCaching;
+using UncoreMetrics.API.Services;
 using Microsoft.EntityFrameworkCore;
 using Swashbuckle.AspNetCore.Annotations;
 using UncoreMetrics.API.Models.DTOs;
@@ -105,6 +107,7 @@ public class ServerDataController : ControllerBase
     }
 
     [HttpGet("OverallAnalytics")]
+    [OutputCache(PolicyName = CachePolicies.OverallAnalytics)]
     [SwaggerResponse(200, Type = typeof(DataResponse<OverallAnalyticsResponseDTO>), Description = "On success")]
     public async Task<ActionResult<IResponse>> GetOverallAnalytics(CancellationToken token)
     {

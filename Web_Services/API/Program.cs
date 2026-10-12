@@ -112,6 +112,7 @@ public class Program
         });
 
         builder.Services.AddScoped<IPrometheusStatsCollector, PrometheusStatsCollector>();
+        builder.Services.AddOutputCache(CachePolicies.Register);
 
         var app = builder.Build();
 
@@ -148,6 +149,8 @@ public class Program
 
 
         app.UseMiddleware<JSONErrorMiddleware>();
+
+        app.UseOutputCache();
 
         app.UseAuthorization();
 

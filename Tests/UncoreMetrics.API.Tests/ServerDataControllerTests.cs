@@ -131,10 +131,12 @@ public class ServerDataControllerTests : IClassFixture<ApiFactory>
     [Fact]
     public async Task UnhandledException_Returns500JsonError()
     {
-        _factory.ClickHouse.GetOverallAnalytics(Arg.Any<CancellationToken>())
+        // A per-server endpoint, which isn't output cached, so this can't be answered from another test's cached response
+        var id = Guid.NewGuid();
+        _factory.ClickHouse.GetUptimeData(id.ToString(), 24, Arg.Any<CancellationToken>())
             .ThrowsAsync(new InvalidOperationException("ClickHouse is down"));
 
-        var response = await _client.GetAsync("/v2/servers/OverallAnalytics", Token);
+        var response = await _client.GetAsync($"/v2/servers/uptimedata/{id}", Token);
 
         await AssertError(response, HttpStatusCode.InternalServerError, "internal_error");
     }

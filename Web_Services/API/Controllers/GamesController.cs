@@ -1,4 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OutputCaching;
+using UncoreMetrics.API.Services;
 using Swashbuckle.AspNetCore.Annotations;
 using UncoreMetrics.API.Models.Responses.API;
 using UncoreMetrics.Data.GameData;
@@ -12,6 +14,7 @@ namespace UncoreMetrics.API.Controllers;
 public class GamesController : ControllerBase
 {
     [HttpGet]
+    [OutputCache(PolicyName = CachePolicies.Games)]
     [SwaggerResponse(200, Type = typeof(DataResponse<IReadOnlyList<GameInformation>>), Description = "The games Uncore Metrics collects data for")]
     public ActionResult<IResponse> GetGames()
     {

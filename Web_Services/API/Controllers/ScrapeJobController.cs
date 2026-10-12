@@ -1,4 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OutputCaching;
+using UncoreMetrics.API.Services;
 using Microsoft.EntityFrameworkCore;
 using Swashbuckle.AspNetCore.Annotations;
 using UncoreMetrics.API.Models.Responses.API;
@@ -30,6 +32,7 @@ public class ScrapeJobController : ControllerBase
 
     // GET: api/<ScrapeJobController>
     [HttpGet]
+    [OutputCache(PolicyName = CachePolicies.Jobs)]
     [SwaggerResponse(200, Type = typeof(DataResponse<List<ScrapeJob>>), Description = "On success")]
     public async Task<ActionResult<IResponse>> Get(CancellationToken token)
     {
