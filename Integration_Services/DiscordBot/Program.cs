@@ -2,6 +2,7 @@ using DiscordBot.Helpers;
 using Microsoft.EntityFrameworkCore;
 using Sentry;
 using Sentry.Extensions.Logging;
+using Sentry.Extensions.Logging.Extensions.DependencyInjection;
 using Serilog;
 using Serilog.Events;
 using UncoreMetrics.Data;
@@ -78,20 +79,20 @@ namespace DiscordBot
                         throw new InvalidOperationException("DiscordBotConfig cannot be null, see sample");
                     }
 
-                    if (string.IsNullOrWhiteSpace(baseConfiguration.SENTRY_DSN) == false)
+                    // An empty DSN disables Sentry, but a null one throws on startup
+                    services.Configure<SentryLoggingOptions>(options =>
                     {
-                        services.Configure<SentryLoggingOptions>(options =>
-                        {
-                            options.Dsn = baseConfiguration.SENTRY_DSN;
-                            options.SendDefaultPii = true;
-                            options.AttachStacktrace = true;
-                            options.MinimumBreadcrumbLevel = LogLevel.Debug;
-                            options.MinimumEventLevel = LogLevel.Warning;
-                            options.TracesSampleRate = 1.0;
-                        });
-                    }
+                        options.Dsn = baseConfiguration.SENTRY_DSN ?? string.Empty;
+                        options.SendDefaultPii = true;
+                        options.AttachStacktrace = true;
+                        options.MinimumBreadcrumbLevel = LogLevel.Debug;
+                        options.MinimumEventLevel = LogLevel.Warning;
+                        options.TracesSampleRate = 1.0;
+                    });
 
-                    services.AddSentry();
+                    // Explicit options type: plain AddSentry() resolves to Sentry.AspNetCore's overload, which reads
+                    // SentryAspNetCoreOptions and would ignore the configuration above
+                    services.AddSentry<SentryLoggingOptions>();
                     services.AddLogging();
 
 

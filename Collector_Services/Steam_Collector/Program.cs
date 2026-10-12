@@ -2,7 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Polly;
 using Polly.Extensions.Http;
 using Sentry;
-using Sentry.Extensions.Logging;
+using Sentry.AspNetCore;
 using Serilog;
 using Serilog.Context;
 using Serilog.Events;
@@ -71,7 +71,9 @@ public class Program
                 services.Configure<SteamCollectorConfiguration>(configuration);
                 services.Configure<BaseConfiguration>(configuration);
 
-                services.Configure<SentryLoggingOptions>(options =>
+                // This project references Sentry.AspNetCore, so AddSentry() reads SentryAspNetCoreOptions.
+                // Configuring SentryLoggingOptions instead has no effect and leaves the DSN unset.
+                services.AddSentry().AddSentryOptions(options =>
                 {
                     options.Dsn = baseConfiguration?.SENTRY_DSN ?? string.Empty;
                     options.SendDefaultPii = true;
@@ -80,7 +82,6 @@ public class Program
                     options.MinimumEventLevel = LogLevel.Warning;
                     options.TracesSampleRate = 1.0;
                 });
-                services.AddSentry();
                 services.AddLogging();
 
                 var resolver = new GameResolvers();

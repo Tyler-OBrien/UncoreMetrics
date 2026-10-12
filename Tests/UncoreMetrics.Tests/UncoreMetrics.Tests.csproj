@@ -20,6 +20,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\Collector_Services\Steam_Collector\Steam_Collector.csproj" />
     <ProjectReference Include="..\..\Data_Services\UncoreMetrics.Data\UncoreMetrics.Data.csproj" />
+    <ProjectReference Include="..\..\Integration_Services\DiscordBot\DiscordBot.csproj" />
   </ItemGroup>
 
 </Project>

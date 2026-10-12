@@ -60,7 +60,7 @@ namespace Ping_Collector_Probe
 
                     services.Configure<SentryLoggingOptions>(options =>
                     {
-                        options.Dsn = baseConfiguration.SENTRY_DSN;
+                        options.Dsn = baseConfiguration.SENTRY_DSN ?? string.Empty;
                         options.SendDefaultPii = true;
                         options.AttachStacktrace = true;
                         options.MinimumBreadcrumbLevel = LogLevel.Debug;
