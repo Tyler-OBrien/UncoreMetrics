@@ -31,8 +31,8 @@ public class HellLetLooseResolver : BaseResolver
             .Where(server => server.NextCheck < DateTime.UtcNow && server.AppID == AppId).AsNoTracking()
             .OrderBy(server => server.NextCheck).Take(_configuration.ServersPerPollRun)
             .ToListAsync();
-        // Abort run if less then 100 servers to poll, and no server is over 5 minutes overdue
-        if (servers.Count < 100 && servers.Any(server => server.NextCheck > DateTime.UtcNow.AddMinutes(5)) == false)
+        // Batch polls: wait for 100 due servers, unless one has already waited longer than MaxPollDelay
+        if (!ShouldPoll(servers, 100, DateTime.UtcNow))
             return new List<Server>();
         return servers.ToList<Server>();
     }

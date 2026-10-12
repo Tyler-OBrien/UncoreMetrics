@@ -40,6 +40,22 @@ public abstract class BaseResolver
     }
 
     /// <summary>
+    ///     How long a due server can wait for a poll batch to fill up before it's polled anyway.
+    /// </summary>
+    public static readonly TimeSpan MaxPollDelay = TimeSpan.FromMinutes(5);
+
+    /// <summary>
+    ///     Polls are batched: poll once at least <paramref name="minimumBatch" /> servers are due, or as soon as any due
+    ///     server has been waiting longer than <see cref="MaxPollDelay" />. Without the second rule, a game with fewer
+    ///     due servers than the batch size would never be polled.
+    /// </summary>
+    public static bool ShouldPoll(IReadOnlyCollection<Server> dueServers, int minimumBatch, DateTime utcNow)
+    {
+        return dueServers.Count >= minimumBatch ||
+               dueServers.Any(server => server.NextCheck < utcNow - MaxPollDelay);
+    }
+
+    /// <summary>
     ///     Name of Resolver
     /// </summary>
     public abstract string Name { get; }
