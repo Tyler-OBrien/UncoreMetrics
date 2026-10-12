@@ -6,13 +6,16 @@ on:
   pull_request:
     branches: [master]
 
+permissions:
+  contents: read
+
 jobs:
-  build:
+  dotnet:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-      - uses: actions/setup-dotnet@v4
+      - uses: actions/setup-dotnet@v6
         with:
           dotnet-version: 11.0.x
           dotnet-quality: preview
@@ -23,6 +26,7 @@ jobs:
       - name: Build
         run: dotnet build UncoreMetrics.sln -c Release --no-restore
 
+      # Includes the Postgres integration tests, which use Docker (available on GitHub's Ubuntu runners)
       - name: Test
         run: dotnet test --solution UncoreMetrics.sln -c Release --no-build
 
@@ -33,3 +37,70 @@ jobs:
             echo "::error::Vulnerable packages found"
             exit 1
           fi
+
+  website:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: Web_Services/Frontend/uncore-metrics-astro
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: pnpm/action-setup@v6
+        with:
+          version: 12
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: pnpm
+          cache-dependency-path: Web_Services/Frontend/uncore-metrics-astro/pnpm-lock.yaml
+
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      - name: Test
+        run: pnpm test
+
+      - name: Type check and build
+        run: pnpm build
+
+      - name: Check for vulnerable packages
+        run: pnpm audit --prod
+
+  # Linux builds of each service, downloadable from the workflow run instead of building locally
+  publish:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    needs: [dotnet, website]
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        service:
+          - Web_Services/API/API.csproj
+          - Collector_Services/Steam_Collector/Steam_Collector.csproj
+          - Collector_Services/Ping_Collector/Ping_Collector/Ping_Collector.csproj
+          - Collector_Services/Ping_Collector/Ping_Collector_Probe/Ping_Collector_Probe.csproj
+          - Integration_Services/DiscordBot/DiscordBot.csproj
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: 11.0.x
+          dotnet-quality: preview
+
+      - name: Publish linux-x64
+        id: publish
+        run: |
+          name=$(basename "${{ matrix.service }}" .csproj)
+          dotnet publish "${{ matrix.service }}" -c Release -r linux-x64 --self-contained true \
+            -p:PublishSingleFile=true -o "out/$name"
+          # Ship code and default config only; real settings live on the server
+          rm -f "out/$name/appsettings.Development.json"
+          echo "name=$name" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: ${{ steps.publish.outputs.name }}-linux-x64
+          path: out/${{ steps.publish.outputs.name }}
+          retention-days: 14
