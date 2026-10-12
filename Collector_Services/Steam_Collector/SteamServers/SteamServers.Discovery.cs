@@ -95,11 +95,8 @@ public partial class SteamServers : ISteamServers
         }
 
         var serverListCount = serverList.Count;
-        foreach (var server in serverList.ToList())
-        {
-            var (Host, Port) = SteamServerQuery.ParseIPAndPort(server.Address);
-            if (Host.IsPrivate()) serverList.Remove(server);
-        }
+        // One pass, rather than List.Remove (a linear search and shift) per private server
+        serverList.RemoveAll(server => SteamServerQuery.ParseIPAndPort(server.Address).address.IsPrivate());
 
         _logger.LogDebug(
             "Removed {removedPrivateIPServers} Servers containing Private IP Addresses (Valve Servers use Relays and don't expose, among others)",

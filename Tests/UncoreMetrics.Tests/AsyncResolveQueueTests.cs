@@ -61,6 +61,25 @@ public class AsyncResolveQueueTests
     }
 
     [Fact]
+    public async Task LazyInput_IsEnumeratedOnce()
+    {
+        var enumerations = 0;
+        IEnumerable<int> Items()
+        {
+            enumerations++;
+            for (var i = 0; i < 20; i++) yield return i;
+        }
+        var solver = new DelegateSolver(i => Task.FromResult<(string?, bool)>((i.ToString(), true)));
+
+        using var queue = new AsyncResolveQueue<int, string>(NullLogger.Instance, Items(), 2, solver,
+            TestContext.Current.CancellationToken);
+        await WaitUntilDone(queue);
+
+        Assert.Equal(1, enumerations);
+        Assert.Equal(20, queue.IncomingItems);
+    }
+
+    [Fact]
     public async Task CancelledToken_StopsProcessing()
     {
         using var cts = new CancellationTokenSource();

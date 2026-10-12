@@ -152,6 +152,9 @@ public static class A2SRulesHelper
     private static int GetTotalFound(string template, RuleResponse ruleResponse)
     {
         // This is hacky and won't work in some cases... but is necessary for Project Zomboid which labels its descriptions as Description<Count>/<Max>, i.e Description0/6
+        // Only templates using {1} need the count, so skip scanning every rule key for the rest
+        if (!template.Contains("{1", StringComparison.Ordinal))
+            return 0;
         var totalFound = 0;
         var findPrefix = template.IndexOf("{0}", StringComparison.OrdinalIgnoreCase);
         if (findPrefix != -1)

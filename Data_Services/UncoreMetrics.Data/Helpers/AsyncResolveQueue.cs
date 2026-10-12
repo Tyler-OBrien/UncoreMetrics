@@ -27,7 +27,8 @@ public class AsyncResolveQueue<TIn, TOut> : IDisposable
         _solvingMethod = solver;
 
         _incoming = new ConcurrentQueue<TIn>(items);
-        Interlocked.Add(ref _incomingItems, items.Count());
+        // Count the queue, not `items`: enumerating a lazy Select again would rebuild every element
+        Interlocked.Add(ref _incomingItems, _incoming.Count);
         for (var i = 0; i < workerCount; i++)
             Consume(token).ContinueWith(t => _logger.LogError(t.Exception, "Worker Exception"),
                 TaskContinuationOptions.OnlyOnFaulted).ContinueWith(
