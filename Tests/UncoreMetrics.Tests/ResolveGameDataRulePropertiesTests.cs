@@ -148,6 +148,30 @@ public class ResolveGameDataRulePropertiesTests
     }
 
     [Fact]
+    public void RepeatedCalls_OnSameType_ResolveTheSame()
+    {
+        // The property metadata is cached per type after the first call
+        var first = new SquadServer();
+        first.ResolveGameDataPropertiesFromRules(TestRules.Of(("GameMode_s", "RAAS"), ("LicenseSig0_s", "abc")));
+        var second = new SquadServer();
+        second.ResolveGameDataPropertiesFromRules(TestRules.Of(("GameMode_s", "AAS"), ("LicenseSig0_s", "xyz")));
+
+        Assert.Equal("RAAS", first.GameMode);
+        Assert.Equal("abc", first.LicenseSig);
+        Assert.Equal("AAS", second.GameMode);
+        Assert.Equal("xyz", second.LicenseSig);
+    }
+
+    [Fact]
+    public void UnsupportedPropertyType_ThrowsEveryTime()
+    {
+        var rules = TestRules.Of(("ratio", "1.5"));
+
+        Assert.Throws<InvalidOperationException>(() => new UnsupportedModel().ResolveGameDataPropertiesFromRules(rules));
+        Assert.Throws<InvalidOperationException>(() => new UnsupportedModel().ResolveGameDataPropertiesFromRules(rules));
+    }
+
+    [Fact]
     public void UnsupportedPropertyType_Throws()
     {
         var rules = TestRules.Of(("ratio", "1.5"));
