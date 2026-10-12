@@ -7,6 +7,7 @@ using UncoreMetrics.API.Models.DTOs;
 using UncoreMetrics.API.Models.Responses.API;
 using UncoreMetrics.Data;
 using UncoreMetrics.Data.ClickHouse;
+using UncoreMetrics.Data.GameData;
 
 namespace UncoreMetrics.API.Controllers;
 
@@ -102,6 +103,9 @@ namespace UncoreMetrics.API.Controllers;
                         token);
                 break;
             default:
+                // Games tracked without a game-specific table have no extra data, which isn't an error
+                if (StaticGameInfo.Games.Any(game => game.AppId == appid))
+                    return Ok(new DataResponse<Dictionary<string, object>>(new Dictionary<string, object>()));
                 return BadRequest(new ErrorResponse(HttpStatusCode.BadRequest,
                     $"Cannot find the game type specified.",
                     "invalid_game"));
