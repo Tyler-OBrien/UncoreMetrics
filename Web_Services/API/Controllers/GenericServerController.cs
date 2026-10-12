@@ -39,7 +39,7 @@ public class GenericServerController : ControllerBase
     [SwaggerResponse(400, Type = typeof(ErrorResponse), Description = "If you exceed the max page side or min. page, an error will be returned.")]
     public async Task<ActionResult<IResponse>> GetServers(CancellationToken token,
         [FromQuery] bool? includeDead = false,
-        [FromQuery] int page = 1, [FromQuery] int pageSize = 25)
+        [FromQuery] int page = 1, [FromQuery] int pageSize = 25, [FromQuery] ulong? appId = null)
     {
         if (pageSize > 100)
         {
@@ -53,27 +53,13 @@ public class GenericServerController : ControllerBase
                 "page_out_of_range"));
         }
 
+        var servers = _genericServersContext.Servers.AsNoTracking();
         if (includeDead == false)
-        {
-            return Ok(new DataResponse<PagedResult<ServerSearchResultDTO>>(await _genericServersContext.Servers
-                .AsNoTracking()
-                .OrderByDescending(server => server.Players)
-                .Where(server => server.ServerDead == includeDead).Select(server => new ServerSearchResultDTO
-                {
-                    ServerID = server.ServerID,
-                    Name = server.Name,
-                    Game = server.Game,
-                    Map = server.Map,
-                    AppID = server.AppID,
-                    Players = server.Players,
-                    MaxPlayers = server.MaxPlayers,
-                    ISP = server.ISP,
-                    Country = server.Country
-                }).GetPaged(page, pageSize, token)));
-        }
+            servers = servers.Where(server => server.ServerDead == false);
+        if (appId.HasValue)
+            servers = servers.Where(server => server.AppID == appId.Value);
 
-        return Ok(new DataResponse<PagedResult<ServerSearchResultDTO>>(await _genericServersContext.Servers
-            .AsNoTracking()
+        return Ok(new DataResponse<PagedResult<ServerSearchResultDTO>>(await servers
             .OrderByDescending(server => server.Players).Select(server => new ServerSearchResultDTO
             {
                 ServerID = server.ServerID,

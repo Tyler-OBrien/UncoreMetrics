@@ -23,7 +23,7 @@ namespace UncoreMetrics.Data.GameData
                 new GameInformation(251570, "7 Days To Die", "7-days-to-die"),
                 new GameInformation(393380, "Squad", "Squad"),
                 new GameInformation(304930, "Unturned", "Unturned"),
-                new GameInformation(1604030, "V Rising", "V Rising"),
+                new GameInformation(1604030, "V Rising", "V-Rising"),
             });
     }
 

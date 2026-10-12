@@ -10,6 +10,7 @@ public class GenericServerControllerTests : IClassFixture<ApiFactory>, IAsyncLif
     private static readonly Guid PopularServerId = Guid.NewGuid();
     private static readonly Guid QuietServerId = Guid.NewGuid();
     private static readonly Guid DeadServerId = Guid.NewGuid();
+    private static readonly Guid SquadServerId = Guid.NewGuid();
 
     private readonly ApiFactory _factory;
     private readonly HttpClient _client;
@@ -32,21 +33,23 @@ public class GenericServerControllerTests : IClassFixture<ApiFactory>, IAsyncLif
         await _factory.SeedAsync(
             CreateServer(PopularServerId, "Popular", 90, dead: false),
             CreateServer(QuietServerId, "Quiet", 5, dead: false),
-            CreateServer(DeadServerId, "Dead", 0, dead: true));
+            CreateServer(DeadServerId, "Dead", 0, dead: true),
+            CreateServer(SquadServerId, "Squad Server", 50, dead: false, appId: 393380, game: "Squad"));
     }
 
     public ValueTask DisposeAsync() => ValueTask.CompletedTask;
 
-    private static Server CreateServer(Guid id, string name, uint players, bool dead)
+    private static Server CreateServer(Guid id, string name, uint players, bool dead, ulong appId = 252490,
+        string game = "Rust")
     {
         var address = IPAddress.Parse("1.2.3.4");
         return new Server
         {
             ServerID = id,
             Name = name,
-            Game = "Rust",
+            Game = game,
             Map = "Procedural Map",
-            AppID = 252490,
+            AppID = appId,
             Address = address,
             IpAddressBytes = address.GetAddressBytes(),
             Port = 28015,
@@ -74,8 +77,8 @@ public class GenericServerControllerTests : IClassFixture<ApiFactory>, IAsyncLif
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         var data = (await ReadJson(response)).GetProperty("data");
         var names = data.GetProperty("results").EnumerateArray().Select(s => s.GetProperty("name").GetString());
-        Assert.Equal(["Popular", "Quiet"], names);
-        Assert.Equal(2, data.GetProperty("rowCount").GetInt32());
+        Assert.Equal(["Popular", "Squad Server", "Quiet"], names);
+        Assert.Equal(3, data.GetProperty("rowCount").GetInt32());
     }
 
     [Fact]
@@ -85,9 +88,29 @@ public class GenericServerControllerTests : IClassFixture<ApiFactory>, IAsyncLif
 
         var data = (await ReadJson(response)).GetProperty("data");
         var result = Assert.Single(data.GetProperty("results").EnumerateArray());
-        Assert.Equal("Quiet", result.GetProperty("name").GetString());
+        Assert.Equal("Squad Server", result.GetProperty("name").GetString());
         Assert.Equal(2, data.GetProperty("currentPage").GetInt32());
-        Assert.Equal(2, data.GetProperty("pageCount").GetInt32());
+        Assert.Equal(3, data.GetProperty("pageCount").GetInt32());
+    }
+
+    [Fact]
+    public async Task GetServers_FiltersByAppId()
+    {
+        var response = await _client.GetAsync("/v1/servers?appId=393380", Token);
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        var result = Assert.Single((await ReadJson(response)).GetProperty("data").GetProperty("results").EnumerateArray());
+        Assert.Equal("Squad Server", result.GetProperty("name").GetString());
+    }
+
+    [Fact]
+    public async Task GetServers_IncludeDeadReturnsDeadServersToo()
+    {
+        var response = await _client.GetAsync("/v1/servers?includeDead=true&appId=252490", Token);
+
+        var names = (await ReadJson(response)).GetProperty("data").GetProperty("results").EnumerateArray()
+            .Select(s => s.GetProperty("name").GetString());
+        Assert.Equal(["Popular", "Quiet", "Dead"], names);
     }
 
     [Theory]
