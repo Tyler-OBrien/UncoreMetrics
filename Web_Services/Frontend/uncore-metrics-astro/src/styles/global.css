@@ -1,0 +1,471 @@
+@import "tailwindcss";
+
+/* Class-based dark mode (BaseLayout/ThemeToggle put .dark on <html>). */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* Tailwind v3 defaults that v4 changed; kept so the site looks the same. */
+@layer base {
+	*,
+	::after,
+	::before,
+	::backdrop,
+	::file-selector-button {
+		border-color: var(--color-gray-200, currentColor);
+	}
+	button:not(:disabled),
+	[role="button"]:not(:disabled) {
+		cursor: pointer;
+	}
+	input::placeholder,
+	textarea::placeholder {
+		color: var(--color-gray-400);
+	}
+}
+
+/* Global variables. Size/shadow tokens are --fs-* and --elevation-* because
+   Tailwind v4 reads --text-* and --shadow-* for its own utilities. */
+:root {
+	/* Colors */
+	--gray-0: #090b11;
+	--gray-50: #141925;
+	--gray-100: #283044;
+	--gray-200: #3d4663;
+	--gray-300: #505d84;
+	--gray-400: #6474a2;
+	--gray-500: #8490b5;
+	--gray-600: #a3acc8;
+	--gray-700: #c3cadb;
+	--gray-800: #e3e6ee;
+	--gray-900: #f3f4f7;
+	--gray-999-basis: 0, 0%, 100%;
+	--gray-999_40: hsla(var(--gray-999-basis), 0.4);
+	--gray-999: #ffffff;
+
+	--accent-light: #c561f6;
+	--accent-regular: #7611a6;
+	--accent-dark: #1c0056;
+	--accent-overlay: hsla(280, 89%, 67%, 0.33);
+	--accent-subtle-overlay: var(--accent-overlay);
+	--accent-text-over: var(--gray-999);
+
+	--link-color: var(--accent-regular);
+
+	/* Gradients */
+	--gradient-stop-1: var(--accent-light);
+	--gradient-stop-2: var(--accent-regular);
+	--gradient-stop-3: var(--accent-dark);
+	--gradient-subtle: linear-gradient(150deg, var(--gray-900) 19%, var(--gray-999) 150%);
+	--gradient-accent: linear-gradient(
+		150deg,
+		var(--gradient-stop-1),
+		var(--gradient-stop-2),
+		var(--gradient-stop-3)
+	);
+	--gradient-accent-orange: linear-gradient(
+		150deg,
+		#ca7879,
+		var(--accent-regular),
+		var(--accent-dark)
+	);
+	--gradient-stroke: linear-gradient(180deg, var(--gray-900), var(--gray-700));
+
+	/* Shadows */
+	--elevation-sm: 0px 6px 3px rgba(9, 11, 17, 0.01), 0px 4px 2px rgba(9, 11, 17, 0.01),
+		0px 2px 2px rgba(9, 11, 17, 0.02), 0px 0px 1px rgba(9, 11, 17, 0.03);
+	--elevation-md: 0px 28px 11px rgba(9, 11, 17, 0.01), 0px 16px 10px rgba(9, 11, 17, 0.03),
+		0px 7px 7px rgba(9, 11, 17, 0.05), 0px 2px 4px rgba(9, 11, 17, 0.06);
+	--elevation-lg: 0px 62px 25px rgba(9, 11, 17, 0.01), 0px 35px 21px rgba(9, 11, 17, 0.05),
+		0px 16px 16px rgba(9, 11, 17, 0.1), 0px 4px 9px rgba(9, 11, 17, 0.12);
+
+	/* Text Sizes */
+	--fs-sm: 0.875rem;
+	--fs-base: 1rem;
+	--fs-md: 1.125rem;
+	--fs-lg: 1.25rem;
+	--fs-xl: 1.625rem;
+	--fs-2xl: 2.125rem;
+	--fs-3xl: 2.625rem;
+	--fs-4xl: 3.5rem;
+	--fs-5xl: 4.5rem;
+
+	/* Fonts */
+	--font-system: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu,
+		Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+	--font-body: 'Public Sans', var(--font-system);
+	--font-brand: Rubik, var(--font-system);
+
+	/* Transitions */
+	--theme-transition: 0.2s ease-in-out;
+
+	/* Semantic status colors (health of a value) */
+	--status-good: #15803d;
+	--status-elevated: #b45309;
+	--status-bad: #b91c1c;
+	--status-good-bg: rgba(21, 128, 61, 0.1);
+	--status-elevated-bg: rgba(180, 83, 9, 0.1);
+	--status-bad-bg: rgba(185, 28, 28, 0.1);
+
+	/* Card / panel surfaces */
+	--surface-bg: #ffffff;
+	--surface-bg-hover: #f7f8fa;
+	--surface-border: rgba(9, 11, 17, 0.08);
+
+	/* Page background accent glow */
+	--page-glow: hsla(280, 89%, 67%, 0.1);
+}
+
+:root.theme-dark {
+	--gray-0: #ffffff;
+	--gray-50: #f3f4f7;
+	--gray-100: #e3e6ee;
+	--gray-200: #c3cadb;
+	--gray-300: #a3acc8;
+	--gray-400: #8490b5;
+	--gray-500: #6474a2;
+	--gray-600: #505d84;
+	--gray-700: #3d4663;
+	--gray-800: #283044;
+	--gray-900: #141925;
+	--gray-999-basis: 225, 31%, 5%;
+	--gray-999: #090b11;
+
+	--accent-light: #1c0056;
+	--accent-regular: #7611a6;
+	--accent-dark: #c561f6;
+	--accent-overlay: hsla(280, 89%, 67%, 0.33);
+	--accent-subtle-overlay: hsla(281, 81%, 36%, 0.33);
+	--accent-text-over: var(--gray-0);
+
+	--link-color: var(--accent-dark);
+
+	--gradient-stop-1: #4c11c6;
+	--gradient-subtle: linear-gradient(150deg, var(--gray-900) 19%, var(--gray-999) 81%);
+	--gradient-accent-orange: linear-gradient(
+		150deg,
+		#ca7879,
+		var(--accent-regular),
+		var(--accent-light)
+	);
+	--gradient-stroke: linear-gradient(180deg, var(--gray-600), var(--gray-800));
+
+	--elevation-sm: 0px 6px 3px rgba(255, 255, 255, 0.01), 0px 4px 2px rgba(255, 255, 255, 0.01),
+		0px 2px 2px rgba(255, 255, 255, 0.02), 0px 0px 1px rgba(255, 255, 255, 0.03);
+	--elevation-md: 0px 28px 11px rgba(255, 255, 255, 0.01), 0px 16px 10px rgba(255, 255, 255, 0.03),
+		0px 7px 7px rgba(255, 255, 255, 0.05), 0px 2px 4px rgba(255, 255, 255, 0.06);
+	--elevation-lg: 0px 62px 25px rgba(255, 255, 255, 0.01), 0px 35px 21px rgba(255, 255, 255, 0.05),
+		0px 16px 16px rgba(255, 255, 255, 0.1), 0px 4px 9px rgba(255, 255, 255, 0.12);
+
+	/* Semantic status colors (health of a value) */
+	--status-good: #4ade80;
+	--status-elevated: #fbbf24;
+	--status-bad: #f87171;
+	--status-good-bg: rgba(74, 222, 128, 0.12);
+	--status-elevated-bg: rgba(251, 191, 36, 0.12);
+	--status-bad-bg: rgba(248, 113, 113, 0.12);
+
+	/* Card / panel surfaces */
+	--surface-bg: #1b1b1f;
+	--surface-bg-hover: #232329;
+	--surface-border: rgba(255, 255, 255, 0.08);
+
+	/* Page background accent glow */
+	--page-glow: hsla(280, 89%, 55%, 0.16);
+}
+
+/* Element defaults. Layered so Tailwind utilities override them, as they did
+   in v3 (where a utility's class selector out-ranked these element selectors). */
+@layer base {
+	html,
+	body {
+		min-height: 100%;
+		overflow-x: hidden;
+	}
+
+	body {
+		background-color: var(--gray-999);
+		color: var(--gray-200);
+		font-family: var(--font-body);
+		-webkit-font-smoothing: antialiased;
+		line-height: 1.5;
+	}
+
+	*,
+	*::after,
+	*::before {
+		box-sizing: border-box;
+		margin: 0;
+	}
+
+	img {
+		max-width: 100%;
+		height: auto;
+	}
+
+	a {
+		color: var(--link-color);
+	}
+
+	h1,
+	h2,
+	h3,
+	h4,
+	h5 {
+		line-height: 1.1;
+		font-family: var(--font-brand);
+		font-weight: 600;
+		color: var(--gray-100);
+	}
+
+	h1 {
+		font-size: var(--fs-5xl);
+	}
+
+	h2 {
+		font-size: var(--fs-4xl);
+	}
+
+	h3 {
+		font-size: var(--fs-3xl);
+	}
+
+	h4 {
+		font-size: var(--fs-2xl);
+	}
+
+	h5 {
+		font-size: var(--fs-xl);
+	}
+}
+
+/* Utilities */
+
+/* Reusable card/panel surface. Themes via CSS vars (flips with .theme-dark). */
+.surface {
+	background-color: var(--surface-bg);
+	border: 1px solid var(--surface-border);
+	border-radius: 0.75rem;
+	box-shadow: var(--elevation-sm);
+}
+
+.surface-hover {
+	transition:
+		box-shadow var(--theme-transition),
+		border-color var(--theme-transition),
+		background-color var(--theme-transition);
+}
+
+.surface-hover:hover {
+	background-color: var(--surface-bg-hover);
+	box-shadow: var(--elevation-md);
+}
+
+/* Health-colored values (applied to the big delay/latency numbers). */
+.value-good {
+	color: var(--status-good);
+}
+.value-elevated {
+	color: var(--status-elevated);
+}
+.value-bad {
+	color: var(--status-bad);
+}
+
+/* Status-page summary chips, tinted by health token. */
+.status-chip {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.4rem;
+	padding: 0.3rem 0.7rem;
+	border-radius: 999rem;
+	font-size: var(--fs-sm);
+	font-weight: 600;
+	line-height: 1;
+	white-space: nowrap;
+}
+.status-chip .chip-dot {
+	width: 0.55rem;
+	height: 0.55rem;
+	border-radius: 999rem;
+	flex: none;
+}
+.status-chip.is-zero {
+	opacity: 0.5;
+}
+.status-chip-good {
+	color: var(--status-good);
+	background-color: var(--status-good-bg);
+}
+.status-chip-good .chip-dot {
+	background-color: var(--status-good);
+}
+.status-chip-elevated {
+	color: var(--status-elevated);
+	background-color: var(--status-elevated-bg);
+}
+.status-chip-elevated .chip-dot {
+	background-color: var(--status-elevated);
+}
+.status-chip-bad {
+	color: var(--status-bad);
+	background-color: var(--status-bad-bg);
+}
+.status-chip-bad .chip-dot {
+	background-color: var(--status-bad);
+}
+
+/* Live-connection pill (id="websocket-conn-status"). Defaults to a muted
+   "connecting/disconnected" look; .websocket-connected flips it green-live. */
+.websocket-conn-pill {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.45rem;
+	padding: 0.3rem 0.75rem;
+	border-radius: 999rem;
+	font-size: var(--fs-sm);
+	font-weight: 600;
+	text-decoration: none;
+	color: var(--status-elevated);
+	background-color: var(--status-elevated-bg);
+	transition:
+		color var(--theme-transition),
+		background-color var(--theme-transition);
+}
+.websocket-conn-pill::before {
+	content: "";
+	width: 0.55rem;
+	height: 0.55rem;
+	border-radius: 999rem;
+	background-color: currentColor;
+	flex: none;
+}
+.websocket-conn-pill.websocket-connected {
+	color: var(--status-good);
+	background-color: var(--status-good-bg);
+}
+.websocket-conn-pill.websocket-connected::before {
+	animation: ws-pulse 1.8s ease-in-out infinite;
+}
+@keyframes ws-pulse {
+	0%,
+	100% {
+		opacity: 1;
+		box-shadow: 0 0 0 0 var(--status-good-bg);
+	}
+	50% {
+		opacity: 0.55;
+		box-shadow: 0 0 0 0.25rem transparent;
+	}
+}
+
+/* Incident callout box — dark-mode aware (replaces light-only red utilities). */
+.incident-box {
+	margin-top: 1rem;
+	padding: 0.75rem;
+	border-radius: 0.5rem;
+	color: var(--status-bad);
+	background-color: var(--status-bad-bg);
+	border: 1px solid var(--status-bad);
+}
+.incident-box .incident-muted {
+	color: inherit;
+	opacity: 0.85;
+}
+
+.sr-only {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	padding: 0;
+	margin: -1px;
+	overflow: hidden;
+	clip: rect(0, 0, 0, 0);
+	white-space: nowrap;
+	border-width: 0;
+}
+
+.wrapper {
+	width: 100%;
+	max-width: 83rem;
+	margin-inline: auto;
+	padding-inline: 1.5rem;
+}
+
+.stack {
+	display: flex;
+	flex-direction: column;
+}
+
+.gap-2 {
+	gap: 0.5rem;
+}
+.gap-4 {
+	gap: 1rem;
+}
+.gap-8 {
+	gap: 2rem;
+}
+.gap-10 {
+	gap: 2.5rem;
+}
+.gap-15 {
+	gap: 3.75rem;
+}
+.gap-20 {
+	gap: 5rem;
+}
+.gap-30 {
+	gap: 7.5rem;
+}
+.gap-48 {
+	gap: 12rem;
+}
+
+@media (min-width: 50em) {
+	.lg\:gap-2 {
+		gap: 0.5rem;
+	}
+	.lg\:gap-4 {
+		gap: 1rem;
+	}
+	.lg\:gap-8 {
+		gap: 2rem;
+	}
+	.lg\:gap-10 {
+		gap: 2.5rem;
+	}
+	.lg\:gap-15 {
+		gap: 3.75rem;
+	}
+	.lg\:gap-20 {
+		gap: 5rem;
+	}
+	.lg\:gap-30 {
+		gap: 7.5rem;
+	}
+	.lg\:gap-48 {
+		gap: 12rem;
+	}
+}
+
+/* Shared page and chart controls. */
+.skip-link { position: fixed; top: .5rem; left: .5rem; z-index: 10001; padding: .75rem 1rem; background: var(--gray-999); color: var(--gray-0); transform: translateY(-200%); }
+.skip-link:focus { transform: translateY(0); }
+:focus-visible { outline: 2px solid var(--accent-regular); outline-offset: 3px; }
+@layer base {
+	main { min-width: 0; }
+	main details > summary { font-size: 1rem; }
+	main details[open] > summary { margin-bottom: .75rem; }
+}
+main select, main input[type="text"], main input[type="search"], main input[type="datetime-local"] { max-width: 100%; border: 1px solid var(--gray-700); border-radius: .5rem; padding: .5rem .75rem; color: var(--gray-100); background: var(--gray-999); }
+:root { --monitor-chart-height: 320px; }
+@media (min-width: 768px) { :root { --monitor-chart-height: 480px; } }
+.chart-state { padding: .75rem; color: var(--gray-300); font-size: .875rem; }
+
+[data-raw] { position: relative; cursor: help; }
+[data-raw]:hover::after, [data-raw]:focus::after { content: attr(data-raw); position: absolute; left: 0; top: 100%; z-index: 20; margin-top: .35rem; padding: .4rem .6rem; border: 1px solid var(--gray-700); border-radius: .4rem; background: var(--gray-999); color: var(--gray-100); font-size: .875rem; font-weight: 400; white-space: nowrap; }
+.chart-state:empty { display: none; }
+
+.chart-legend { display: flex; flex-wrap: wrap; gap: .25rem .75rem; margin: .5rem 0; padding: 0; list-style: none; font-size: .875rem; }
+.chart-legend button { display: inline-flex; align-items: center; gap: .4rem; padding: .35rem .25rem; border: 0; background: transparent; color: var(--gray-200); cursor: pointer; }
+.chart-legend button[aria-pressed="false"] { opacity: .5; text-decoration: line-through; }
+.chart-legend span { width: .6rem; height: .6rem; border-radius: 2px; }

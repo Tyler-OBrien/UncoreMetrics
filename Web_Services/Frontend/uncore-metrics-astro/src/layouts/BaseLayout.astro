@@ -1,0 +1,66 @@
+---
+// Learn about using Astro layouts:
+// https://docs.astro.build/en/core-concepts/layouts/
+
+// Component Imports
+import MainHead from '../components/MainHead.astro';
+import Nav from '../components/Nav.astro';
+import Footer from '../components/Footer.astro';
+
+interface Props {
+	title?: string | undefined;
+	description?: string | undefined;
+}
+
+const { title, description } = Astro.props;
+---
+
+<html lang="en">
+	<head>
+		<MainHead title={title} description={description} />
+	</head>
+	<body>
+		<a class="skip-link" href="#main-content">Skip to content</a>
+		<div class="stack backgrounds">
+			<Nav />
+			<slot />
+			<Footer />
+		</div>
+
+		<script>
+			document.querySelectorAll('iframe[data-src]').forEach((frame) => {
+                const details = frame.closest('details');
+                const load = () => {
+                    if (details?.open && frame instanceof HTMLIFrameElement && frame.dataset.src) {
+                        frame.src = frame.dataset.src;
+                        delete frame.dataset.src;
+                    }
+                };
+                details?.addEventListener('toggle', load);
+                load();
+            });
+			// Add “loaded” class once the document has completely loaded.
+			addEventListener('load', () => document.documentElement.classList.add('loaded'));
+		</script>
+
+		<style>
+			/* Flat base color with a single soft accent glow near the top.
+			   Pure CSS, no image assets. Glow color flips with .theme-dark via --page-glow. */
+			.backgrounds {
+				min-height: 100%;
+				isolation: isolate;
+				background:
+					radial-gradient(70% 55% at 50% -10%, var(--page-glow), transparent 70%)
+						no-repeat,
+					var(--gray-999);
+				background-attachment: fixed, scroll;
+			}
+			@media (forced-colors: active) {
+				/* Deactivate custom backgrounds for high contrast users. */
+				.backgrounds {
+					background: none;
+				}
+			}
+		</style>
+	</body>
+</html>

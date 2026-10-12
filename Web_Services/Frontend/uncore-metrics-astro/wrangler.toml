@@ -1,0 +1,25 @@
+name = "uncore-metrics-website"
+main = "@astrojs/cloudflare/entrypoints/server"
+compatibility_date = "2025-06-19"
+compatibility_flags = [ "nodejs_compat" ]
+# account_id = "<your account id>"  # add before deploying
+
+[vars]
+# The Uncore Metrics REST API. Called server-side only: pages fetch at render time,
+# and the browser's refreshes go through this site's /api proxy, so the API needs
+# no CORS handling for this site.
+#
+# These vars are loaded by `astro dev` too, so set UNCORE_API_URL in .env to point
+# dev at a local API (see .env.example).
+UNCORE_API_URL = "https://api.uncore.app"
+
+[assets]
+binding = "ASSETS"
+directory = "./dist/client"
+
+[observability]
+enabled = true
+
+[observability.logs]
+enabled = true
+head_sampling_rate = 1
