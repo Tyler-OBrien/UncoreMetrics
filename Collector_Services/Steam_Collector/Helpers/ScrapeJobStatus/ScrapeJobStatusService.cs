@@ -15,6 +15,9 @@ public class ScrapeJobStatusService : IScrapeJobStatusService
     private readonly ServersContext _genericServersContext;
     private readonly ILogger _logger;
 
+    // The job row (one per game and node). Looked up once per run, then updated in place.
+    private ScrapeJob? _trackedJob;
+
 
     public ScrapeJobStatusService(
         IOptions<SteamCollectorConfiguration> baseConfiguration, ServersContext serversContext,
@@ -53,16 +56,17 @@ public class ScrapeJobStatusService : IScrapeJobStatusService
     private async Task UpdateStatus(ScrapeJob job, CancellationToken token)
     {
 
-        var tryFind = await _genericServersContext.ScrapeJobs.FirstOrDefaultAsync(currentJob => currentJob.InternalId == job.InternalId, token);
-        if (tryFind != null)
+        _trackedJob ??= await _genericServersContext.ScrapeJobs.FirstOrDefaultAsync(currentJob => currentJob.InternalId == job.InternalId, token);
+        if (_trackedJob != null)
         {
-            tryFind.Copy(job);
-            await _genericServersContext.SaveChangesAsync(token);
+            _trackedJob.Copy(job);
         }
         else
         {
             await _genericServersContext.ScrapeJobs.AddAsync(job, token);
-            await _genericServersContext.SaveChangesAsync(token);
+            _trackedJob = job;
         }
+
+        await _genericServersContext.SaveChangesAsync(token);
     }
 }

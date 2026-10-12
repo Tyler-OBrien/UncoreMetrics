@@ -108,9 +108,12 @@ public partial class SteamServers : ISteamServers
             if (delayCount % StatusLogIntervalSeconds == 0)
                 LogStatus(pool, servers.Count, queue.Completed, queue.Failed, queue.Successful, maxConcurrency,
                     queue.Running);
-            var scrapeJobUpdate = _scrapeJobStatusService.UpdateStatus(
-                (int)Math.Round(queue.Completed / (double)servers.Count * 100), queue.Completed, servers.Count,
-                runType, cancellationTokenSource.Token);
+            // Progress for the website's jobs page, which refreshes every 5 seconds
+            var scrapeJobUpdate = delayCount % StatusWriteIntervalSeconds == 0
+                ? _scrapeJobStatusService.UpdateStatus(
+                    (int)Math.Round(queue.Completed / (double)servers.Count * 100), queue.Completed, servers.Count,
+                    runType, cancellationTokenSource.Token)
+                : Task.CompletedTask;
             await Task.WhenAll(Task.Delay(1000, cancellationTokenSource.Token), scrapeJobUpdate);
             delayCount++;
         }
