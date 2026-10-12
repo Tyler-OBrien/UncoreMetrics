@@ -140,7 +140,7 @@ const iconLinks: { label: string; href: string; icon: keyof typeof iconPaths }[]
 			};
 
 			// Toggle menu visibility when the menu button is clicked.
-			btn.addEventListener('click', () => setExpanded(menu.hidden));
+			btn.addEventListener('click', () => setExpanded(Boolean(menu.hidden)));
             document.addEventListener('keydown', (event) => {
                 if (event.key === 'Escape' && !btn.hidden && !menu.hidden) {
                     setExpanded(false);

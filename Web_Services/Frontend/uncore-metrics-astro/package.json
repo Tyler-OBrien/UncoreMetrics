@@ -15,13 +15,13 @@
     "@astrojs/cloudflare": "^14.3.4",
     "@astrojs/preact": "^6.0.6",
     "@tailwindcss/vite": "^4.3.3",
-    "astro": "^7.3.7",
-    "plotly.js-basic-dist-min": "^3.0.1",
-    "preact": "^10.25.4",
+    "astro": "^7.3.8",
+    "plotly.js-basic-dist-min": "^4.1.2",
+    "preact": "^10.29.8",
     "tailwindcss": "^4.3.3",
-    "typescript": "^5.5.3"
+    "typescript": "^6.0.3"
   },
   "devDependencies": {
-    "wrangler": "^4.148.0"
+    "wrangler": "^4.149.0"
   }
 }
