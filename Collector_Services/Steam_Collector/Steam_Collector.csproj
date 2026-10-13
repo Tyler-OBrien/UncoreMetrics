@@ -18,8 +18,8 @@
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.23.0" />
     <PackageReference Include="NATS.Client" Version="1.1.8" />
     <PackageReference Include="Okolni.Source.Query.Pool" Version="1.6.0" />
-    <PackageReference Include="Sentry" Version="6.12.0" />
-    <PackageReference Include="Sentry.AspNetCore" Version="6.12.0" />
+    <PackageReference Include="Sentry" Version="6.12.1" />
+    <PackageReference Include="Sentry.AspNetCore" Version="6.12.1" />
     <PackageReference Include="Serilog" Version="4.4.0" />
     <PackageReference Include="Serilog.Extensions.Hosting" Version="10.0.0" />
     <PackageReference Include="Serilog.Sinks.Async" Version="2.1.0" />
