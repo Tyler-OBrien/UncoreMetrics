@@ -13,17 +13,17 @@
   },
   "dependencies": {
     "@astrojs/check": "^0.9.10",
-    "@astrojs/cloudflare": "^14.3.4",
-    "@astrojs/preact": "^6.0.6",
+    "@astrojs/cloudflare": "^14.4.0",
+    "@astrojs/preact": "^6.1.0",
     "@tailwindcss/vite": "^4.3.3",
-    "astro": "^7.3.8",
+    "astro": "^7.4.0",
     "plotly.js-basic-dist-min": "^4.1.2",
     "preact": "^10.29.8",
     "tailwindcss": "^4.3.3",
     "typescript": "^6.0.3"
   },
   "devDependencies": {
-    "vitest": "^5.0.3",
-    "wrangler": "^4.149.0"
+    "vitest": "^5.0.5",
+    "wrangler": "^4.151.1"
   }
 }
